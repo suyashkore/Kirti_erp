@@ -1,0 +1,3336 @@
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php init_head(); ?>
+<div id="wrapper" style="min-height:1px">
+	<div class="content">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel_s">
+					<div class="panel-body">
+						<style>
+							@media (max-width: 767px) {
+								.mobile-menu-btn {
+									display: block !important;
+									margin-bottom: 10px;
+									width: 100%;
+									text-align: left;
+								}
+
+								.custombreadcrumb {
+									display: none !important;
+								}
+
+								.custombreadcrumb.open {
+									display: block !important;
+								}
+
+								.custombreadcrumb li {
+									display: block;
+									padding: 8px 10px;
+									border-bottom: 1px solid #eee;
+								}
+
+								.custombreadcrumb li a {
+									display: block;
+								}
+
+								.custombreadcrumb li+li:before {
+									content: none;
+								}
+							}
+
+							.mobile-menu-btn {
+								display: none;
+							}
+						</style>
+						<button class="btn btn-default mobile-menu-btn"
+							onclick="$('.custombreadcrumb').toggleClass('open')">
+							<i class="fa fa-bars"></i> Menu
+						</button>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb custombreadcrumb"
+								style="background-color:#fff !important; margin-Bottom:0px !important; display: flex; flex-wrap: wrap;">
+								<li class="breadcrumb-item"><a href="<?= admin_url(); ?>"><b><i
+												class="fa fa-home fa-fw fa-lg"></i></b></a></li>
+								<li class="breadcrumb-item active text-capitalize"><b>Master</b></li>
+								<li class="breadcrumb-item active" aria-current="page"><b>Transporter Master</b></li>
+							</ol>
+						</nav>
+						<hr class="hr_style">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="searchh2" style="display:none;">Please wait while fetching data.</div>
+								<div class="searchh3" style="display:none;">Please wait while creating new record.</div>
+								</style>
+							</div>
+						</div>
+
+						<!-- Top Fields - Main Information -->
+						<div class="row">
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Transporter
+										Category</label>
+									<select class="selectpicker form-control" id="groups_in"
+										data-none-selected-text="None selected" name="groups_in" data-width="100%"
+										data-live-search="true" title="Select Customer Category">
+										<option value=""></option>
+										<?php foreach ($gettransportergroups as $key => $value) { ?>
+											<option
+												value="<?php echo $value['SubActGroupID']; ?>"
+												data-shortcode="<?php echo $value['ShortCode']; ?>">
+												<?php echo $value['SubActGroupName']; ?>
+											</option>
+										<?php } ?>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<input type="hidden" id="HiddenTransporterCode" name="HiddenTransporterCode">
+									<label class="control-label"><small class="req text-danger">* </small>Transporter Code</label>
+									<input type="text" class="form-control" id="AccountID" name="AccountID" readonly>
+
+									<input type="hidden" name="SubActGroupID" value="" id="SubActGroupID">
+									<input type="hidden" name="SubActGroupID1" value="" id="SubActGroupID1">
+									<input type="hidden" name="ActGroupID" value="" id="ActGroupID">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Transporter Name</label>
+									<input type="text" class="form-control" id="AccoountName" name="AccoountName"
+										readonly>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Favouring Name</label>
+									<input type="text" class="form-control" id="FavouringName" name="FavouringName" value="">
+								</div>
+							</div>
+						</div>
+						<!-- BILLING INFORMATION SECTION -->
+						<div class="row">
+							<div class="col-md-12">
+								<h4 class="bold p_style">Billing Information</h4>
+								<hr class="hr_style">
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>PAN No</label>
+									<input type="text" class="form-control" id="Pan" name="Pan"
+										style="text-transform:uppercase;" pattern="[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}"
+										maxlength="10" minlength="10" required>
+									<span class="pan_denger" style="color:red;"></span>
+									<!-- <small class="form-text text-muted">Format: AAAAA0000A</small> -->
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>GSTIN</label>
+									<span class="gst_denger" style="color:red;"></span>
+									<input type="text" class="form-control" id="vat" name="vat"
+										pattern="([0-9]){2}([A-Za-z]){5}([0-9]){4}([A-Za-z]){1}([0-9]{1})([0-9A-Za-z]){2}"
+										maxlength="15" minlength="15" onchange="verifyGSTIN()" required>
+									<!-- <span class="gst_denger" style="color:red;"></span> -->
+									<!-- <small class="form-text text-muted">15 digit GST number</small> -->
+								</div>
+							</div>
+
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Country</label>
+									<select class="selectpicker form-control" id="country" name="country"
+										data-width="100%" data-live-search="true" required>
+										<option value="India" selected>India</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Pincode</label>
+									<input type="text" class="form-control" id="zip" name="zip"
+										onkeypress="return isNumber(event)" maxlength="6" minlength="6"
+										pattern="[0-9]{6}" required>
+									<!-- <small class="form-text text-muted">6 digit pincode</small> -->
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>State</label>
+									<select class="selectpicker form-control" id="state" name="state" data-width="100%"
+										data-live-search="true" data-none-selected-text="None selected" required>
+										<option value=""></option>
+										<?php foreach ($state as $st) { ?>
+											<option value="<?php echo $st['short_name']; ?>">
+												<?php echo $st['state_name']; ?>
+											</option>
+										<?php } ?>
+									</select>
+									<input type="hidden" name="hiddenState" id="hiddenState" value="">
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>City</label>
+									<select class="selectpicker form-control" id="city" name="city" data-width="100%"
+										data-live-search="true" data-none-selected-text="None selected" required>
+										<option value=""></option>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Mobile</label>
+									<input type="text" class="form-control" id="phonenumber" name="phonenumber"
+										onkeypress="return isNumber(event)" maxlength="10" minlength="10"
+										pattern="[0-9]{10}" required>
+									<!-- <small class="form-text text-muted">10 digit mobile number</small> -->
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">Alternate Mobile</label>
+									<input type="text" class="form-control" id="altphonenumber" name="altphonenumber"
+										onkeypress="return isNumber(event)" maxlength="10" minlength="10"
+										pattern="[0-9]{10}">
+									<!-- <small class="form-text text-muted">10 digit mobile number</small> -->
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label"><small class="req text-danger">* </small>Email</label>
+									<input type="email" class="form-control" id="email" name="email"
+										pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" required>
+									<span class="email_error" style="color:red;"></span>
+									<!-- <small class="form-text text-muted">Valid email address required</small> -->
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">TDS</label>
+									<select class="selectpicker" id="Tds" name="Tds" data-width="100%">
+										<option value="">Non Selected</option>
+										<option value="1">Yes</option>
+										<option value="0">No</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-2" id="TdsSec" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">TDS Section</label>
+									<select class="selectpicker" id="Tdsselection" name="Tdsselection"
+										data-width="100%">
+										<option value="">Non Selected</option>
+										<?php if (isset($Tdssection)) {
+											foreach ($Tdssection as $w): ?>
+												<option value="<?= $w['TDSCode'] ?>"><?= $w['TDSName'] ?></option>
+										<?php endforeach;
+										} ?>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-2" id="TdsPercent1" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">TDS Rate (%)</label>
+									<select class="selectpicker" id="TdsPercent" name="TdsPercent" data-width="100%">
+										<option value="">Non Selected</option>
+									</select>
+								</div>
+							</div>
+							<div class="clearfix"></div>
+
+							<div class="col-md-4">
+								<div class="form-group">
+									<label class="control-label">Address</label>
+									<textarea class="form-control" id="address" name="address" rows="2"></textarea>
+								</div>
+							</div>
+
+
+						</div>
+						<!-- Contact Details Section -->
+						<div class="row">
+							<div class="col-md-12">
+								<h4 class="bold p_style">Contact Details</h4>
+								<hr class="hr_style">
+								<div class="table-responsive">
+									<table class="table table-bordered" id="contactTable">
+										<thead>
+											<tr>
+												<th>Name</th>
+												<th>Designation</th>
+												<th><span class="text-danger">* </span>Mobile Number</th>
+												<th><span class="text-danger">* </span>Email</th>
+												<th>Send SMS</th>
+												<th>Send Email</th>
+												<th>Action</th>
+											</tr>
+										</thead>
+										<tbody id="contacttbody">
+											<tr>
+												<td><input type="text" id="cp_name" class="form-control cp_name_input">
+												</td>
+												<td>
+													<select class="selectpicker cp_designation_input" id="cp_designation" name="cp_designation"
+														data-width="100%" data-container="body">
+														<option value="">None Selected</option>
+														<?php foreach ($position as $key => $value) { ?>
+															<option value="<?php echo $value['position_id']; ?>">
+																<?php echo $value['position_name']; ?>
+															</option>
+														<?php } ?>
+													</select>
+												</td>
+												<td><input type="text" id="cp_mobile"
+														class="form-control cp_mobile_input" maxlength="10"
+														minlength="10" pattern="[0-9]{10}"
+														onkeypress="return isNumber(event)" required
+														title="10 digit mobile number required"></td>
+												<td><input type="email" id="cp_email"
+														class="form-control cp_email_input"
+														pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+														required title="Valid email address required"></td>
+												<td class="text-center"><input type="checkbox" id="cp_send_sms"
+														class="cp_sms_checkbox"><label></label></td>
+												<td class="text-center"><input type="checkbox" id="cp_send_email"
+														class="cp_email_checkbox"><label></label></td>
+												<td><button type="button" class="btn btn-success"
+														onclick="addContactRow()"><i class="fa fa-plus"></i></button>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<!-- <small class="form-text text-muted">
+										<strong>Note:</strong> Mobile Number and Email are required. Phone Number is optional. At least one of "Send SMS" or "Send Email" must be selected.
+									</small> -->
+							</div>
+						</div>
+
+						<!-- Banking & Payment / Other Information -->
+						<div class="row">
+							<div class="col-md-12">
+								<h4 class="bold p_style">Credit / Payment Bank Information</h4>
+								<hr class="hr_style">
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">Is Bank Detail</label>
+									<select name="is_bank_detail" id="is_bank_detail" class="form-control selectpicker"
+										data-live-search="true" data-none-selected-text="None selected">
+										<option value="0" selected>No</option>
+										<option value="1">Yes</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-md-2 bank_detail_section" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">IFSC Code</label>
+									<input type="text" name="ifsc_code" id="ifsc_code" class="form-control"
+										maxlength="11">
+								</div>
+							</div>
+
+							<div class="col-md-2 bank_detail_section" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">Bank Name</label>
+									<input type="text" name="bank_name" id="bank_name" class="form-control" readonly>
+								</div>
+							</div>
+
+							<div class="col-md-2 bank_detail_section" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">Branch Name</label>
+									<input type="text" name="branch_name" id="branch_name" class="form-control"
+										readonly>
+								</div>
+							</div>
+
+							<div class="col-md-2 bank_detail_section" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">Bank Address</label>
+									<input type="text" name="bank_address" id="bank_address" class="form-control"
+										readonly>
+								</div>
+							</div>
+
+							<div class="col-md-2 bank_detail_section" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">Account Number</label>
+									<input type="text" name="account_number" id="account_number" class="form-control">
+								</div>
+							</div>
+
+							<div class="col-md-2 bank_detail_section" style="display:none;">
+								<div class="form-group">
+									<label class="control-label">Account Holder Name</label>
+									<input type="text" name="account_holder_name" id="account_holder_name"
+										class="form-control" readonly>
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label class="control-label">Is Active</label>
+									<select name="IsActive" id="IsActive" class="form-control selectpicker"
+										data-live-search="true">
+										<option value="Y">Yes</option>
+										<option value="N">No</option>
+									</select>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group" id='BlockedReasonDiv'>
+									<label class="control-label"><span class="text-danger">* </span>Blocked Reason</label>
+									<textarea name="blocked_reason" id="blocked_reason" class="form-control" rows="1"></textarea>
+								</div>
+							</div>
+							<div class="clearfix"></div>
+
+							<!-- Middle Section -->
+							<div class="col-md-3">
+								<table class="table" id="person_table">
+									<thead>
+										<tr>
+											<th>State</th>
+											<th class="checkbox-col">
+												<input type="checkbox" id="select_all_persons" />
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php foreach ($state as $st) { ?>
+											<tr>
+												<td><?php echo $st['state_name']; ?></td>
+												<td class="checkbox-col">
+													<input type="checkbox" name="person_check[]" value="<?php echo $st['short_name']; ?>">
+												</td>
+											</tr> <?php } ?>
+									</tbody>
+								</table>
+							</div>
+
+
+							<!-- RIGHT: File Attachments -->
+							<div class="col-md-9">
+								<h4 class="bold">File Attachments</h4>
+								<hr class="hr_style">
+								<div class="row">
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>PAN Card</label>
+											<input type="file" name="PANCard" id="PANCard" class="form-control" data-field-type="PANCard">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>Aadhar Card</label>
+											<input type="file" name="Aadhar" id="Aadhar" class="form-control" data-field-type="Aadhar">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>Transport Permit</label>
+											<input type="file" name="Permit" id="Permit" class="form-control" data-field-type="Permit">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>Owner Photograph</label>
+											<input type="file" name="Photo" id="Photo" class="form-control" data-field-type="Photo">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>GST Certificate</label>
+											<input type="file" name="GST" id="GST" class="form-control" data-field-type="GST">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>Shop Act</label>
+											<input type="file" name="ShopAct" class="form-control" data-field-type="ShopAct">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>Cancel Cheque</label>
+											<input type="file" name="Cheque" id="Cheque" class="form-control" data-field-type="Cheque">
+										</div>
+									</div>
+
+									<div class="col-md-4">
+										<div class="form-group">
+											<label>Address Proof</label>
+											<input type="file" name="AddressProof" id="AddressProof" class="form-control" data-field-type="AddressProof">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="clearfix"></div>
+						<br>
+						<div class="col-md-12">
+							<!-- <span id="updateWarning"
+								class="text-warning"
+								style="display:none; font-size:13px; margin-bottom:6px;">
+								⚠ This record is locked and cannot be updated.
+							</span> -->
+						</div>
+						<br><br>
+						<div class="col-md-12 sticky-actions">
+							<div class="action-buttons text-right">
+								<?php if (has_permission('transporter', '', 'create')) {
+								?>
+									<button type="button" class="btn btn-success btn-group-custom saveBtn"><i class="fa fa-save"></i> Save</button>
+								<?php
+								} else {
+								?>
+									<button type="button" class="btn btn-success btn-group-custom saveBtn2 disabled"><i class="fa fa-save"></i> Save</button>
+								<?php
+								} ?>
+
+								<?php if (has_permission('transporter', '', 'edit')) {
+								?>
+									<button type="button" class="btn btn-success btn-group-custom updateBtn"><i class="fa fa-save"></i> Update</button>
+								<?php
+								} else {
+								?>
+									<button type="button" class="btn btn-success btn-group-custom updateBtn2 disabled"><i class="fa fa-save"></i> Update</button>
+								<?php
+								} ?>
+
+
+
+								<button type="reset" class="btn btn-warning cancelBtn">
+									<i class="fa fa-refresh"></i> Reset
+								</button>
+
+								<button type="button" class="btn btn-info showAllBtn" id="btnShowItemDivisionList">
+									<i class="fa fa-list"></i> Show List
+								</button>
+							</div>
+						</div>
+
+					</div>
+
+					<div class="clearfix"></div>
+					<!-- Iteme List Model-->
+
+					<div class="modal fade Account_List" id="Account_List" tabindex="-1" role="dialog"
+						data-keyboard="false" data-backdrop="static">
+						<div class="modal-dialog modal-lg" role="document">
+							<div class="modal-content">
+								<div class="modal-header" style="padding:5px 10px;">
+									<button type="button" class="close" data-dismiss="modal"
+										aria-label="Close"><span aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title">Transporter List</h4>
+								</div>
+								<div class="modal-body" style="padding:0px 5px !important">
+
+									<div class="table-Account_List tableFixHead2">
+										<table
+											class="tree table table-striped table-bordered table-Account_List tableFixHead2"
+											id="table_Account_List" width="100%">
+											<thead>
+												<tr>
+													<th style="text-align:left;" class="sortablePop">Transporter Code</th>
+													<th style="text-align:left;" class="sortablePop">Transporter Name</th>
+													<th style="text-align:left;" class="sortablePop">Favouring Name</th>
+													<th style="text-align:left;" class="sortablePop">PAN NO</th>
+													<th style="text-align:left;" class="sortablePop">GSTIN</th>
+													<th style="text-align:left;" class="sortablePop">Is Active</th>
+												</tr>
+											</thead>
+											<tbody id="customertlistbody">
+
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<div class="modal-footer" style="padding:0px;">
+									<input type="text" id="myInput1" onkeyup="myFunction2()"
+										placeholder="Search for names.." title="Type in a name"
+										style="float: left;width: 100%;">
+								</div>
+							</div>
+							<!-- /.modal-content -->
+						</div>
+						<!-- /.modal-dialog -->
+					</div>
+					<!-- /.modal -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+<?php init_tail(); ?>
+
+<script>
+	// Initialize position data for dynamic row creation
+	var positionData = <?php echo json_encode($position); ?>;
+
+	function getPositionOptions(selectedPosition = '') {
+		let html = '<option value=""></option>';
+		let selectedId = '';
+		let selectedName = '';
+
+		if (selectedPosition) {
+			// selectedPosition can be either id or name; find matching record
+			positionData.forEach(function(pos) {
+				if (pos.position_id == selectedPosition || pos.position_name == selectedPosition) {
+					selectedId = pos.position_id;
+					selectedName = pos.position_name;
+				}
+			});
+
+			if (selectedId) {
+				html = '<option value="' + selectedId + '" selected>' + selectedName + '</option>' + html;
+			}
+		}
+
+		// Add all positions (skip already-added selectedId)
+		positionData.forEach(function(pos) {
+			if (pos.position_id != selectedId) {
+				html += '<option value="' + pos.position_id + '">' + pos.position_name + '</option>';
+			}
+		});
+		return html;
+	}
+
+	// Populate Contact Details table from GST response (promoters & principal contact)
+	function populateContactTableFromGSTData(apiResponse) {
+		if (!apiResponse || !apiResponse.data || !apiResponse.data.details) return;
+		let details = apiResponse.data.details;
+		let promoters = details.promoters || [];
+		let contactPrincipal = (details.contact_details && details.contact_details.principal) ? details.contact_details
+			.principal : {};
+		let email = contactPrincipal.email || apiResponse.data.email || '';
+		let rawMobile = contactPrincipal.mobile || apiResponse.data.mobile || '';
+		let mobile = rawMobile ? rawMobile.replace(/\D/g, '').slice(-10) : '';
+
+		// Remove existing added contact rows and clear inputs
+		$("#contacttbody tr.addedtr_contact").remove();
+		$("#cp_name").val('');
+		$("#cp_designation").val('');
+		$("#cp_mobile").val('');
+		$("#cp_email").val('');
+		$("#cp_send_email").prop('checked', false);
+		$("#cp_send_sms").prop('checked', false);
+
+		function esc(s) {
+			return s ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, "&#39;")
+				.replace(/\"/g, '&quot;') : '';
+		}
+
+		promoters.forEach(function(name) {
+			name = name ? name.toString().trim() : '';
+			if (!name) return;
+			let sendEmailChecked = email ? 'checked' : '';
+			let sendSMSChecked = mobile ? 'checked' : '';
+			var newRow = $("<tr class='addedtr_contact'></tr>");
+			newRow.append("<td><input type='text' name='cp_name[]' class='form-control' value='" + esc(name) +
+				"'></td>");
+			newRow.append("<td><select class='selectpicker form-control cp_designation_input' name='cp_designation[]' data-width='100%' data-container='body'>" + getPositionOptions() + "</select></td>");
+			newRow.append("<td><input type='text' name='cp_mobile[]' class='form-control' value='" + esc(
+					mobile) +
+				"' maxlength='10' minlength='10' pattern='[0-9]{10}' onkeypress='return isNumber(event)' required></td>"
+			);
+			newRow.append("<td><input type='email' name='cp_email[]' class='form-control' value='" + esc(
+				email) + "' pattern='[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' required></td>");
+			newRow.append(
+				"<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_sms[]' " +
+				(sendSMSChecked ? '' : '') + "><label></label></div></td>");
+			newRow.append(
+				"<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_email[]' " +
+				(sendEmailChecked ? '' : '') + "><label></label></div></td>");
+			newRow.append(
+				"<td><a href='#' class='btn btn-danger removebtn_contact'><i class='fa fa-times'></i></a></td>"
+			);
+			$("#contacttbody").append(newRow);
+			newRow.find('.selectpicker').selectpicker();
+			newRow.find('.selectpicker').selectpicker('refresh');
+		});
+
+		// If no promoters present, add principal as a contact row so user sees it
+		if (promoters.length === 0 && (email || mobile)) {
+			var principalRow = $("<tr class='addedtr_contact'></tr>");
+			principalRow.append("<td><input type='text' name='cp_name[]' class='form-control' value='Principal'></td>");
+			principalRow.append("<td><select class='selectpicker form-control cp_designation_input' name='cp_designation[]' data-width='100%' data-container='body'>" + getPositionOptions() + "</select></td>");
+			principalRow.append("<td><input type='text' name='cp_mobile[]' class='form-control' value='" + esc(mobile) +
+				"' maxlength='10' minlength='10' pattern='[0-9]{10}' onkeypress='return isNumber(event)' required></td>"
+			);
+			principalRow.append("<td><input type='email' name='cp_email[]' class='form-control' value='" + esc(email) +
+				"' pattern='[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' required></td>");
+			principalRow.append(
+				"<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_sms[]' " + (
+					mobile ? '' : '') + "><label></label></div></td>");
+			principalRow.append(
+				"<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_email[]' " + (
+					email ? '' : '') + "><label></label></div></td>");
+			principalRow.append(
+				"<td><a href='#' class='btn btn-danger removebtn_contact'><i class='fa fa-times'></i></a></td>");
+			$("#contacttbody").append(principalRow);
+			principalRow.find('.selectpicker').selectpicker();
+			principalRow.find('.selectpicker').selectpicker('refresh');
+		}
+	}
+
+	function isNumber(evt) {
+		evt = (evt) ? evt : window.event;
+		var charCode = (evt.which) ? evt.which : evt.keyCode;
+		if (charCode != 46 && charCode > 31 &&
+			(charCode < 48 || charCode > 57)) {
+			return false;
+		}
+		return true;
+	}
+
+	function toggleBlockedReason() {
+		let IsActive = $('#IsActive').val();
+
+		if (IsActive === 'N') {
+			// IsActive = No → SHOW blocked reason
+			$('#BlockedReasonDiv').show();
+			$('#BlockedReason').prop('required', true);
+		} else {
+			// IsActive = Yes → HIDE blocked reason
+			$('#BlockedReasonDiv').hide();
+			$('#BlockedReason').prop('required', false).val('');
+		}
+	}
+
+	function toggleBankSection() {
+		let bankVal = $('#is_bank_detail').val();
+
+		if (bankVal === '1') {
+			$('.bank_detail_section').show();
+		} else {
+			$('.bank_detail_section').hide();
+		}
+	}
+
+	$(document).ready(function() {
+
+		$('.updateBtn').hide();
+		$('.updateBtn2').hide();
+		// $("#AccountID").dblclick(function() {
+		//     $('#Account_List').modal('show');
+		//     $('#Account_List').on('shown.bs.modal', function() {
+		//         $('#myInput1').focus();
+		//     })
+		// });
+
+
+		toggleBlockedReason();
+		$('#IsActive').on('changed.bs.select change', function() {
+			toggleBlockedReason();
+		});
+
+		toggleBankSection();
+		$('#is_bank_detail').on('changed.bs.select change', function() {
+			toggleBankSection();
+		});
+
+
+
+
+		// Handle filter dropdowns outside table
+		$('#filter_state').on('change', function() {
+			var StateID = $(this).val();
+			var url = "<?php echo base_url(); ?>admin/clients/GetCity";
+			if (StateID !== '') {
+				jQuery.ajax({
+					type: 'POST',
+					url: url,
+					data: {
+						StateID: StateID
+					},
+					dataType: 'json',
+					success: function(data) {
+						$("#filter_city").find('option').remove();
+						$("#filter_city").append(new Option('None selected', ""));
+						for (var i = 0; i < data.length; i++) {
+							$("#filter_city").append(new Option(data[i].city_name, data[i]
+								.id));
+						}
+						$('#filter_city').selectpicker('refresh');
+					}
+				});
+			} else {
+				$("#filter_city").find('option').remove();
+				$("#filter_city").append(new Option('None selected', ""));
+				$('#filter_city').selectpicker('refresh');
+			}
+		});
+
+		function getSubGroupsByMain(Tdsselection) {
+			$.ajax({
+				url: "<?php echo admin_url(); ?>clients/gettdspercent",
+				dataType: "JSON",
+				method: "POST",
+				data: {
+					Tdsselection: Tdsselection
+				},
+				beforeSend: function() {
+					$('.searchh2').css('display', 'block').css('color', 'blue');
+				},
+				complete: function() {
+					$('.searchh2').css('display', 'none');
+				},
+				success: function(data) {
+					$('#TdsPercent').empty();
+
+
+					if (data && data.length > 0) {
+						$('#TdsPercent').append('<option value="">Non Selected</option>');
+						$.each(data, function(index, item) {
+							$('#TdsPercent').append('<option value="' + item.rate + '">' +
+								item.rate + '</option>');
+						});
+					} else {
+						$('#TdsPercent').append('<option value="">Non Selected</option>');
+					}
+					$('.selectpicker').selectpicker('refresh');
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.log("AJAX Error:", textStatus, errorThrown);
+				}
+			});
+		}
+		$('#Tdsselection').on('change', function() {
+			var Tdsselection = $(this).val();
+			getSubGroupsByMain(Tdsselection);
+		});
+
+		function checkTds() {
+			if ($('#Tds').val() === "1") {
+				$('#TdsPercent1').show();
+				$('#TdsSec').show();
+			} else {
+				$('#TdsPercent1').hide();
+				$('#TdsSec').hide();
+			}
+		}
+		$('#Tds').on('change', function() {
+			checkTds();
+		});
+
+		// Bank Detail Show/Hide
+		function checkBankDetail() {
+			if ($('#is_bank_detail').val() === "1") {
+				$('.bank_detail_section').show();
+			} else {
+				$('.bank_detail_section').hide();
+			}
+		}
+		$('#is_bank_detail').on('change', function() {
+			checkBankDetail();
+		});
+
+		// Is Active - Blocked Reason Show/Hide
+		function checkBlockedReason() {
+			// Clear all existing rows and rebuild from GSTIN data
+			// $('#locationtbody').empty();
+
+			if (gstinData && gstinData.details && gstinData.details.contact_details && gstinData.details
+				.contact_details.additional) {
+				let additionalContacts = gstinData.details.contact_details.additional;
+
+				additionalContacts.forEach(function(location) {
+					let fullAddress = location.address || '';
+					let mobileRaw = location.mobile || '';
+					let mobile = mobileRaw.replace(/\D/g, '').slice(-10);
+
+					let addressParts = fullAddress ? fullAddress.split(',').map(part => part.trim()) : [];
+					let pincode = '';
+					let state = '';
+					let city = '';
+
+					// Extract pincode if present as last token
+					if (addressParts.length > 0) {
+						let last = addressParts[addressParts.length - 1];
+						if (/^\d{6}$/.test(last)) {
+							pincode = last;
+							addressParts.pop();
+						}
+					}
+
+					// Extract state and city if present
+					if (addressParts.length > 0) {
+						state = addressParts[addressParts.length - 1];
+						addressParts.pop();
+					}
+					if (addressParts.length > 0) {
+						city = addressParts[addressParts.length - 1];
+						addressParts.pop();
+					}
+
+					let addressWithoutPinStateCity = addressParts.join(', ');
+
+
+				});
+			}
+			$('.selectpicker').selectpicker('refresh');
+
+			if (data.Tds == "1") {
+				$('#TdsPercent1').show();
+				$('#TdsSec').show();
+				$('select[name=Tds]').val(data.Tds);
+				$('.selectpicker').selectpicker('refresh');
+				$('select[name=Tdsselection]').val(data.Tdsselection);
+				$('.selectpicker').selectpicker('refresh');
+
+				$.ajax({
+					url: "<?php echo admin_url(); ?>clients/gettdspercent",
+					dataType: "JSON",
+					method: "POST",
+					data: {
+						Tdsselection: data.Tdsselection
+					},
+					success: function(res) {
+						$('#TdsPercent').empty();
+						$('#TdsPercent').append('<option value="">Non Selected</option>');
+						$.each(res, function(index, item) {
+							$('#TdsPercent').append('<option value="' + item.rate + '">' +
+								item.rate + '</option>');
+						});
+						$('select[name=TdsPercent]').val(data.TdsPercent);
+						$('.selectpicker').selectpicker('refresh');
+					}
+				});
+			} else {
+				$('#TdsPercent1').hide();
+				$('#TdsSec').hide();
+				$('select[name=Tds]').val('0');
+			}
+
+			$('#city').selectpicker('val', data.city);
+			$('.selectpicker').selectpicker('refresh');
+
+			// Prefer ActSubGroupID2 (actual stored subgroup) falling back to DistributorType
+			var groupsVal = data.ActSubGroupID2 || data.DistributorType || '';
+			// Set using selectpicker API so the UI updates correctly on keyboard/tab events
+			$('#groups_in').selectpicker('val', groupsVal);
+			// Populate hidden SubActGroupID for downstream logic (if exists in payload)
+			if (typeof data.ActSubGroupID2 !== 'undefined' && data.ActSubGroupID2) {
+				$('#SubActGroupID').val(data.ActSubGroupID2);
+			}
+			if (typeof data.SubActGroupID1 !== 'undefined' && data.SubActGroupID1) {
+				$('#SubActGroupID1').val(data.SubActGroupID1);
+			}
+			if (typeof data.ActMainGroupID !== 'undefined' && data.ActMainGroupID) {
+				$('#ActGroupID').val(data.ActMainGroupID);
+			}
+			// Make transporter category readonly in edit mode
+			$('#groups_in').prop('disabled', true);
+			$('.selectpicker').selectpicker('refresh');
+
+			$('select[name=state]').val(data.state);
+			$('.selectpicker').selectpicker('refresh');
+			$("#hiddenState").val(data.state);
+
+			<?php
+			if (has_permission_new('openingbaledit', '', 'edit')) {
+			?>
+				var is_accessable = 1;
+			<?php
+			} else {
+			?>
+				var is_accessable = 0;
+			<?php
+			}
+			?>
+			if (is_accessable == "0") {}
+
+			$('select[name=is_bank_detail]').val(data.is_bank_detail);
+			checkBankDetail();
+			$('.selectpicker').selectpicker('refresh');
+
+			var contactdetails = data.contactdetails;
+			populateContactData(contactdetails);
+
+			$('.saveBtn').hide();
+			$('.updateBtn').show();
+			$('.saveBtn2').hide();
+			$('.updateBtn2').show();
+		}
+
+		// $("#AccountID").focus(function() {
+		// 	ResetForm();
+		// });
+
+		$("#AccountID").dblclick(function() {
+			$('#Account_List').modal('show');
+			$.ajax({
+				url: "<?php echo admin_url(); ?>TransportMaster/GetAllTransporterList",
+				dataType: "JSON",
+				method: "POST",
+				beforeSend: function() {
+					$('.searchh2').css('display', 'block');
+					$('.searchh2').css('color', 'blue');
+				},
+				complete: function() {
+					$('.searchh2').css('display', 'none');
+				},
+				success: function(data) {
+					$('#customertlistbody').html(data);
+					$('.get_AccountID').on('click', function() {
+						AccountID = $(this).attr("data-id");
+						$.ajax({
+							url: "<?php echo admin_url(); ?>TransportMaster/GetComprehensiveAccountData",
+							dataType: "JSON",
+							method: "POST",
+							data: {
+								AccountID: AccountID
+							},
+							beforeSend: function() {
+								$('.searchh2').css('display', 'block');
+								$('.searchh2').css('color', 'blue');
+								// Toggle buttons immediately when record is clicked
+								$('.saveBtn').hide();
+								$('.updateBtn').show();
+								$('.saveBtn2').hide();
+								$('.updateBtn2').show();
+							},
+							complete: function() {
+								$('.searchh2').css('display', 'none');
+							},
+							success: function(response) {
+								console.log('Comprehensive data response:', response);
+								if (response.status === 'success') {
+									PopulateFormFromComprehensiveData(response.data);
+								} else {
+									alert_float('error', response.message || 'Failed to fetch account data');
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								console.log('AJAX Error:', textStatus, errorThrown);
+								alert_float('error', 'Error fetching account data');
+							}
+						});
+						$('#Account_List').modal('hide');
+					});
+				}
+			});
+			$('#Account_List').on('shown.bs.modal', function() {
+				$('#myInput1').val('');
+				$('#myInput1').focus();
+			})
+
+		});
+
+		// Show All button click - fetch and show all accounts (same behaviour as AccountID dblclick)
+		$('.showAllBtn').on('click', function() {
+			$('#Account_List').modal('show');
+			$.ajax({
+				url: "<?php echo admin_url(); ?>TransportMaster/GetAllTransporterList",
+				dataType: "JSON",
+				method: "POST",
+				beforeSend: function() {
+					$('.searchh2').css('display', 'block');
+					$('.searchh2').css('color', 'blue');
+				},
+				complete: function() {
+					$('.searchh2').css('display', 'none');
+				},
+				success: function(data) {
+					$('#customertlistbody').html(data);
+					$('.get_AccountID').on('click', function() {
+						AccountID = $(this).attr("data-id");
+						$.ajax({
+							url: "<?php echo admin_url(); ?>TransportMaster/GetComprehensiveAccountData",
+							dataType: "JSON",
+							method: "POST",
+							data: {
+								AccountID: AccountID
+							},
+							beforeSend: function() {
+								$('.searchh2').css('display', 'block');
+								$('.searchh2').css('color', 'blue');
+								// Toggle buttons immediately when record is clicked
+								$('.saveBtn').hide();
+								$('.updateBtn').show();
+								$('.saveBtn2').hide();
+								$('.updateBtn2').show();
+							},
+							complete: function() {
+								$('.searchh2').css('display', 'none');
+							},
+							success: function(response) {
+								console.log('Comprehensive data response:', response);
+								if (response.status === 'success') {
+									PopulateFormFromComprehensiveData(response.data);
+								} else {
+									alert_float('error', response.message || 'Failed to fetch account data');
+								}
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								console.log('AJAX Error:', textStatus, errorThrown);
+								alert_float('error', 'Error fetching account data');
+							}
+						});
+						$('#Account_List').modal('hide');
+					});
+				}
+			});
+
+			$('#Account_List').on('shown.bs.modal', function() {
+				$('#myInput1').val('');
+				$('#myInput1').focus();
+			});
+		});
+
+		$("#firstname, #lastname").keypress(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == "") {
+				$("#lblError").html("");
+			} else {
+				var regex = /^[A-Za-z\s]+$/;
+				var isValid = regex.test(String.fromCharCode(keyCode));
+				return isValid;
+			}
+		});
+
+		$("#AccoountName").keypress(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == "") {
+				$("#lblError").html("");
+			} else {
+				var regex = /^[A-Za-z0-9\s]+$/;
+				var isValid = regex.test(String.fromCharCode(keyCode));
+				return isValid;
+			}
+		});
+
+		$("#AccountID").keypress(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == "") {
+				$("#lblError").html("");
+			} else {
+				var regex = /^[A-Za-z0-9]+$/;
+				var isValid = regex.test(String.fromCharCode(keyCode));
+				return isValid;
+			}
+		});
+
+		$("#vat").keypress(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == "") {
+				$("#lblError").html("");
+			} else {
+				var regex = /^[A-Za-z0-9]+$/;
+				var isValid = regex.test(String.fromCharCode(keyCode));
+				return isValid;
+			}
+		});
+
+		$("#Pan").keypress(function(e) {
+			var keyCode = e.keyCode || e.which;
+			if (keyCode == "") {
+				$("#lblError").html("");
+			} else {
+				var regex = /^[A-Za-z0-9]+$/;
+				var isValid = regex.test(String.fromCharCode(keyCode));
+				return isValid;
+			}
+		});
+
+		function fetchAccountHolderName() {
+			var bank_ac_no = $('#account_number').val();
+			var ifsc_code = $('#ifsc_code').val();
+			if (bank_ac_no != '' && ifsc_code != '') {
+				$.ajax({
+					url: "<?php echo admin_url(); ?>purchase/verifyBankAccount",
+					method: "POST",
+					dataType: 'json',
+					data: {
+						bank_ac_no: bank_ac_no,
+						ifsc_code: ifsc_code
+					},
+					beforeSend: function() {
+						$('.searchh2').css('display', 'block');
+						$('.searchh2').css('color', 'blue');
+					},
+					complete: function() {
+						$('.searchh2').css('display', 'none');
+					},
+					success: function(data) {
+						if (data.success == false) {
+							alert_float('danger', "Bank account not verified");
+							$('#account_holder_name').val('');
+							$('#account_number').val('');
+						} else {
+							$('#account_holder_name').val(data.data.full_name);
+						}
+					}
+				});
+			}
+		}
+
+		/**
+		 * Populate form with comprehensive account data from all tables
+		 * @param {Object} comprehensiveData - Contains clientDetails, shippingData, bankData, contactData
+		 */
+		function PopulateFormFromComprehensiveData(comprehensiveData) {
+			try {
+				// First, clear all existing data
+				ResetForm();
+
+				// Log incoming data for debugging
+				console.log('=== COMPREHENSIVE DATA RECEIVED ===');
+				console.log('Full data object:', comprehensiveData);
+				console.log('Attachments array:', comprehensiveData.attachments);
+				console.log('Contact data:', comprehensiveData.contactData);
+				console.log('State data:', comprehensiveData.stateData);
+				console.log('Bank data:', comprehensiveData.bankData);
+				console.log('===================================');
+
+				// 1. POPULATE CLIENT DETAILS (from tblclients)
+				if (comprehensiveData && comprehensiveData.clientDetails) {
+					var client = comprehensiveData.clientDetails;
+
+					$('#AccountID').val(client.AccountID || '');
+					$('#AccoountName').val(client.company || '');
+					$('#FavouringName').val(client.FavouringName || '');
+					$('#Pan').val(client.PAN || '');
+					$('#vat').val(client.GSTIN || '');
+
+					// Handle Billing Country - if value is "0" or empty, set to "India"
+					var countryValue = client.billing_country || '0';
+					if (countryValue === '0' || countryValue === '' || countryValue === 'India') {
+						$('#country').val('India');
+					} else {
+						$('#country').val(countryValue);
+					}
+
+					$('#zip').val(client.billing_zip || '');
+					$('#state').val(client.billing_state || '');
+
+					// After setting state, load cities for that state
+					var stateVal = client.billing_state || '';
+					if (stateVal) {
+						$.ajax({
+							url: "<?php echo base_url(); ?>admin/clients/GetCity",
+							type: 'POST',
+							data: {
+								StateID: stateVal
+							},
+							dataType: 'json',
+							success: function(cityData) {
+								$("#city").find('option').remove();
+								$("#city").append(new Option('Select City', ''));
+								if (cityData && cityData.length > 0) {
+									cityData.forEach(function(city) {
+										$("#city").append(new Option(city.city_name, city.id));
+									});
+									// Set the city value after options are loaded
+									if (client.billing_city) {
+										$('#city').val(client.billing_city);
+									}
+								}
+								$('.selectpicker').selectpicker('refresh');
+							}
+						});
+					}
+
+					$('#address').val(client.billing_address || '');
+					$('#phonenumber').val(client.MobileNo || '');
+					$('#altphonenumber').val(client.AltMobileNo || '');
+					$('#email').val(client.Email || '');
+
+
+					// Other fields
+					$('#Tds').val(client.IsTDS == 'Y' ? '1' : '0');
+					checkTds(); // Ensure visibility is toggled
+
+					if (client.IsTDS == 'Y') {
+						$('#Tdsselection').val(client.TDSSection || '');
+						$('.selectpicker').selectpicker('refresh');
+
+						// Fetch TDS Percent options asynchronously
+						var selectedTdsSection = client.TDSSection;
+						if (selectedTdsSection) {
+							$.ajax({
+								url: "<?php echo admin_url(); ?>clients/gettdspercent",
+								dataType: "JSON",
+								method: "POST",
+								data: {
+									Tdsselection: selectedTdsSection
+								},
+								success: function(data) {
+									$('#TdsPercent').empty();
+									if (data && data.length > 0) {
+										$('#TdsPercent').append('<option value="">Non Selected</option>');
+										$.each(data, function(index, item) {
+											$('#TdsPercent').append('<option value="' + item.rate + '">' +
+												item.rate + '</option>');
+										});
+									} else {
+										$('#TdsPercent').append('<option value="">Non Selected</option>');
+									}
+
+									// Set the value AFTER options are populated
+									if (client.TDSPer) {
+										$('#TdsPercent').val(client.TDSPer);
+									}
+									$('#TdsPercent').selectpicker('refresh');
+								}
+							});
+						}
+					}
+
+					$('#IsActive').val(client.IsActive || '');
+					$('#IsActive').selectpicker('refresh');
+					toggleBlockedReason(); // VERY IMPORTANT
+
+					$('#blocked_reason').val(client.DeActiveReason || '');
+
+					// Populate Transport Category (groups_in) from ActSubGroupID2
+					// ActSubGroupID2 is the transporter/customer category
+					if (client.ActSubGroupID2) {
+						$('#groups_in').selectpicker('val', client.ActSubGroupID2);
+						// Disable the groups_in dropdown in edit mode (prevent category change)
+						$('#groups_in').prop('disabled', true);
+						console.log('Transport Category populated: ' + client.ActSubGroupID2);
+					}
+
+					// Refresh selectpicker for dropdowns
+					$('.selectpicker').selectpicker('refresh');
+
+					console.log('Client details populated successfully');
+				}
+
+				// 2. POPULATE CONTACT DETAILS (from tblcontacts)
+				if (comprehensiveData && comprehensiveData.contactData && comprehensiveData.contactData.length > 0) {
+					// Clear existing contact rows (except first one)
+					$('#contacttbody tr.addedtr_contact').remove();
+
+					// Populate first row or create new rows
+					comprehensiveData.contactData.forEach(function(contact, index) {
+						if (index === 0) {
+							// Use first row - store ID as hidden field so UPDATE knows it's existing contact
+							$('#cp_name').val(contact.firstname || contact.Name || '');
+							$('#cp_designation').val(contact.PositionID || '');
+							$('#cp_mobile').val(contact.phonenumber || contact.Mobile || '');
+							$('#cp_email').val(contact.Email || contact.email || '');
+							$('#cp_send_sms').prop('checked', contact.IsSmsYN === 'Y');
+							$('#cp_send_email').prop('checked', contact.IsEmailYN === 'Y');
+							// Preserve contact ID in hidden field for update operations
+							if (contact.id) {
+								$('<input type="hidden" name="cp_id" value="' + contact.id + '">').insertBefore($('#cp_name'));
+							}
+						} else {
+							// Add additional rows with complete data including hidden ID
+							var newRow = $("<tr class='addedtr_contact'></tr>");
+							// Insert hidden ID field first
+							var idField = contact.id ? "<input type='hidden' name='cp_id[]' value='" + contact.id + "'>" : "<input type='hidden' name='cp_id[]' value=''>";
+							newRow.append("<td>" + idField + "<input type='text' name='cp_name[]' class='form-control' value='" + (contact.firstname || contact.Name || '') + "'></td>");
+							newRow.append("<td><select class='selectpicker form-control cp_designation_input' name='cp_designation[]' data-width='100%' data-container='body'>" + getPositionOptions(contact.PositionID) + "</select></td>");
+							newRow.append("<td><input type='text' name='cp_mobile[]' class='form-control' value='" + (contact.phonenumber || contact.Mobile || '') + "' maxlength='10' minlength='10' pattern='[0-9]{10}' onkeypress='return isNumber(event)' required></td>");
+							newRow.append("<td><input type='email' name='cp_email[]' class='form-control' value='" + (contact.Email || contact.email || '') + "' pattern='[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' required></td>");
+							newRow.append("<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_sms[]' " + (contact.IsSmsYN === 'Y' ? 'checked' : '') + "><label></label></div></td>");
+							newRow.append("<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_email[]' " + (contact.IsEmailYN === 'Y' ? 'checked' : '') + "><label></label></div></td>");
+							newRow.append("<td><a href='#' class='btn btn-danger removebtn_contact'><i class='fa fa-times'></i></a></td>");
+							$("#contacttbody").append(newRow);
+							newRow.find('.selectpicker').selectpicker();
+							newRow.find('.selectpicker').selectpicker('refresh');
+						}
+					});
+
+					console.log('Contact details populated successfully with IDs preserved');
+				}
+
+				// 4. POPULATE BANK DETAILS (from tblBankMaster)
+				if (comprehensiveData && comprehensiveData.bankData && comprehensiveData.bankData.length > 0) {
+					// Use first bank record (modify if multiple banks needed)
+					var bank = comprehensiveData.bankData[0];
+
+					// $('#is_bank_detail').val('1');
+					// $('.bank_detail_section').show();
+
+					$('#is_bank_detail').val('1');
+					$('#is_bank_detail').selectpicker('refresh');
+					toggleBankSection();
+
+					$('#ifsc_code').val(bank.IFSC || '');
+					$('#bank_name').val(bank.BankName || '');
+					$('#branch_name').val(bank.BranchName || '');
+					$('#bank_address').val(bank.BankAddress || '');
+					$('#account_number').val(bank.AccountNo || '');
+					$('#account_holder_name').val(bank.HolderName || '');
+
+					$('.selectpicker').selectpicker('refresh');
+
+					console.log('Bank details populated successfully');
+				} else {
+					// $('#is_bank_detail').val('0');
+					// $('.bank_detail_section').hide();
+
+					$('#is_bank_detail').val('0');
+					$('#is_bank_detail').selectpicker('refresh');
+					toggleBankSection();
+
+				}
+
+				// 5. POPULATE STATE DETAILS
+				if (
+					comprehensiveData &&
+					comprehensiveData.stateData &&
+					comprehensiveData.stateData.length > 0
+				) {
+
+					var stateData = comprehensiveData.stateData;
+
+					// STEP 1 — Uncheck all checkboxes first
+					$('input[name="person_check[]"]').prop('checked', false);
+
+					// STEP 2 — Extract returned state codes
+					var selectedStates = stateData.map(function(item) {
+						return item.State.trim();
+					});
+
+					console.log("States from DB:", selectedStates);
+
+					// STEP 3 — Match and check boxes
+					$('input[name="person_check[]"]').each(function() {
+
+						var checkboxValue = $(this).val().trim();
+
+						if (selectedStates.includes(checkboxValue)) {
+							$(this).prop('checked', true);
+						}
+
+					});
+
+					console.log('State checkboxes populated successfully');
+
+				} else {
+
+					// No state data → uncheck all
+					$('input[name="person_check[]"]').prop('checked', false);
+
+					console.log('No state data found');
+
+					// Optional bank section logic (kept from your code)
+					$('#is_bank_detail').val('0');
+					$('#is_bank_detail').selectpicker('refresh');
+					toggleBankSection();
+				}
+
+				// Populate attachment view links
+				if (comprehensiveData &&
+					comprehensiveData.attachments &&
+					comprehensiveData.attachments.length > 0) {
+
+					// Remove all existing view links first
+					$('.attachmentViewLink').remove();
+					var attachments = comprehensiveData.attachments;
+
+
+					attachments.forEach(function(att) {
+
+						var fullUrl = '<?php echo base_url(); ?>' + att.file;
+
+						// find matching input by label name
+						$('.form-group').each(function() {
+
+							var labelText = $(this).find('label').text().trim();
+
+							if (labelText === att.name) {
+
+								var viewLink = $('<a>', {
+									class: 'attachmentViewLink',
+									href: fullUrl,
+									target: '_blank',
+									text: ' View',
+									style: 'margin-left:8px; font-weight:600; color:#0275d8; cursor:pointer;'
+								});
+
+								$(this).find('label').append(viewLink);
+							}
+
+						});
+
+					});
+
+				}
+
+				console.log('Form populated completely with all account data');
+				alert_float('success', 'Account details loaded successfully');
+
+				// Toggle buttons - show UPDATE, hide SAVE
+				$('.saveBtn').hide();
+				$('.updateBtn').show();
+				$('.saveBtn2').hide();
+				$('.updateBtn2').show();
+
+			} catch (error) {
+				console.error('Error populating form:', error);
+				alert_float('error', 'Error loading account data: ' + error.message);
+			}
+		}
+
+
+		$('#ifsc_code').blur(function() {
+			var ifsc_code = $('#ifsc_code').val();
+			if (ifsc_code != '') {
+				$.ajax({
+					url: "<?php echo admin_url(); ?>purchase/fetchBankDetailsFromIFSC",
+					method: "POST",
+					dataType: 'json',
+					data: {
+						ifsc_code: ifsc_code
+					},
+					beforeSend: function() {
+						$('.searchh2').css('display', 'block');
+						$('.searchh2').css('color', 'blue');
+					},
+					complete: function() {
+						$('.searchh2').css('display', 'none');
+					},
+					success: function(data) {
+						if (data == "Not Found") {
+							alert_float('danger', "Enter valid IFSC Code");
+							$('#bank_name').val("");
+							$('#branch_name').val("");
+							$('#bank_address').val("");
+						} else {
+							$('#bank_name').val(data.BANK);
+							$('#branch_name').val(data.BRANCH);
+							$('#bank_address').val(data.ADDRESS);
+							fetchAccountHolderName();
+						}
+					}
+				});
+			}
+		});
+
+		$('#account_number').blur(function() {
+			fetchAccountHolderName();
+		});
+
+		// PAN Verification on blur event
+		$("#Pan").on("blur", function() {
+			let panNo = $(this).val().trim();
+			// Map 4th PAN character to organisation type and set default
+			if (panNo && panNo.length >= 4) {
+				let ch = panNo.charAt(3).toUpperCase();
+				const panMap = {
+					'P': 'Proprietorship',
+					'F': 'Partnership',
+					'C': 'Private Limited',
+					'H': 'Hindu Undivided Family (HUF)',
+					'T': 'Society / Trust / Club',
+					'G': 'Government Department/Body',
+					'L': 'Local Authority'
+				};
+			}
+			if (panNo === "") {
+				$(".pan_denger").text("");
+				return;
+			}
+
+			let panPattern = /^[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}$/;
+			if (!panPattern.test(panNo)) {
+				$(".pan_denger").text("Invalid PAN format").css("color", "red");
+				return;
+			}
+
+			let panLabel = $('label').filter(function() {
+				return $(this).parent().find('#Pan').length > 0;
+			});
+			if (panLabel) {
+				panLabel.html(
+					'<small class="req text-danger">* </small>PAN <span style="color: blue; font-size: 12px;"><i>(Verifying...)</i></span>'
+				);
+			}
+
+			$.ajax({
+				url: "<?php echo admin_url('clients/verify_pan'); ?>",
+				type: "POST",
+				dataType: "json",
+				data: {
+					pan: panNo.toUpperCase()
+				},
+				timeout: 30000,
+				success: function(res) {
+					if (res.status === 'success') {
+						$("#AccoountName").val(res.data.full_name || '');
+						alert_float('success', 'PAN No verified successfully');
+
+						let panLabel = $('label').filter(function() {
+							return $(this).parent().find('#Pan').length > 0;
+						});
+						if (panLabel) {
+							panLabel.html('<small class="req text-danger">* </small>PAN');
+						}
+
+						let gstinLabel = document.querySelector('label[for="vat"]') || $(
+							'label').filter(function() {
+							return $(this).parent().find('#vat').length > 0;
+						});
+						if (gstinLabel) {
+							$(gstinLabel).html(
+								'<small class="req text-danger">* </small>GSTIN <span style="color: blue; font-size: 12px;"><i>(Fetching Data...)</i></span>'
+							);
+						}
+
+						// Fetch GSTIN by PAN
+						$.ajax({
+							url: "<?php echo admin_url('clients/get_gstin_by_pan'); ?>",
+							type: "POST",
+							dataType: "json",
+							data: {
+								pan: panNo.toUpperCase()
+							},
+							timeout: 30000,
+							success: function(gstRes) {
+								if (gstRes.status === 'success') {
+									let gstinList = gstRes.data.gstin_list || [];
+
+									if (gstinList.length === 1) {
+										$("#vat").hide();
+
+										let gstinDropdown = `
+											<select id="gstin_select" class="selectpicker form-control" onchange="verifyGSTIN()" data-width="100%" style='margin-top:5px;'>
+											<option value="${gstinList[0].gstin}" selected>${gstinList[0].gstin}</option>
+										`;
+
+										gstinDropdown += `</select>`;
+
+										$(".gst_denger").html(gstinDropdown)
+											.css("color", "green").show();
+										$("#vat").val(gstinList[0].gstin);
+										$('#gstin_select').selectpicker(
+											'refresh');
+
+										alert_float('success',
+											'GSTIN fetched and filled automatically'
+										);
+
+										// AUTO VERIFY GSTIN
+										verifyGSTIN();
+									} else if (gstinList.length > 1) {
+										$("#vat").hide();
+
+										let gstinDropdown = `
+											<select id="gstin_select" class="selectpicker form-control" onchange="handleGstinSelection()" data-width="100%" style='margin-top:5px;'>
+											<option value="">Select GSTN NO</option>
+										`;
+
+										gstinList.forEach(function(item) {
+											gstinDropdown +=
+												`<option value="${item.gstin}" data-state="${item.state}">${item.gstin}</option>`;
+										});
+
+										gstinDropdown += `</select>`;
+
+										$(".gst_denger").html(gstinDropdown)
+											.css("color", "green").show();
+										$('#gstin_select').selectpicker(
+											'refresh');
+
+										let gstinLabel = $('label').filter(
+											function() {
+												return $(this).parent()
+													.find('#vat').length >
+													0;
+											});
+										if (gstinLabel) {
+											gstinLabel.html(
+												'<small class="req text-danger">* </small>GSTIN'
+											);
+										}
+									} else {
+										$("#vat").hide();
+
+										let gstinDropdown = `
+											<select id="gstin_select" class="selectpicker form-control" data-width="100%" style='margin-top:5px;' disabled>
+											<option value="">NO GSTIN FOUND</option>
+										`;
+
+										gstinDropdown += `</select>`;
+
+										$(".gst_denger").html(gstinDropdown)
+											.css("color", "orange").show();
+										$('#gstin_select').selectpicker(
+											'refresh');
+
+										let gstinLabel = $('label').filter(
+											function() {
+												return $(this).parent()
+													.find('#vat').length >
+													0;
+											});
+										if (gstinLabel) {
+											gstinLabel.html(
+												'<small class="req text-danger">* </small>GSTIN'
+											);
+										}
+
+										alert_float('warning',
+											'No GSTIN found for this PAN');
+									}
+								} else {
+									console.log('No GSTIN found:', gstRes
+										.message);
+									let gstinLabel = $('label').filter(
+										function() {
+											return $(this).parent().find(
+												'#vat').length > 0;
+										});
+									if (gstinLabel) {
+										gstinLabel.html(
+											'<small class="req text-danger">* </small>GSTIN'
+										);
+									}
+								}
+							},
+							error: function(xhr, status, error) {
+								console.log('GSTIN fetch error:', error);
+								let gstinLabel = $('label').filter(function() {
+									return $(this).parent().find('#vat')
+										.length > 0;
+								});
+								if (gstinLabel) {
+									gstinLabel.html(
+										'<small class="req text-danger">* </small>GSTIN'
+									);
+								}
+							}
+						});
+					} else {
+						$(".pan_denger").html("✗ " + res.message).css("color", "red");
+						alert_float('danger', res.message || 'PAN verification failed');
+
+						let panLabel = $('label').filter(function() {
+							return $(this).parent().find('#Pan').length > 0;
+						});
+						if (panLabel) {
+							panLabel.html('<small class="req text-danger">* </small>PAN');
+						}
+
+						if (res.message === 'Invalid PAN') {
+							$("#Pan").val('');
+							$(".pan_denger").text("");
+						}
+					}
+				},
+				error: function(xhr, status, error) {
+					$(".pan_denger").html("✗ Verification failed").css("color", "red");
+					alert_float('danger', 'PAN verification failed');
+
+					let panLabel = $('label').filter(function() {
+						return $(this).parent().find('#Pan').length > 0;
+					});
+					if (panLabel) {
+						panLabel.html('<small class="req text-danger">* </small>PAN');
+					}
+				}
+			});
+		});
+	});
+
+	$('#shipping_state').on('change', function() {
+		var StateID = $(this).val();
+		var url = "<?php echo base_url(); ?>admin/clients/GetCity";
+		jQuery.ajax({
+			type: 'POST',
+			url: url,
+			data: {
+				StateID: StateID
+			},
+			dataType: 'json',
+			success: function(data) {
+				$("#shipping_city").find('option').remove();
+				$("#shipping_city").selectpicker("refresh");
+				for (var i = 0; i < data.length; i++) {
+					$("#shipping_city").append(new Option(data[i].city_name, data[i].id));
+				}
+				$('.selectpicker').selectpicker('refresh');
+			}
+		});
+	});
+
+	function ResetForm() {
+		var HiddenAccountID = $('#HiddenAccountID').val();
+		$('#AccountID').val(HiddenAccountID);
+		$('#FavouringName').val('');
+		$('#AccoountName').val('');
+		$('#phonenumber').val('');
+		$('#altphonenumber').val('');
+		$('#email').val('');
+		$('#vat').val('');
+		$('.selectpicker').selectpicker('refresh');
+		$('#tan_number').val('');
+		$('#address').val('');
+		$('#zip').val('');
+		$('#FLNO1').val('');
+		$('#Pan').val('');
+		$('#MaxCrdAmt').val('');
+		$('.selectpicker').selectpicker('refresh');
+		$('#website').val('');
+		$('#send_email').prop('checked', false);
+		$('#send_sms').prop('checked', false);
+		$('input[name="person_check[]"]').prop('checked', false);
+
+
+		$('#groups_in').val('');
+
+		$('#ifsc_code').val('');
+		$('#bank_name').val('');
+		$('#branch_name').val('');
+		$('#bank_address').val('');
+		$('#account_number').val('');
+		$('#account_holder_name').val('');
+
+		// $('#attachment').val('');
+		$('.attachmentViewLink').remove();
+		$('input[type="file"]').each(function() {
+			$(this).val('');
+		});
+
+
+		$('#blocked_reason').val('');
+
+		$("#cp_name").val('');
+		$("#cp_designation").val('');
+		$("#cp_mobile").val('');
+		$("#cp_email").val('');
+		$("#cp_send_email").prop('checked', false);
+		$("#cp_send_sms").prop('checked', false);
+
+
+		// $('#IsActive').prop('checked', false);
+		$('#IsActive').val('Y');
+		$('#IsActive').selectpicker('refresh');
+		toggleBlockedReason();
+
+
+		$('select[name=vat]').val('');
+		$('.selectpicker').selectpicker('refresh');
+
+		$('select[name=country]').val('1');
+		$('select[name=territory]').val('');
+		$('select[name=broker]').val('');
+		$('select[name=broker_person]').val('');
+		$('select[name=freight_term]').val('');
+		$('select[name=priority]').val('');
+		$('#credit_days').val('0');
+		// $('select[name=is_bank_detail]').val('0');
+		$('#is_bank_detail').val('0');
+		$('#is_bank_detail').selectpicker('refresh');
+		toggleBankSection();
+
+		// $('select[name=IsActive]').val('Y');
+		$('select[name=Tds]').val('');
+		$('#TdsPercent1').hide();
+		$('#TdsSec').hide();
+		$('select[name=Tdsselection]').val('');
+		$('select[name=default_currency]').val('');
+		$('select[name=temp_account_type]').val('');
+
+		$("#city").children().remove();
+		$('.selectpicker').selectpicker('refresh');
+
+		// Reset transporter category and ensure it's enabled in create/new mode
+		$('#groups_in').prop('disabled', false);
+		$('#groups_in').selectpicker('val', '');
+		$('.selectpicker').selectpicker('refresh');
+
+		$('select[name=state]').val('');
+		$('.selectpicker').selectpicker('refresh');
+		$("#hiddenState").val("");
+
+		$('select[name=filter_state]').val('');
+		$('select[name=filter_city]').val('');
+		$('select[name=filter_location]').val('');
+		$('.selectpicker').selectpicker('refresh');
+
+		$("#addresstbody tr.addedtr").remove();
+		$(".opening_bal").prop("readonly", false);
+
+		$("#contacttbody tr.addedtr_contact").remove();
+		$("#locationtbody tr.addedtr_location").remove();
+
+		// Remove existing attachment display sections
+		$('.attachment-display-col').remove();
+
+
+		$('.saveBtn').show();
+		$('.updateBtn').hide();
+		$('.saveBtn2').show();
+		$('.updateBtn2').hide();
+	}
+
+	// Clear the entire form including HiddenAccountID and AccountID
+	function ClearFormCompletely() {
+		ResetForm();
+		$('#HiddenAccountID').val('');
+		$('#AccountID').val('');
+		$('.selectpicker').selectpicker('refresh');
+	}
+
+	$(".cancelBtn").click(function() {
+		ResetForm();
+		// Reload page after 1 second to ensure complete refresh
+		// setTimeout(function() {
+		// 	location.reload();
+		// }, 0000);
+	});
+
+	function populateContactData(contactdetails) {
+		$("#contacttbody tr.addedtr_contact").remove();
+
+		$("#cp_name").val('');
+		$("#cp_designation").val('');
+		$("#cp_mobile").val('');
+		$("#cp_email").val('');
+		$("#cp_send_email").prop('checked', false);
+		$("#cp_send_sms").prop('checked', false);
+
+		if (contactdetails) {
+			contactdetails.forEach(function(cdata) {
+				var newRow = $("<tr class='addedtr_contact'></tr>");
+				newRow.append("<td><input type='hidden' name='cp_id[]' value='" + cdata.id +
+					"'><input type='text' name='cp_name[]' class='form-control' value='" + cdata.Name +
+					"'></td>");
+				newRow.append("<td><select class='selectpicker form-control cp_designation_input' name='cp_designation[]' data-width='100%' data-container='body'>" + getPositionOptions(cdata.PositionID || cdata.Designation) + "</select></td>");
+				newRow.append("<td><input type='text' name='cp_mobile[]' class='form-control' value='" + cdata
+					.Mobile + "' maxlength='10' onkeypress='return isNumber(event)'></td>");
+				newRow.append("<td><input type='text' name='cp_email[]' class='form-control' value='" + cdata
+					.Email + "'></td>");
+				newRow.append(
+					"<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_sms[]' " +
+					(cdata.SendSMS == 1 ? 'checked' : '') + "><label></label></div></td>");
+				newRow.append(
+					"<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_email[]' " +
+					(cdata.SendEmail == 1 ? 'checked' : '') + "><label></label></div></td>");
+				newRow.append(
+					"<td><a href='#' class='btn btn-danger removebtn_contact'><i class='fa fa-times'></i></a></td>"
+				);
+				$("#contacttbody").append(newRow);
+				newRow.find('.selectpicker').selectpicker();
+				newRow.find('.selectpicker').selectpicker('refresh');
+			});
+		}
+	}
+
+	// NEW FUNCTION - Populate Location Data from GSTIN API
+	function populateLocationDataFromGSTIN(gstinData) {
+		// Clear existing location rows except the first one
+		$("#locationtbody tr.addedtr_location").remove();
+
+		if (gstinData && gstinData.details && gstinData.details.contact_details && gstinData.details.contact_details
+			.additional) {
+			let additionalContacts = gstinData.details.contact_details.additional;
+
+			additionalContacts.forEach(function(location, index) {
+				if (location.address && location.mobile) {
+					// Parse the address to extract pincode, state, and city
+					let fullAddress = location.address;
+					let addressParts = fullAddress.split(',').map(part => part.trim());
+
+					let pincode = '';
+					let state = '';
+					let city = '';
+					let addressWithoutPinStateCity = '';
+
+					// Extract pincode (last element if 6 digits)
+					if (addressParts.length > 0) {
+						let lastElement = addressParts[addressParts.length - 1];
+						if (/^\d{6}$/.test(lastElement)) {
+							pincode = lastElement;
+							addressParts.pop(); // Remove pincode from array
+						}
+					}
+
+					// Extract state (now last element after removing pincode)
+					if (addressParts.length > 0) {
+						state = addressParts[addressParts.length - 1];
+						addressParts.pop(); // Remove state from array
+					}
+
+					// Extract city (now last element after removing pincode and state)
+					if (addressParts.length > 0) {
+						city = addressParts[addressParts.length - 1];
+						addressParts.pop(); // Remove city from array
+					}
+
+					// Remaining parts form the address
+					addressWithoutPinStateCity = addressParts.join(', ');
+
+					// Clean mobile number (extract last 10 digits)
+					let mobile = location.mobile.replace(/\D/g, '').slice(-10);
+
+					// Create new row
+					let newRow = $("<tr class='addedtr_location'></tr>");
+
+					// Add pincode
+					newRow.append("<td><input type='text' class='form-control' name='loc_pincode[]' value='" +
+						pincode + "' onkeypress='return isNumber(event)' maxlength='6' required></td>");
+
+					// Add address
+					newRow.append("<td><textarea class='form-control' name='loc_address[]' rows='1'>" +
+						addressWithoutPinStateCity + "</textarea></td>");
+
+					// Add state dropdown
+					let stateDropdown =
+						"<td><select class='form-control loc_state' name='loc_state[]' required>";
+					stateDropdown += "<option value=''>Select State</option>";
+					<?php foreach ($state as $st) { ?>
+						stateDropdown +=
+							"<option value='<?php echo $st['short_name']; ?>'><?php echo $st['state_name']; ?></option>";
+					<?php } ?>
+					stateDropdown += "</select></td>";
+					newRow.append(stateDropdown);
+
+					// Add city dropdown (will be populated after state selection)
+					newRow.append(
+						"<td><select class='form-control loc_city' name='loc_city[]' required><option value=''>Select City</option></select></td>"
+					);
+
+					// Add mobile
+					newRow.append("<td><input type='text' class='form-control' name='loc_mobile[]' value='" +
+						mobile + "' onkeypress='return isNumber(event)' maxlength='10' required></td>");
+
+					// Add remove button
+					newRow.append(
+						"<td><button type='button' class='btn btn-danger removeLocationBtn'><i class='fa fa-times'></i></button></td>"
+					);
+
+					// Append row to table
+					$("#locationtbody").append(newRow);
+
+					// Now set the state value and trigger city population
+					let stateSelect = newRow.find('.loc_state');
+					let citySelect = newRow.find('.loc_city');
+
+					// Find matching state
+					stateSelect.find('option').each(function() {
+						if ($(this).text().toLowerCase().indexOf(state.toLowerCase()) !== -1) {
+							stateSelect.val($(this).val());
+
+							// Fetch cities for this state
+							let stateId = $(this).val();
+							$.ajax({
+								url: "<?php echo base_url(); ?>admin/clients/GetCity",
+								type: 'POST',
+								data: {
+									StateID: stateId
+								},
+								dataType: 'json',
+								success: function(cityData) {
+									citySelect.empty();
+									citySelect.append(new Option('Select City', ''));
+
+									cityData.forEach(function(cityItem) {
+										citySelect.append(new Option(cityItem
+											.city_name, cityItem.id));
+									});
+
+									// Now find and set the matching city
+									citySelect.find('option').each(function() {
+										if ($(this).text().toLowerCase().indexOf(
+												city.toLowerCase()) !== -1) {
+											citySelect.val($(this).val());
+											return false;
+										}
+									});
+								}
+							});
+
+							return false;
+						}
+					});
+				}
+			});
+
+			alert_float('success', 'Location data populated from GSTIN');
+		}
+	}
+
+	$('#groups_in').on('change', function() {
+		var selectedTransporterType = $(this).val();
+
+		// Clear if nothing selected
+		if (!selectedTransporterType) {
+			$('#AccountID').val('');
+			$('#HiddenTransporterCode').val('');
+			return;
+		}
+
+		var $select = $(this);
+		$select.prop('disabled', true);
+
+		$.ajax({
+			url: "<?php echo admin_url('TransportMaster/GetNextTransporterCode'); ?>",
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				ActSubGroupID2: selectedTransporterType
+			},
+			success: function(response) {
+				if (response && response.status === 'success' && response.next_code) {
+					$('#AccountID').val(response.next_code);
+					$('#HiddenTransporterCode').val(response.ActSubGroupID2 || selectedTransporterType);
+					console.log('Customer Code generated: ' + response.next_code + ' (Category: ' + (
+							response.category_name || '') + ', Count: ' + (response.count || '') +
+						')');
+				} else {
+					$('#AccountID').val('');
+					$('#HiddenTransporterCode').val('');
+					alert_float('warning', (response && response.message) ? response.message :
+						'Failed to generate customer code');
+				}
+			},
+			error: function(xhr) {
+				console.error('Error generating customer code:', xhr.responseText || xhr.statusText);
+				alert_float('error', 'Error generating customer code. Please try again.');
+				$('#AccountID').val('');
+				$('#HiddenTransporterCode').val('');
+			},
+			complete: function() {
+				$select.prop('disabled', false);
+			}
+		});
+	});
+
+	$('.saveBtn').on('click', function() {
+		groups_in = $('#groups_in').val();
+		AccountID = $('#AccountID').val();
+		AccoountName = $('#AccoountName').val();
+		FavouringName = $('#FavouringName').val();
+		Pan = $('#Pan').val();
+		vat = $('#vat').val();
+		country = $('#country').val();
+		zip = $('#zip').val();
+		state = $('#state').val();
+		city = $('#city').val();
+		phonenumber = $('#phonenumber').val();
+		altphonenumber = $('#altphonenumber').val();
+		email = $('#email').val();
+
+		Tds = $('#Tds').val();
+		TdsPercent = '';
+		Tdsselection = '';
+		if (Tds === '1') {
+			TdsPercent = $('#TdsPercent').val();
+			Tdsselection = $('#Tdsselection').val();
+		}
+
+		address = $('#address').val();
+
+		let Contact = [];
+		// Collect contact rows regardless of whether inputs use array name attributes
+		$("#contacttbody tr").each(function() {
+			let Name = $(this).find("input[name='cp_name[]']").val() || $(this).find('.cp_name_input').val();
+			let Designation = $(this).find("select[name='cp_designation[]']").val() || $(this).find("select[name='cp_designation']").val() || $(this).find("input[name='cp_designation[]']").val() || $(this).find('.cp_designation_input').val();
+			let Mobile = $(this).find("input[name='cp_mobile[]']").val() || $(this).find('.cp_mobile_input').val();
+			let Email = $(this).find("input[name='cp_email[]']").val() || $(this).find('.cp_email_input').val();
+			let SendEmail = $(this).find("input[name='cp_send_email[]']").is(':checked') ? 1 : $(this).find('.cp_email_checkbox').is(':checked') ? 1 : 0;
+			let SendSMS = $(this).find("input[name='cp_send_sms[]']").is(':checked') ? 1 : $(this).find('.cp_sms_checkbox').is(':checked') ? 1 : 0;
+
+			// Skip empty rows
+			if (!Name && !Designation && !Mobile && !Email) return;
+
+			var DesignationToSave = Designation;
+			if (DesignationToSave) {
+				var posMatch = positionData.find(function(p) {
+					return p.position_id == DesignationToSave || p.position_name == DesignationToSave;
+				});
+				if (posMatch) DesignationToSave = posMatch.position_id;
+			}
+
+			Contact.push({
+				Name: Name,
+				Designation: DesignationToSave,
+				Mobile: Mobile,
+				Email: Email,
+				SendEmail: SendEmail,
+				SendSMS: SendSMS
+			});
+		});
+		let ContactData = JSON.stringify(Contact);
+
+		is_bank_detail = $('#is_bank_detail').val();
+
+		ifsc_code = $('#ifsc_code').val();
+		bank_name = $('#bank_name').val();
+		branch_name = $('#branch_name').val();
+		bank_address = $('#bank_address').val();
+		account_number = $('#account_number').val();
+		account_holder_name = $('#account_holder_name').val();
+
+		IsActive = $('#IsActive').val();
+		blocked_reason = $('#blocked_reason').val();
+
+		// attachment = document.getElementById('attachment').files[0] || null;
+
+		var formData = new FormData();
+
+		let docs = [
+			'PANCard', 'Aadhar', 'Permit',
+			'Photo', 'GST', 'ShopAct', 'Cheque', 'AddressProof'
+		];
+
+
+
+
+		if (AccountID == '') {
+			alert_float('warning', 'please enter Customer id');
+			$('#AccountID').focus();
+		} else if ($.trim(AccoountName) == '') {
+			alert_float('warning', 'please enter Customer Name');
+			$('#AccountName').focus();
+		} else if (!$('#Pan').val().match('[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}') && $('#Pan').val() !== "") {
+			alert_float('warning', 'Enter valid PAN number');
+			$('#Pan').focus();
+		} else if (!$('#vat').val().match('[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z][0-9][0-9A-Za-z]{2}') && $('#vat')
+			.val() !== '') {
+			alert_float('warning', "Enter valid GST no..");
+			$('#vat').focus();
+		} else if (phonenumber == '') {
+			alert_float('warning', 'please  enter mobile number');
+			$('#phonenumber').focus();
+		} else if (!$('#phonenumber').val().match('[0-9]{10}') && $('#phonenumber').val() !== "") {
+			alert_float('warning', 'Enter valid Mobile number');
+			$('#phonenumber').focus();
+		} else if (!$('#email').val().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && $('#email').val() !== "") {
+			alert_float('warning', 'Enter valid Email-id');
+			$('.saveBtn').removeAttr('disabled');
+			$('#email').focus();
+		} else if (country == '') {
+			alert_float('warning', 'Please select Billing Country');
+			$('#country').focus();
+		} else if (state == '') {
+			alert_float('warning', 'please select State');
+			$('#state').focus();
+		} else if (city == '') {
+			alert_float('warning', 'please select City');
+			$('#city').focus();
+		} else if (Contact.length === 0) {
+			alert_float('warning', 'Please add at least one Contact Detail');
+			$('#contacttbody').focus();
+		} else if (is_bank_detail == '' || is_bank_detail == null) {
+			alert_float('warning', 'Please select Bank Details option');
+			$('#is_bank_detail').focus();
+		} else if (IsActive === 'N' && $.trim(blocked_reason) === '') {
+			alert_float('warning', 'Please enter blocked reason');
+			$('#blocked_reason').focus();
+			return;
+		}
+
+		// else if (!attachment) {
+		// 	alert_float('warning', 'Please upload an attachment file');
+		// 	$('#attachment').focus();
+		// } 
+		else {
+			// Use FormData to include file attachment
+			var formData = new FormData();
+			formData.append('AccountID', AccountID);
+			formData.append('AccoountName', AccoountName);
+			formData.append('FavouringName', FavouringName);
+			formData.append('phonenumber', phonenumber);
+			formData.append('altphonenumber', altphonenumber);
+			formData.append('email', email);
+			formData.append('vat', vat);
+			formData.append('groups_in', groups_in);
+			formData.append('state', state);
+			formData.append('city', city);
+			formData.append('address', address);
+			formData.append('zip', zip);
+			formData.append('Pan', Pan);
+			formData.append('IsActive', IsActive);
+			formData.append('ContactData', ContactData);
+			formData.append('country', country);
+
+			formData.append('is_bank_detail', is_bank_detail);
+			formData.append('ifsc_code', ifsc_code);
+			formData.append('bank_name', bank_name);
+			formData.append('branch_name', branch_name);
+			formData.append('account_number', account_number);
+			formData.append('bank_address', bank_address);
+			formData.append('account_holder_name', account_holder_name);
+			formData.append('Tds', Tds);
+			formData.append('TdsPercent', TdsPercent);
+			formData.append('Tdsselection', Tdsselection);
+			formData.append('blocked_reason', blocked_reason);
+			// attachment file
+			// if (attachment) {
+			// 	formData.append('attachment', attachment);
+			// }
+
+			docs.forEach(function(doc) {
+				let file = $('input[name="' + doc + '"]')[0].files[0];
+				if (file) {
+					formData.append(doc, file);
+				}
+			});
+
+			// Append checked transport states (checkboxes) so backend receives person_check[]
+			var checkedStates = [];
+			$("input[name='person_check[]']:checked").each(function() {
+				checkedStates.push($(this).val());
+			});
+			checkedStates.forEach(function(s) {
+				formData.append('person_check[]', s);
+			});
+
+			// CSRF token (if present)
+			var csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
+			var csrfVal = $('input[name="' + csrfName + '"]').val() || '<?= $this->security->get_csrf_hash(); ?>';
+			formData.append(csrfName, csrfVal);
+
+			$.ajax({
+				url: "<?php echo admin_url(); ?>TransportMaster/SaveAccountID",
+				dataType: "JSON",
+				method: "POST",
+				data: formData,
+				processData: false,
+				contentType: false,
+				beforeSend: function() {
+					$('.searchh3').css('display', 'block');
+					$('.searchh3').css('color', 'blue');
+				},
+				complete: function() {
+					$('.searchh3').css('display', 'none');
+				},
+				success: function(data) {
+					if (data && data.success) {
+						$('#HiddenAccountID').val(data.account_id || '');
+
+						// Check if any attachments were uploaded
+						var uploadedFiles = [];
+						docs.forEach(function(doc) {
+							var fileInput = $('input[name="' + doc + '"]');
+							if (fileInput.length && fileInput[0].files.length > 0) {
+								uploadedFiles.push(doc);
+							}
+						});
+
+						// // Show attachment upload alert
+						// if (uploadedFiles.length > 0) {
+						// 	alert_float('success', 'Attachment(s) have been uploaded and saved to the database successfully!');
+						// }
+
+						// Show success toast for created record
+						alert_float('success', data.message || 'Record created successfully...');
+						// Clear form after a short delay so toast remains visible
+						ResetForm();
+					} else {
+						var msg = (data && data.message) ? data.message : 'Something went wrong...';
+						alert_float('warning', msg);
+						ResetForm();
+					}
+				},
+				error: function(xhr, status, err) {
+					console.error('SaveAccountID error', status, err, xhr.responseText);
+					var errorMsg = 'Error saving record';
+					try {
+						if (xhr.responseText) {
+							var response = JSON.parse(xhr.responseText);
+							if (response.message) {
+								errorMsg = response.message;
+							}
+						}
+					} catch (e) {
+						errorMsg = xhr.responseText || 'Error saving record';
+					}
+					alert_float('danger', errorMsg);
+					ResetForm();
+				}
+			});
+		}
+	});
+
+	$('.updateBtn').on('click', function() {
+		AccountID = $('#AccountID').val();
+		FavouringName = $('#FavouringName').val();
+		AccoountName = $('#AccoountName').val();
+		phonenumber = $('#phonenumber').val();
+		altphonenumber = $('#altphonenumber').val();
+		email = $('#email').val();
+		website = $('#website').val();
+		vat = $('#vat').val();
+		groups_in = $('#groups_in').val();
+		state = $('#state').val();
+		city = $('#city').val();
+		address = $('#address').val();
+		zip = $('#zip').val();
+		tan_number = $('#tan_number').val();
+		FLNO1 = $('#FLNO1').val();
+		Pan = $('#Pan').val();
+		MaxCrdAmt = $('#MaxCrdAmt').val();
+		IsActive = $('#IsActive').val();
+		expiry_licence = $('#expiry_licence').val();
+		country = $('#country').val();
+		territory = $('#territory').val();
+		broker = $('#broker').val();
+		broker_person = $('#broker_person').val();
+		freight_term = $('#freight_terms').val();
+		priority = $('#priority').val();
+		// attachment = document.getElementById('attachment').files[0] || null;
+		var formData = new FormData();
+
+		let docs = [
+			'PANCard', 'Aadhar', 'Permit',
+			'Photo', 'GST', 'ShopAct', 'Cheque', 'AddressProof'
+		];
+
+		credit_days = $('#credit_days').val();
+		is_bank_detail = $('#is_bank_detail').val();
+
+		ifsc_code = $('#ifsc_code').val();
+		bank_name = $('#bank_name').val();
+		branch_name = $('#branch_name').val();
+		bank_address = $('#bank_address').val();
+		account_number = $('#account_number').val();
+		account_holder_name = $('#account_holder_name').val();
+		temp_account_type = $('#temp_account_type').val();
+		temp_account_number = $('#temp_account_number').val();
+		Tds = $('#Tds').val();
+		TdsPercent = '';
+		Tdsselection = '';
+		if (Tds === '1') {
+			TdsPercent = $('#TdsPercent').val();
+			Tdsselection = $('#Tdsselection').val();
+		}
+
+		blocked_reason = $('#blocked_reason').val();
+
+		let Contact = [];
+		// Collect contact rows irrespective of name attribute presence; preserve id when present
+		$("#contacttbody tr").each(function() {
+			let id = $(this).find("input[name='cp_id[]']").val() || '';
+			let Name = $(this).find("input[name='cp_name[]']").val() || $(this).find('.cp_name_input').val();
+			let Designation = $(this).find("select[name='cp_designation[]']").val() || $(this).find("select[name='cp_designation']").val() || $(this).find("input[name='cp_designation[]']").val() || $(this).find('.cp_designation_input').val();
+			let Mobile = $(this).find("input[name='cp_mobile[]']").val() || $(this).find('.cp_mobile_input').val();
+			let Email = $(this).find("input[name='cp_email[]']").val() || $(this).find('.cp_email_input').val();
+			let SendEmail = $(this).find("input[name='cp_send_email[]']").is(':checked') ? 1 : $(this).find('.cp_email_checkbox').is(':checked') ? 1 : 0;
+			let SendSMS = $(this).find("input[name='cp_send_sms[]']").is(':checked') ? 1 : $(this).find('.cp_sms_checkbox').is(':checked') ? 1 : 0;
+
+			if (!Name && !Designation && !Mobile && !Email) return;
+
+			var DesignationToSave = Designation;
+			if (DesignationToSave) {
+				var posMatch = positionData.find(function(p) {
+					return p.position_id == DesignationToSave || p.position_name == DesignationToSave;
+				});
+				if (posMatch) DesignationToSave = posMatch.position_id;
+			}
+
+			Contact.push({
+				id: id,
+				Name: Name,
+				Designation: DesignationToSave,
+				Mobile: Mobile,
+				Email: Email,
+				SendEmail: SendEmail,
+				SendSMS: SendSMS
+			});
+		});
+		let ContactData = JSON.stringify(Contact);
+
+		// Validate contact rows: designation required and at least one send option
+		for (let i = 0; i < Contact.length; i++) {
+		    let c = Contact[i];
+		    if (!c.Designation || c.Designation.toString().trim() === '') {
+		        alert_float('warning', 'Contact designation is required for ' + (c.Name || ('contact #' + (i +
+		            1))));
+		        return;
+		    }
+		    if (c.SendEmail != 1 && c.SendSMS != 1) {
+		        alert_float('warning', 'At least one of Send SMS or Send Email must be selected for ' + (c
+		            .Name || ('contact #' + (i + 1))));
+		        return;
+		    }
+		}
+
+		if (AccountID == '') {
+			alert_float('warning', 'please enter AccountID');
+			$('#AccountID').focus();
+		} else if ($.trim(AccoountName) == '') {
+			alert_float('warning', 'please enter Account Name');
+			$('#AccountName').focus();
+		} else if (!$('#Pan').val().match('[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}') && $('#Pan').val() !== "") {
+			alert_float('warning', 'Enter valid PAN number');
+			$('#Pan').focus();
+		} else if (!$('#vat').val().match('[0-9]{2}[A-Za-z]{5}[0-9]{4}[A-Za-z][0-9][0-9A-Za-z]{2}') && $('#vat')
+			.val() !== '') {
+			alert_float('warning', "Enter valid GST no..");
+			$('#vat').focus();
+		} else if (phonenumber == '') {
+			alert_float('warning', 'please  enter mobile number');
+			$('#phonenumber').focus();
+		} else if (!$('#phonenumber').val().match('[0-9]{10}') && $('#phonenumber').val() !== "") {
+			alert_float('warning', 'Enter valid Mobile number');
+			$('#phonenumber').focus();
+		} else if (!$('#email').val().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && $('#email').val() !== "") {
+			alert_float('warning', 'Enter valid Email-id');
+			$('.saveBtn').removeAttr('disabled');
+			$('#email').focus();
+		} else if (state == '') {
+			alert_float('warning', 'please select State');
+			$('#state').focus();
+		} else if (city == '') {
+			alert_float('warning', 'please select City');
+			$('#city').focus();
+		} else if (Contact.length === 0) {
+			alert_float('warning', 'Please add at least one Contact Detail');
+			$('#contacttbody').focus();
+		} else if (country == '') {
+			alert_float('warning', 'Please select Billing Country');
+			$('#country').focus();
+		} else if (is_bank_detail == '' || is_bank_detail == null) {
+			alert_float('warning', 'Please select Bank Details option');
+			$('#is_bank_detail').focus();
+		}
+		else if (IsActive === 'N' && $.trim(blocked_reason) === '') {
+			alert_float('warning', 'Please enter blocked reason');
+			$('#blocked_reason').focus();
+			return;
+		}
+		// else if (!attachment) {
+		// 	alert_float('warning', 'Please upload an attachment file');
+		// 	$('#attachment').focus();
+		// } 
+		else {
+			// Use FormData to include file attachment for update
+			var formDataUpd = new FormData();
+			formDataUpd.append('AccountID', AccountID);
+			formDataUpd.append('AccoountName', AccoountName);
+			formDataUpd.append('FavouringName', FavouringName);
+			formDataUpd.append('phonenumber', phonenumber);
+			formDataUpd.append('altphonenumber', altphonenumber);
+			formDataUpd.append('email', email);
+			formDataUpd.append('vat', vat);
+			formDataUpd.append('groups_in', groups_in);
+			formDataUpd.append('state', state);
+			formDataUpd.append('city', city);
+			formDataUpd.append('address', address);
+			formDataUpd.append('zip', zip);
+			formDataUpd.append('Pan', Pan);
+			formDataUpd.append('IsActive', IsActive);
+			formDataUpd.append('country', country);
+			
+			formDataUpd.append('ContactData', ContactData);
+
+
+			formDataUpd.append('is_bank_detail', is_bank_detail);
+			formDataUpd.append('ifsc_code', ifsc_code);
+			formDataUpd.append('bank_name', bank_name);
+			formDataUpd.append('branch_name', branch_name);
+			formDataUpd.append('bank_address', bank_address);
+			formDataUpd.append('account_number', account_number);
+			formDataUpd.append('account_holder_name', account_holder_name);
+			formDataUpd.append('Tds', Tds);
+			formDataUpd.append('TdsPercent', TdsPercent);
+			formDataUpd.append('Tdsselection', Tdsselection);
+
+			formDataUpd.append('blocked_reason', blocked_reason);
+			// if (attachment) {
+			// 	formDataUpd.append('attachment', attachment);
+			// }
+
+			docs.forEach(function(doc) {
+				let file = $('input[name="' + doc + '"]')[0].files[0];
+				if (file) {
+					formDataUpd.append(doc, file);
+				}
+			});
+			// Append checked transport states (checkboxes) so backend receives person_check[] on update
+			var checkedStatesUpd = [];
+			$("input[name='person_check[]']:checked").each(function() {
+				checkedStatesUpd.push($(this).val());
+			});
+			checkedStatesUpd.forEach(function(s) {
+				formDataUpd.append('person_check[]', s);
+			});
+			var csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
+			var csrfVal = $('input[name="' + csrfName + '"]').val() || '<?= $this->security->get_csrf_hash(); ?>';
+			formDataUpd.append(csrfName, csrfVal);
+
+			$.ajax({
+				url: "<?php echo admin_url(); ?>TransportMaster/UpdateAccountID",
+				dataType: "JSON",
+				method: "POST",
+				data: formDataUpd,
+				processData: false,
+				contentType: false,
+				beforeSend: function() {
+					$('.searchh4').css('display', 'block');
+					$('.searchh4').css('color', 'blue');
+				},
+				complete: function() {
+					$('.searchh4').css('display', 'none');
+				},
+				success: function(data) {
+					if (data && data.success) {
+
+						// Check if any attachments were uploaded
+						var uploadedFilesUpd = [];
+						docs.forEach(function(doc) {
+							var fileInput = $('input[name="' + doc + '"]');
+							if (fileInput.length && fileInput[0].files.length > 0) {
+								uploadedFilesUpd.push(doc);
+							}
+						});
+
+						// // Show attachment upload alert
+						// if (uploadedFilesUpd.length > 0) {
+						// 	alert_float('success', 'Attachment(s) have been uploaded and saved to the database successfully!');
+						// }
+
+						// Show success toast for updated record
+						alert_float('success', data.message || 'Record updated successfully...');
+						// Clear form after a short delay so toast remains visible
+						setTimeout(function() {
+							ClearFormCompletely();
+						}, 700);
+					} else {
+						var msg = (data && data.message) ? data.message : 'Something went wrong...';
+						alert_float('warning', msg);
+						ResetForm();
+					}
+				},
+				error: function(xhr, status, err) {
+					console.error('UpdateAccountID error', status, err, xhr.responseText);
+					var errorMsg = 'Error updating record';
+					try {
+						if (xhr.responseText) {
+							var response = JSON.parse(xhr.responseText);
+							if (response.message) {
+								errorMsg = response.message;
+							}
+						}
+					} catch (e) {
+						errorMsg = xhr.responseText || 'Error updating record';
+					}
+					alert_float('danger', errorMsg);
+					ResetForm();
+				}
+			});
+		}
+	});
+
+	$('#state').on('change', function() {
+		var StateID = $(this).val();
+		var url = "<?php echo base_url(); ?>admin/clients/GetCity";
+		jQuery.ajax({
+			type: 'POST',
+			url: url,
+			data: {
+				StateID: StateID
+			},
+			dataType: 'json',
+			success: function(data) {
+				$("#city").find('option').remove();
+				$("#city").selectpicker("refresh");
+				for (var i = 0; i < data.length; i++) {
+					$("#city").append(new Option(data[i].city_name, data[i].id));
+				}
+				$('.selectpicker').selectpicker('refresh');
+			}
+		});
+	});
+
+	function addContactRow() {
+		var Name = $("#cp_name").val();
+		var Designation = $("#cp_designation").val();
+		var Mobile = $("#cp_mobile").val();
+		var Email = $("#cp_email").val();
+		var SendEmail = $("#cp_send_email").is(':checked') ? 1 : 0;
+		var SendSMS = $("#cp_send_sms").is(':checked') ? 1 : 0;
+
+		if (Mobile == '') {
+			alert_float('warning', 'Mobile Number is required');
+			return;
+		}
+
+		if (Mobile.length != 10) {
+			alert_float('warning', 'Mobile Number must be exactly 10 digits');
+			return;
+		}
+
+		if (Email == '') {
+			alert_float('warning', 'Email is required');
+			return;
+		}
+
+		if (!Email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+			alert_float('warning', 'Enter valid Email address');
+			return;
+		}
+
+		if (SendEmail == 0 && SendSMS == 0) {
+			alert_float('warning', 'At least one of "Send SMS" or "Send Email" must be selected');
+			return;
+		}
+
+		var newRow = $("<tr class='addedtr_contact'></tr>");
+		newRow.append("<td><input type='text' name='cp_name[]' class='form-control' value='" + Name + "'></td>");
+		newRow.append("<td><select class='selectpicker form-control cp_designation_input' name='cp_designation[]' data-width='100%' data-container='body'>" + getPositionOptions(Designation) + "</select></td>");
+		newRow.append("<td><input type='text' name='cp_mobile[]' class='form-control' value='" + Mobile +
+			"' maxlength='10' minlength='10' pattern='[0-9]{10}' onkeypress='return isNumber(event)' required></td>"
+		);
+		newRow.append("<td><input type='email' name='cp_email[]' class='form-control' value='" + Email +
+			"' pattern='[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' required></td>");
+		newRow.append("<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_sms[]' " + (
+			SendSMS == 1 ? 'checked' : '') + "><label></label></div></td>");
+		newRow.append("<td class='text-center'><div class='checkbox'><input type='checkbox' name='cp_send_email[]' " + (
+			SendEmail == 1 ? 'checked' : '') + "><label></label></div></td>");
+		newRow.append("<td><a href='#' class='btn btn-danger removebtn_contact'><i class='fa fa-times'></i></a></td>");
+		$("#contacttbody").append(newRow);
+
+		// Refresh selectpicker for newly added row
+		newRow.find('.selectpicker').selectpicker();
+		newRow.find('.selectpicker').selectpicker('refresh');
+
+		$("#cp_name").val('');
+		$("#cp_designation").val('').selectpicker('refresh');
+		$("#cp_mobile").val('');
+		$("#cp_email").val('');
+		$("#cp_send_email").prop('checked', false);
+		$("#cp_send_sms").prop('checked', false);
+	}
+
+	$(document).on('click', '.removebtn_contact', function() {
+		$(this).closest('tr').remove();
+	});
+	$('#select_all_persons').on('change', function () {
+    $("input[name='person_check[]']").prop('checked', this.checked);
+});
+
+
+	function addLocationRow() {
+		var newRow = `
+            <tr class="addedtr_location">
+                <td><input type="text" class="form-control" name="loc_pincode[]" onkeypress="return isNumber(event)" maxlength="6" required></td>
+                <td><textarea name="loc_address[]" class="form-control" rows="1"></textarea></td>
+                <td>
+                    <select class="selectpicker form-control loc_state" name="loc_state[]" required>
+                        <option value="">Select State</option>
+                        <?php foreach ($state as $st) { ?>
+                        <option value="<?php echo $st['short_name']; ?>">
+                            <?php echo $st['state_name']; ?></option>
+                        <?php } ?>
+                    </select>
+                </td>
+                <td>
+                    <select class="selectpicker form-control loc_city" name="loc_city[]" required>
+                        <option value="">Select City</option>
+                    </select>
+                </td>
+                <td><input type="text" class="form-control" name="loc_mobile[]" onkeypress="return isNumber(event)" maxlength="10" required></td>
+                <td><button type="button" class="btn btn-danger removeLocationBtn"><i class="fa fa-times"></i></button></td>
+            </tr>
+        `;
+		$("#locationtbody").append(newRow);
+		// Initialize/refresh selectpicker for newly added selects
+		$("#locationtbody .selectpicker").selectpicker();
+	}
+
+	$(document).on('click', '.removeLocationBtn', function(e) {
+		e.preventDefault();
+		$(this).closest('tr').remove();
+	});
+
+	$(document).on('change', '.loc_state', function() {
+		var StateID = $(this).val();
+		var cityDropdown = $(this).closest('tr').find('select.loc_city');
+		var url = "<?php echo base_url(); ?>admin/clients/GetCity";
+		if (StateID !== '') {
+			jQuery.ajax({
+				type: 'POST',
+				url: url,
+				data: {
+					StateID: StateID
+				},
+				dataType: 'json',
+				success: function(data) {
+					cityDropdown.find('option').remove();
+					cityDropdown.append(new Option('None selected', ""));
+					for (var i = 0; i < data.length; i++) {
+						cityDropdown.append(new Option(data[i].city_name, data[i].id));
+					}
+				}
+			});
+		} else {
+			cityDropdown.find('option').remove();
+			cityDropdown.append(new Option('None selected', ""));
+		}
+	});
+
+	$(document).on("click", ".sortablePop", function() {
+		var table = $("#table_Account_List tbody");
+		var rows = table.find("tr").toArray();
+		var index = $(this).index();
+		var ascending = !$(this).hasClass("asc");
+
+		$(".sortablePop").removeClass("asc desc");
+		$(".sortablePop span").remove();
+
+		$(this).addClass(ascending ? "asc" : "desc");
+		$(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
+
+		rows.sort(function(a, b) {
+			var valA = $(a).find("td").eq(index).text().trim();
+			var valB = $(b).find("td").eq(index).text().trim();
+
+			if ($.isNumeric(valA) && $.isNumeric(valB)) {
+				return ascending ? valA - valB : valB - valA;
+			} else {
+				return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+			}
+		});
+		table.append(rows);
+	});
+
+	// Verify GSTIN and call KYC API
+	function verifyGSTIN() {
+		let gstinNo = $('#vat').val();
+		let $gstinInput = $('#vat');
+		let $gstinSelect = $('#gstin_select');
+		let $gstinField = $gstinSelect.length > 0 ? $gstinSelect.next('.bootstrap-select').find('button') : $gstinInput;
+
+		// Reset field style on new verification
+		$gstinField.css('border-color', '');
+
+		// Check from dropdown if exists
+		if ($('#gstin_select').length > 0) {
+			gstinNo = $('#gstin_select').val();
+		}
+
+		if (!gstinNo || gstinNo.length !== 15) {
+			alert_float('warning', 'GSTIN must be 15 characters');
+			$gstinField.css('border-color', 'red');
+			return;
+		}
+
+		$('.gstin-verify-msg').remove();
+
+		$.ajax({
+			url: "<?php echo admin_url('clients/verify_gstin_kyc'); ?>",
+			type: "POST",
+			dataType: "json",
+			data: {
+				gstin: gstinNo.toUpperCase(),
+				userid: $('#userid').val() || $('#userid').attr('value') || 0
+			},
+			beforeSend: function() {
+				let gstinDropdown = $('#gstin_select');
+				if (gstinDropdown.length > 0) {
+					gstinDropdown.after(
+						'<small style="color: blue; display: block; margin-top: 5px;" class="gstin-verify-msg"><i>Verifying...</i></small>'
+					);
+				} else {
+					$('.gst_denger').append(
+						'<br><small style="color: blue;" class="gstin-verify-msg"><i>Verifying...</i></small>'
+					);
+				}
+			},
+			success: function(response) {
+				console.log('GSTIN Response:', response);
+				$('.gstin-verify-msg').remove();
+
+				if (response.status === 'duplicate') {
+					let msgText = response.message || 'GSTIN already exists in the system';
+					alert_float('warning', msgText);
+					$gstinField.css('border-color', 'red');
+					return;
+				} else if (response.status === 'success') {
+					// Clear old data before populating new data
+					$('#AccoountName').val('');
+					// $('#FavouringName').val('');
+					$('#email').val('');
+					$('#phonenumber').val('');
+					$('#address').val('');
+					$('#zip').val('');
+					$('#state').val('').selectpicker('refresh');
+					$('#city').val('').selectpicker('refresh');
+
+					// Clear contact and location tables
+					$("#contacttbody tr.addedtr_contact").remove();
+					$("#locationtbody tr.addedtr_location").remove();
+
+					let msgText = response.message || 'GSTIN verified successfully';
+					alert_float('success', msgText);
+					$gstinField.css('border-color', 'green');
+
+
+					if (response.data && response.data.fallback === false) {
+						var detailsCheck = response.data.details || {};
+						var hasRelevant = false;
+						if (detailsCheck.business_name && detailsCheck.business_name.toString().trim() !==
+							'') hasRelevant = true;
+						if (detailsCheck.contact_details && detailsCheck.contact_details.principal) {
+							var p = detailsCheck.contact_details.principal;
+							if ((p.address && p.address.toString().trim() !== '') || (p.email && p.email
+									.toString().trim() !== '') || (p.mobile && p.mobile.toString()
+									.trim() !== '')) hasRelevant = true;
+						}
+						if (!hasRelevant) {
+							alert_float('warning', 'Data not found');
+							$gstinField.css('border-color', 'red');
+						}
+					}
+
+					if (response.data && response.data.details) {
+						let details = response.data.details;
+						let contactDetails = details.contact_details;
+						console.log('Contact Details:', contactDetails);
+
+						// Populate company name from GSTIN response
+						if (details.business_name) {
+							$('#AccoountName').val(details.business_name);
+						}
+
+						if (contactDetails && contactDetails.principal) {
+							let principal = contactDetails.principal;
+							console.log('Principal data:', principal);
+
+							if (principal.email) {
+								console.log('Setting email:', principal.email);
+								$('#email').val(principal.email);
+							}
+
+							if (principal.mobile) {
+								let mobile = principal.mobile.replace(/\D/g, '').slice(-10);
+								console.log('Setting mobile:', mobile);
+								$('#phonenumber').val(mobile);
+							}
+							populateContactTableFromGSTData(response);
+							if (principal.address) {
+								let fullAddress = principal.address;
+								let addressParts = fullAddress.split(',').map(function(part) {
+									return part.trim();
+								});
+								console.log('Address parts:', addressParts);
+
+								if (addressParts.length > 0) {
+									let lastElement = addressParts[addressParts.length - 1];
+									if (/^\d{6}$/.test(lastElement)) {
+										console.log('Setting pincode:', lastElement);
+										$('#zip').val(lastElement);
+									}
+								}
+
+								if (addressParts.length > 1) {
+									let stateElement = addressParts[addressParts.length - 2];
+									console.log('Looking for state:', stateElement);
+									$('#state option').each(function() {
+										if ($(this).text().indexOf(stateElement) !== -1) {
+											console.log('Setting state:', $(this).val());
+											$('#state').val($(this).val());
+											$('#state').selectpicker('refresh');
+											return false;
+										}
+									});
+								}
+
+								if (addressParts.length > 2) {
+									let cityElement = addressParts[addressParts.length - 3];
+									console.log('Looking for city:', cityElement);
+									if ($('#state').val()) {
+										let stateId = $('#state').val();
+										$.ajax({
+											url: "<?php echo base_url(); ?>admin/clients/GetCity",
+											type: 'POST',
+											data: {
+												StateID: stateId
+											},
+											dataType: 'json',
+											success: function(cityData) {
+												console.log('Cities fetched:', cityData);
+												cityData.forEach(function(city) {
+													if (city.city_name.toLowerCase()
+														.indexOf(cityElement
+															.toLowerCase()) !== -1) {
+														console.log('Setting city:',
+															city.id);
+														if ($('#city option[value="' +
+																city.id + '"]')
+															.length === 0) {
+															$('#city').append(
+																new Option(city
+																	.city_name, city
+																	.id));
+														}
+														$('#city option[data-temp="1"]')
+															.remove();
+														$('#city').selectpicker(
+															'refresh');
+														$('#city').selectpicker('val',
+															city.id);
+														$('#city').selectpicker(
+															'refresh');
+														$('#city').trigger('change');
+														$('#city').selectpicker(
+															'refresh');
+														return false;
+													}
+												});
+											},
+											error: function(err) {
+												console.log('City fetch error:', err);
+											}
+										});
+									}
+								}
+
+								let formattedAddress = addressParts.join('\n');
+								console.log('Setting address:', formattedAddress);
+								$('#address').val(fullAddress);
+
+								let tokens = fullAddress.split(',').map(function(p) {
+									return p.trim();
+								}).filter(function(p) {
+									return p.length > 0;
+								});
+								for (let i = tokens.length - 1; i >= 0; i--) {
+									if (/^\d{6}$/.test(tokens[i])) {
+										$('#zip').val(tokens[i]);
+										tokens.splice(i, 1);
+										break;
+									}
+								}
+
+								let stateDetected = false;
+								for (let i = tokens.length - 1; i >= 0 && !stateDetected; i--) {
+									let tok = tokens[i].toLowerCase();
+									$('#state option').each(function() {
+										if ($(this).text().toLowerCase().indexOf(tok) !== -1) {
+											$('#state').val($(this).val());
+											$('#state').selectpicker('refresh');
+											stateDetected = true;
+											return false;
+										}
+									});
+									if (stateDetected) {
+										tokens.splice(i, 1);
+									}
+								}
+
+								if (stateDetected) {
+									let stateId = $('#state').val();
+									if (stateId) {
+										$.ajax({
+											url: "<?php echo base_url(); ?>admin/clients/GetCity",
+											type: 'POST',
+											data: {
+												StateID: stateId
+											},
+											dataType: 'json',
+											success: function(cityData) {
+												for (let i = tokens.length - 1; i >= 0; i--) {
+													let tok = tokens[i].toLowerCase();
+													for (let j = 0; j < cityData.length; j++) {
+														let cname = cityData[j].city_name
+															.toLowerCase();
+														if (cname === tok) {
+															if ($('#city option[value="' +
+																	cityData[j].id + '"]')
+																.length === 0) {
+																$('#city').append(new Option(
+																	cityData[j]
+																	.city_name,
+																	cityData[j].id));
+																$('#city').selectpicker(
+																	'refresh');
+															}
+															$('#city').selectpicker('val',
+																cityData[j].id);
+															$('#city').selectpicker('refresh');
+															$('#city').trigger('change');
+															return;
+														}
+														if (cname.indexOf(tok) !== -1 || tok
+															.indexOf(cname) !== -1) {
+															if ($('#city option[value="' +
+																	cityData[j].id + '"]')
+																.length === 0) {
+																$('#city').append(new Option(
+																	cityData[j]
+																	.city_name,
+																	cityData[j].id));
+																$('#city').selectpicker(
+																	'refresh');
+															}
+															$('#city').selectpicker('val',
+																cityData[j].id);
+															$('#city').selectpicker('refresh');
+															$('#city').trigger('change');
+															return;
+														}
+														var words = cname.split(/\s+/);
+														if (words.indexOf(tok) !== -1) {
+															if ($('#city option[value="' +
+																	cityData[j].id + '"]')
+																.length === 0) {
+																$('#city').append(new Option(
+																	cityData[j]
+																	.city_name,
+																	cityData[j].id));
+																$('#city').selectpicker(
+																	'refresh');
+															}
+															$('#city').selectpicker('val',
+																cityData[j].id);
+															$('#city').selectpicker('refresh');
+															$('#city').trigger('change');
+															return;
+														}
+													}
+												}
+											},
+											error: function(err) {
+												console.log('City fetch error:', err);
+											}
+										});
+									}
+								}
+
+								$('#address').val(formattedAddress);
+								if (principal.address) {
+									$('#address').val(principal.address);
+								}
+							}
+						} else {
+							console.log('No principal contact details found');
+						}
+					} else {
+						console.log('No data or details in response');
+					}
+
+					if (details.business_name) {
+						$('#AccoountName').val(details.business_name);
+					}
+
+					if (details.gstin) {
+						$('#vat').val(details.gstin);
+					}
+					if (details.pan_number) {
+						$('#Pan').val(details.pan_number);
+					}
+
+					// POPULATE LOCATION TABLE FROM GSTIN DATA
+					populateLocationDataFromGSTIN(response.data);
+
+					let gstinDropdown = $('#gstin_select');
+					if (gstinDropdown.length > 0) {
+						gstinDropdown.after(
+							'<small style="color: green; display: block; margin-top: 8px; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-check"></i> ' +
+							msgText + '</small>');
+					} else {
+						$('.gst_denger').append(
+							'<br><small style="color: green; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-check"></i> ' +
+							msgText + '</small>');
+					}
+				} else {
+					let msgText = response.message || 'GSTIN verification failed';
+					if (msgText && msgText.includes('already exists')) {
+						alert_float('warning', msgText);
+						$gstinField.css('border-color', 'red');
+					} else {
+						alert_float('error', msgText);
+						$gstinField.css('border-color', 'red');
+					}
+				}
+
+				// Refresh all selectpicker instances after populating data
+				$('.selectpicker').selectpicker('refresh');
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log("AJAX Error:", textStatus, errorThrown);
+				console.log("Response:", jqXHR.responseText);
+				$('.gstin-verify-msg').remove();
+				alert_float('error', 'Error verifying GSTIN: ' + textStatus);
+
+
+				let gstinDropdown = $('#gstin_select');
+				if (gstinDropdown.length > 0) {
+					gstinDropdown.after(
+						'<small style="color: red; display: block; margin-top: 8px; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-times"></i> Error verifying GSTIN</small>'
+					);
+				} else {
+					$('.gst_denger').append(
+						'<br><small style="color: red; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-times"></i> Error verifying GSTIN</small>'
+					);
+				}
+				$gstinField.css('border-color', 'red');
+			}
+		});
+	}
+
+	// Handle GSTIN selection from dropdown
+	function handleGstinSelection() {
+		let selectedGstin = $('#gstin_select').val();
+		if (selectedGstin) {
+			$("#vat").val(selectedGstin);
+			alert_float('success', 'GSTIN selected');
+			verifyGSTIN();
+		}
+	}
+</script>
+
+<script type="text/javascript">
+	// Handle Customer Category selection and populate Customer Code
+	$('#select_all_states').on('change', function() {
+		$('input[name="person_check[]"]').prop('checked', $(this).prop('checked'));
+	});
+
+	$('#MaxCrdAmt,#kms,.opening_bal,#crate_limit,#credit_days').on('keypress', function(event) {
+		if ((event.which != 46 || $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+			event.preventDefault();
+		}
+		var input = $(this).val();
+		if ((input.indexOf('.') != -1) && (input.substring(input.indexOf('.')).length > 2)) {
+			event.preventDefault();
+		}
+	});
+</script>
+<style>
+	#AccountID {
+		text-transform: uppercase;
+	}
+
+	#Pan {
+		text-transform: uppercase;
+	}
+
+	#vat {
+		text-transform: uppercase;
+	}
+
+	#table_Account_List td:hover {
+		cursor: pointer;
+	}
+
+	#table_Account_List tr:hover {
+		background-color: #ccc;
+	}
+
+	.table-Account_List {
+		overflow: auto;
+		max-height: 65vh;
+		width: 100%;
+		position: relative;
+		top: 0px;
+	}
+
+	.table-Account_List thead th {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+	}
+
+	.table-Account_List tbody th {
+		position: sticky;
+		left: 0;
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	th,
+	td {
+		padding: 1px 5px !important;
+		white-space: nowrap;
+		border: 1px solid !important;
+		font-size: 11px;
+		line-height: 1.42857143 !important;
+		vertical-align: middle !important;
+	}
+
+	th {
+		background: #50607b;
+		color: #fff !important;
+	}
+
+	/* Reduce width of pincode inputs */
+	/* #zip {
+        max-width: 140px;
+        width: 100%;
+        max-width: 140px;
+        box-sizing: border-box;
+        display: inline-block;
+    } */
+
+	#contactTable th:nth-child(1),
+	#contactTable td:nth-child(1) {
+		width: 350px;
+		max-width: 350px;
+	}
+
+	#contactTable th:nth-child(1),
+	#contactTable td:nth-child(2) {
+		width: 350px;
+		max-width: 350px;
+	}
+
+	#person_table thead,
+	#person_table tbody tr {
+		display: table;
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	#person_table tbody {
+		display: block;
+		max-height: 252px;
+		/* approx height for 10 rows */
+		overflow-y: scroll;
+	}
+
+	#person_table thead {
+		width: 100%;
+	}
+
+	#person_table .checkbox-col {
+		width: 40px;
+		/* adjust: 30–50px */
+		text-align: center;
+	}
+
+	#person_table thead th.checkbox-col,
+	#person_table tbody td.checkbox-col {
+		min-width: 40px;
+		max-width: 40px;
+	}
+
+	#person_table thead {
+		padding-right: 17px;
+		/* scrollbar width (Windows) */
+	}
+
+	.sticky-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #fff;
+    padding-top: 10px;
+	padding-bottom: 10px;
+    border-top: 1px solid #ddd;
+}
+
+	#ifsc_code {
+		text-transform: uppercase;
+	}
+</style>
