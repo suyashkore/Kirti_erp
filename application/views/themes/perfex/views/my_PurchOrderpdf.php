@@ -112,7 +112,7 @@ if (!empty($history)) {
 
 /* ================= SUMMARY SECTION (NO EMPTY SPACE) ================= */
 
-$html .= '<tr>
+$html .= '<tr> 
     <td colspan="10" style="padding:0;">
         <table width="100%" border="0" cellpadding="4" cellspacing="0">
             <tr>
