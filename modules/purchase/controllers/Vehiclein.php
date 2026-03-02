@@ -357,12 +357,12 @@ class Vehiclein extends AdminController
 	}
 	
 	//======================= View GateinPass_pdf Print ============================
-    public function GateinPassPrint($GateINID)
+    public function GateinPassPrint($gatein_no)
     {
 		// echo"";
 		// print_r($GateINID);die;
 		// $GateINID = 'PO251DO00001';
-        if (!$GateINID) {
+        if (!$gatein_no) {
             redirect(admin_url('purchase/AddPurchaseOrder'));
         }
         
@@ -370,13 +370,26 @@ class Vehiclein extends AdminController
             access_denied('Invoices');
         }
         $invoice = [];
-			$invoice1 = $this->Inwards_model->getAllINDetails($GateINID);
-					foreach ($invoice1 as $key => $val) {
-						$data[$key] = $val;
-					}    
-    $invoice = [
-        'invoice' => $invoice1,
-    ];
+		$data['title'] = 'Inwards Master';
+		$data['gatein'] = $this->Inwards_model->getGateinDetails($gatein_no);
+		if(!$data['gatein']){
+			redirect(admin_url('purchase/Inwards'));
+		}
+		$data['inward'] = $this->Inwards_model->getInwardsDetails($data['gatein']->InwardID) ?? [];
+		if($data['inward']){
+			$data['order'] = $this->Inwards_model->getPurchaseOrderDetails($data['inward']['OrderID']) ?? [];
+		}else{
+			$data['order'] = [];
+		}
+		$gateDetails = $this->Inwards_model->getAllINDetails($gatein_no);
+		foreach ($gateDetails as $key => $val) {
+			$data[$key] = $val;
+		}
+		$data['gateDetails'] = $gateDetails; 
+
+			$invoice = [
+				'invoice' => $data,
+			];
         try {
             $pdf = GateinPass_pdf($invoice);
         } catch (Exception $e) {
@@ -398,7 +411,7 @@ class Vehiclein extends AdminController
             $type = 'I';
         }
         
-        $pdf->Output(mb_strtoupper(slug_it($GateINID)) . '-GateinPassSlip.pdf', $type);
+        $pdf->Output(mb_strtoupper(slug_it($gatein_no)) . '-GateinPassSlip.pdf', $type);
     }
 
 }
