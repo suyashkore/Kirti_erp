@@ -10,7 +10,7 @@
          ?>
          <tr data-name="<?php echo $feature; ?>">
             <td>
-               <b><?php echo $permission['main_menu']; ?></b>
+               <b><?php echo $permission['main_menu']??''; ?></b>
             </td>
             <td>
                <b><?php echo $permission['name']; ?></b>

@@ -173,6 +173,68 @@ class Roles_model extends App_Model
 
      */
 
+    // public function update_staff_permission($data, $id)
+
+    // {
+
+    //     $affectedRows = 0;
+
+    //     $permissions  = [];
+
+    //     if (isset($data['permissions'])) {
+
+    //         $permissions = $data['permissions'];
+
+    //     }
+
+
+
+    //     $data['permissions'] = serialize($permissions);
+
+        
+
+    //    /* echo "<pre>";
+
+    //     print_r($data);*/
+
+    //     $aa = explode("-",$data['company_select']);
+
+        
+
+    //     $plant_id= $aa[0];
+
+    //     $year = $aa[1];
+
+    //     $number_day = $data['number_day'] ?? 0;
+
+       
+
+        
+
+    //     if ($this->staff_model->update_permissions_new($permissions, $id,$plant_id,$year,$day_detail,$data)) {
+
+    //                 $affectedRows++;
+
+    //             }
+
+
+
+    //     if ($affectedRows > 0) {
+
+    //         log_activity('Staff permission Updated [ID: ' . $id . ', Name: ' . $data['username'] . ']');
+
+
+
+    //         return true;
+
+    //     }
+
+
+
+    //     return false;
+
+    // }
+
     public function update_staff_permission($data, $id)
 
     {
@@ -205,7 +267,7 @@ class Roles_model extends App_Model
 
         $year = $aa[1];
 
-        $day_detail = $data['number_day'];
+        $day_detail = $data['number_day'] ?? 0;
 
        
 

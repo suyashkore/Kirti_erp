@@ -662,6 +662,496 @@ class Staff_model extends App_Model
 
     }
 
+    public function get_staff_details_for_using_username($id)
+
+		{
+
+			$selected_company = $this->session->userdata('root_company');
+
+			$regExp ='.*;s:[0-9]+:"'.$selected_company.'".*';
+
+			$this->db->select('*');
+
+			//$this->db->where('admin', 0);
+
+			$this->db->where('AccountID', $id);
+
+			//$this->db->where('tblstaff.staff_comp REGEXP',$regExp);
+
+			/*$this->db->where('active', 1);*/
+
+			$staff = $this->db->get(db_prefix() . 'staff')->row();
+
+			if($staff){
+
+				return $staff;
+
+				}else{
+
+				return false;
+
+			}
+
+			
+
+		}
+
+        public function get_staff_details_for_user_rights($id)
+
+		{
+
+			$selected_company = $this->session->userdata('root_company');
+
+			$regExp ='.*;s:[0-9]+:"'.$selected_company.'".*';
+
+			
+
+			$this->db->select('*');
+
+			//$this->db->where('admin', 0);
+
+			$this->db->where('staffid', $id);
+
+			$this->db->where('tblstaff.PlantID',$selected_company);
+
+			/*$this->db->where('active', 1);*/
+
+			$staff = $this->db->get(db_prefix() . 'staff')->row();
+
+			if($staff){
+
+				return $staff;
+
+				}else{
+
+				return false;
+
+			}
+
+			
+
+		}
+
+        // public function update_permissions_new($permissions, $id, $plant_id, $year,$day_detail,$data)
+
+		// {
+
+		// 	$day_detail_new = array();
+
+		// 	$i = 0;
+
+		// 	//echo "<pre>";
+
+		// 	foreach($day_detail as $link)
+
+		// 	{
+
+		// 		if($link == '')
+
+		// 		{
+
+		// 			unset($link);
+
+		// 			}else{
+
+		// 			array_push($day_detail_new, $link);
+
+		// 		}
+
+		// 	}
+
+		// 	/*print_r($day_detail_new);
+
+		// 		print_r($day_detail);
+
+		// 		print_r($permissions);
+
+		// 	die;*/
+
+		// 	$this->db->where('staff_id', $id);
+
+		// 	$this->db->where('plant_id', $plant_id);
+
+		// 	$this->db->LIKE('year', $year);
+
+		// 	$this->db->delete('staff_permissions');
+
+			
+
+		// 	$is_staff_member = is_staff_member($id);
+
+			
+
+		// 	foreach ($permissions as $feature => $capabilities) {
+
+		// 		$j = 0;
+
+		// 		foreach ($capabilities as $capability) {
+
+		// 			$edit = 0;
+
+		// 			$add = 0;
+
+		// 			$delete = 0;
+
+		// 			$view = 0;
+
+		// 			$view_check = 0;
+
+		// 			// Maybe do this via hook.
+
+		// 			if ($feature == 'leads' && !$is_staff_member) {
+
+		// 				continue;
+
+		// 			}
+
+		// 			if(isset($data[$feature])){
+
+		// 				$days = $data[$feature];
+
+		// 				}else{
+
+		// 				$days = NULL;
+
+		// 			}
+
+		// 			if($capability == "view_own" || $capability == "view" || $capability == "create" || $capability == "edit" || $capability == "delete"){
+
+		// 				if($j == 0){
+
+		// 					$this->db->insert('staff_permissions', ['staff_id' => $id, 'feature' => $feature, 'capability' => 'view', 'plant_id' => $plant_id, 'year' => $year, 'days' => $days, 'Lupdate' => date('Y-m-d H:i:s')]);
+
+		// 					$j++;
+
+		// 				}
+
+		// 			}
+
+		// 			if($capability == "view_own"){
+
+						
+
+		// 				$view = 1;
+
+		// 				$view_check = 1;
+
+		// 			}
+
+		// 			if($capability == "view"){
+
+						
+
+		// 				$view = 1;
+
+		// 				$view_check = 1;
+
+		// 			}
+
+		// 			if($capability == "create" && $view == "0"){
+
+						
+
+		// 				$add = 1;
+
+		// 				$view = 1;
+
+		// 				$view_check = 0;
+
+		// 			}
+
+		// 			if($capability == "edit" && $view == "0"){
+
+		// 				$edit = 1;
+
+		// 				$view = 1;
+
+		// 				$view_check = 0;
+
+		// 			}
+
+		// 			if($capability == "delete" && $view == "0"){
+
+		// 				$view = 1;
+
+		// 				$delete = 1;
+
+		// 				$view_check = 0;
+
+		// 			}
+
+					
+
+		// 			if(($capability == "view_own" || $capability == "view")){
+
+						
+
+		// 				}else{
+
+		// 				$this->db->insert('staff_permissions', ['staff_id' => $id, 'feature' => $feature, 'capability' => $capability, 'plant_id' => $plant_id, 'year' => $year, 'days' => $days, 'Lupdate' => date('Y-m-d H:i:s')]);
+
+		// 			}
+
+		// 		}
+
+		// 		$i++;
+
+		// 	}
+
+			
+
+		// 	return true;
+
+		// }
+
+        public function update_permissions_new($permissions, $id, $plant_id, $year, $day_detail, $data)
+{
+    // Ensure $day_detail is an array
+    if (!is_array($day_detail)) {
+        $day_detail = [];
+    }
+
+    $day_detail_new = [];
+    foreach ($day_detail as $link) {
+        if ($link !== '') {
+            $day_detail_new[] = $link;
+        }
+    }
+
+    // Delete existing permissions for this staff/plant/year
+    $this->db->where('staff_id', $id);
+    $this->db->where('plant_id', $plant_id);
+    $this->db->LIKE('year', $year);
+    $this->db->delete('staff_permissions');
+
+    $is_staff_member = is_staff_member($id);
+
+    // Ensure $permissions is an array
+    if (!is_array($permissions)) {
+        $permissions = [];
+    }
+
+    foreach ($permissions as $feature => $capabilities) {
+        // Ensure $capabilities is an array
+        if (!is_array($capabilities)) {
+            continue; // skip invalid capability list
+        }
+
+        $j = 0;
+        foreach ($capabilities as $capability) {
+            $edit = 0;
+            $add = 0;
+            $delete = 0;
+            $view = 0;
+            $view_check = 0;
+
+            // Skip leads if not staff member
+            if ($feature === 'leads' && !$is_staff_member) {
+                continue;
+            }
+
+            // Get days for this feature safely
+            $days = isset($data[$feature]) ? $data[$feature] : null;
+
+            // Insert 'view' capability first if not already inserted
+            if (in_array($capability, ['view_own', 'view', 'create', 'edit', 'delete'])) {
+                if ($j === 0) {
+                    $this->db->insert('staff_permissions', [
+                        'staff_id'   => $id,
+                        'feature'    => $feature,
+                        'capability' => 'view',
+                        'plant_id'   => $plant_id,
+                        'year'       => $year,
+                        'days'       => $days,
+                        'Lupdate'    => date('Y-m-d H:i:s')
+                    ]);
+                    $j++;
+                }
+            }
+
+            // Track capabilities flags
+            if ($capability === "view_own" || $capability === "view") {
+                $view = 1;
+                $view_check = 1;
+            }
+            if ($capability === "create" && $view == 0) {
+                $add = 1;
+                $view = 1;
+                $view_check = 0;
+            }
+            if ($capability === "edit" && $view == 0) {
+                $edit = 1;
+                $view = 1;
+                $view_check = 0;
+            }
+            if ($capability === "delete" && $view == 0) {
+                $delete = 1;
+                $view = 1;
+                $view_check = 0;
+            }
+
+            // Insert other capabilities except 'view' and 'view_own' (already inserted)
+            if (!in_array($capability, ['view_own', 'view'])) {
+                $this->db->insert('staff_permissions', [
+                    'staff_id'   => $id,
+                    'feature'    => $feature,
+                    'capability' => $capability,
+                    'plant_id'   => $plant_id,
+                    'year'       => $year,
+                    'days'       => $days,
+                    'Lupdate'    => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+    }
+
+    return true;
+}
+
+        public function get_new($id = '', $plant_id = '', $year = '', $where = [])
+
+		{ 
+
+			$select_str = '*,CONCAT(firstname,\' \',lastname) as full_name';
+
+			
+
+			// Used to prevent multiple queries on logged in staff to check the total unread notifications in core/AdminController.php
+
+			if (is_staff_logged_in() && $id != '' && $id == get_staff_user_id()) {
+
+				$select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE touserid=' . get_staff_user_id() . ' and isread=0) as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE finished=0 AND staffid=' . get_staff_user_id() . ') as total_unfinished_todos';
+
+			}
+
+			
+
+			$this->db->select($select_str);
+
+			$this->db->where($where);
+
+			
+
+			if (is_numeric($id)) {
+
+				$this->db->where('staffid', $id);
+
+				$staff = $this->db->get(db_prefix() . 'staff')->row();
+
+				
+
+				if ($staff) {
+
+					$staff->permissions = $this->get_staff_permissions_new($id,$plant_id,$year);
+
+				}
+
+				
+
+				return $staff;
+
+			}
+
+			$this->db->order_by('firstname', 'ase');
+
+			
+
+			return $this->db->get(db_prefix() . 'staff')->result_array();
+
+		}
+
+        /**
+
+			* Get staff permissions
+
+			* @param  mixed $id staff id
+
+			* @return array
+
+		*/
+
+		public function get_staff_permissions_new($id,$plant_id,$year)
+
+		{
+
+			// Fix for version 2.3.1 tables upgrade
+
+			if (defined('DOING_DATABASE_UPGRADE')) {
+
+				return [];
+
+			}
+
+			
+
+			$permissions = $this->app_object_cache->get('staff-' . $id . '-permissions');
+
+			
+
+			if (!$permissions && !is_array($permissions)) {
+
+				$this->db->where('staff_id', $id);
+
+				$this->db->where('year', $year);
+
+				$this->db->where('plant_id', $plant_id);
+
+				$permissions = $this->db->get('staff_permissions')->result_array();
+
+				
+
+				$this->app_object_cache->add('staff-' . $id . '-permissions', $permissions);
+
+			}
+
+			
+
+			return $permissions;
+
+		}
+
+        public function get_staff_permissions_new_for_chk_per($id)
+
+		{
+
+			// Fix for version 2.3.1 tables upgrade
+
+			if (defined('DOING_DATABASE_UPGRADE')) {
+
+				return [];
+
+			}
+
+			$selected_company = $this->session->userdata('root_company');
+
+			$selected_year = $this->session->userdata('finacial_year');
+
+			$permissions = $this->app_object_cache->get('staff-' . $id . '-permissions');
+
+			
+
+			if (!$permissions && !is_array($permissions)) {
+
+				$this->db->where('staff_id', $id);
+
+				$this->db->where('plant_id', $selected_company);
+
+				$this->db->where('year', $selected_year);
+
+				$permissions = $this->db->get('staff_permissions')->result_array();
+
+				
+
+				$this->app_object_cache->add('staff-' . $id . '-permissions', $permissions);
+
+			}
+
+			
+
+			return $permissions;
+
+		}
+
 
 
     /**

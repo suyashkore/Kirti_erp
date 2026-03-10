@@ -666,21 +666,25 @@
 				return true;
 				}else{
 				return false;
-			}
 		}
-		public function get_no_act_list($user_id)
-		{  
-			$selected_company = $this->session->userdata('root_company');
-			
-			$sql ='SELECT '.db_prefix().'clients.* FROM '.db_prefix().'clients WHERE no_show = "1" AND PlantID = '.$selected_company;
-			
-			$result = $this->db->query($sql)->result_array();
-			return $result;
-			
-		}
-		public function get_no_act_list_for_staff($user_id)
-		{  
-			$selected_company = $this->session->userdata('root_company');
+	}
+	public function get_no_act_list($user_id)
+	{
+		$selected_company = $this->session->userdata('root_company');
+
+		// Fetch clients that are inactive (IsActive = 'N') for the selected company
+		$sql = '
+        SELECT * 
+        FROM ' . db_prefix() . 'clients 
+        WHERE IsActive = "N"
+          AND PlantID = ' . $selected_company;
+
+		$result = $this->db->query($sql)->result_array();
+		return $result;
+	}
+	public function get_no_act_list_for_staff($user_id)
+	{
+		$selected_company = $this->session->userdata('root_company');
 			
 			$selected_company = $this->session->userdata('root_company');
 			$this->db->select(db_prefix() . 'staff.*');

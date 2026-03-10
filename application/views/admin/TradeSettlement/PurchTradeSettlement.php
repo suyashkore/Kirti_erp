@@ -204,15 +204,16 @@
                     </thead>
                     <tbody id="items_body">
                     </tbody>
-                    <tfoot>
-                      <tr id="total_row">
-                        <td colspan="8"><b>Total</b></td>
-                        <td id="total_weight"><b>0.00</b></td>
-                        <td id="total_bag"><b>0.00</b></td>
-                        <td id="total_katta"><b>0.00</b></td>
-                        <td colspan="2"></td>
-                      </tr>
-                    </tfoot>
+                    <!-- REPLACE your existing tfoot with this -->
+<tfoot>
+  <tr id="total_row">
+    <td colspan="8"><b>Total</b></td>
+    <td id="tfoot_weight" style="font-weight:600;">0.00</td>
+    <td id="tfoot_bag"    style="font-weight:600;">0.00</td>
+    <td id="tfoot_katta"  style="font-weight:600;">0.00</td>
+    <td colspan="2"></td>
+  </tr>
+</tfoot>
                   </table>
                 </div>
 
@@ -239,39 +240,46 @@ $curr_date = date('Y-m-d');
 $curr_date_new = new DateTime($curr_date);
 $last_date_yr = new DateTime($lastdate_date);
 if ($last_date_yr < $curr_date_new) {
-    $max_date_php = $lastdate_date;
+  $max_date_php = $lastdate_date;
 } else {
-    $max_date_php = $curr_date;
+  $max_date_php = $curr_date;
 }
 ?>
 
 <?php init_tail(); ?>
 <script>
-    $(document).ready(function() {
-        var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
-        var year = "20" + fin_y;
-        var cur_y = new Date().getFullYear().toString().substr(-2);
-
-        // Min date: April 1st of FY start year
-        var minStartDate = new Date(year, 3, 1); // month index 3 = April
-
-        // Max date: March 31 of FY end year, OR today if still within FY
-        var maxEndDate;
-        if (parseInt(cur_y) > parseInt(fin_y)) {
-            var fy_new = parseInt(fin_y) + 1;
-            var fy_new_s = "20" + fy_new;
-            maxEndDate = new Date(fy_new_s + '/03/31');
-        } else {
-            maxEndDate = new Date();
-        }
-
-        $('#BookingDate').datetimepicker({
-            format: 'd/m/Y',
-            minDate: minStartDate,
-            maxDate: maxEndDate,
-            timepicker: false
-        });
+  function get_required_fields(form_id) {
+    let fields = [];
+    $('#' + form_id + ' [required]').each(function() {
+        fields.push($(this).attr('id'));
     });
+    return fields;
+}
+  $(document).ready(function() {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
+    } else {
+      maxEndDate = new Date();
+    }
+
+    $('#BookingDate').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+  });
 
   // Get The Customer Dropdrop
   function getBookingDetails(callback = null) {
@@ -316,7 +324,7 @@ if ($last_date_yr < $curr_date_new) {
 
   function getBookingListDetails(InvoiceID) {
     if (!InvoiceID) return;
-    const bookingType = $('#BookingType').val();
+
     $.ajax({
       url: "<?= admin_url(); ?>TradeSettlement/getBookingListDetails",
       type: "POST",
@@ -326,67 +334,108 @@ if ($last_date_yr < $curr_date_new) {
       dataType: "json",
       success: function(response) {
         if (!response.success) return;
-        
-          let d = response.data;
-          let i = response.inward_data;
 
-          $('#BookingDate').val(moment(d.TransDate).format('DD/MM/YYYY'));
-          $('#BookingRate').val(d.ItemAmt);
-          $('#TodaysRate').val(d.ItemAmt);
-          $('#BookingWt').val(d.TotalWeight);
-          $('#InwardWt').val(i.TotalWeight);
+        let d = response.data;
+        let i = response.inward_data;
 
-          calculateShortage();
+        $('#BookingDate').val(moment(d.TransDate).format('DD/MM/YYYY'));
+        $('#BookingRate').val(d.ItemAmt);
+        $('#TodaysRate').val(d.ItemAmt);
+        $('#BookingWt').val(d.TotalWeight);
+        $('#InwardWt').val(i.TotalWeight);
 
-          $('#item_category').val(d.CategoryID).selectpicker('refresh');
-          $('#advreg').val(d.AdvRegType).selectpicker('refresh');
-          $('#gate_no').val(d.GateINID);
+        calculateShortage();
 
-          $('#customer_location').val(d.CustLocationID).selectpicker('refresh');
+        $('#item_category').val(d.CategoryID).selectpicker('refresh');
+        $('#advreg').val(d.AdvRegType).selectpicker('refresh');
+        $('#gate_no').val(d.GateINID);
+        $('#customer_location').val(d.CustLocationID).selectpicker('refresh');
 
-          $('#items_body').html('');
-          $('#row_id').val(0);
+        // Clear existing rows
+        $('#items_body').html('');
+        $('#row_id').val(0);
 
-          if (i) {
+        if (i && i.history && i.history.length > 0) {
+    var historyCount = i.history.length;
+    var totalInwardWeight = parseFloat(i.TotalWeight || 0);
+    var totalBagWeight    = parseFloat(i.BagWeight   || 0);
+    var totalKatta        = parseFloat(i.TotalKatta  || 0);
+    var totalLayer        = parseFloat(i.TotalLayer  || 0);
 
-            addRow(2);
-            var row = parseInt($('#row_id').val());
+    $.each(i.history, function(index, histItem) {
+        addRow(2);
+        var row = parseInt($('#row_id').val());
 
-            $('#order_id' + row).text(i.InwardsID || '');
-            $('#gate_pass' + row).text(i.GatePass || '');
-            $('#inward_date' + row).text(moment(i.TransDate).format('DD/MM/YYYY'));
-            $('#account_id' + row).text(i.AccountID || '');
-            $('#party_name' + row).text(i.company || '');
-            $('#booking_id' + row).text(i.OrderID || '');
+        $('#order_id'    + row).text(i.InwardsID || '');
+        $('#gate_pass'   + row).text(i.GatePass  || '');
+        $('#inward_date' + row).text(moment(i.TransDate).format('DD/MM/YYYY'));
+        $('#account_id'  + row).text(i.AccountID || '');
+        $('#party_name'  + row).text(i.company   || '');
+        $('#booking_id'  + row).text(i.OrderID   || '');
+        $('#item_id'     + row).text(histItem.ItemID    || '');
+        $('#item_name'   + row).text(histItem.item_name || '');
+        $('#status'      + row).text(i.gate_Status || '');
 
-            if (i.history && i.history.length > 0) {
-              $('#item_id' + row).text(i.history[0].ItemID || '');
-              $('#item_name' + row).text(i.history[0].item_name || '');
-            }
+        // ✅ Try per-item fields first, then fall back to equally divided parent total
+        var itemNetWeight = parseFloat(histItem.NetWeight  || histItem.Weight      || histItem.TotalWeight || 0);
+        var itemBagWeight = parseFloat(histItem.BagWeight  || 0);
+        var itemKatta     = parseFloat(histItem.TotalKatta || histItem.Katta       || 0);
+        var itemLayer     = parseFloat(histItem.TotalLayer || histItem.Layer       || 0);
 
-            $('#total_weight' + row).text(i.TotalWeight || 0);
-            $('#total_bag' + row).text(i.BagWeight || 0);
-            $('#total_katta' + row).text(i.TotalKatta || 0);
-            $('#total_layer' + row).text(i.TotalLayer || 0);
-            $('#status' + row).text(i.gate_Status || '');
-            calculateTotals();
+        // ✅ Fallback: divide parent totals equally across all history rows
+        if (itemNetWeight === 0 && totalInwardWeight > 0) {
+            itemNetWeight = totalInwardWeight / historyCount;
+        }
+        if (itemBagWeight === 0 && totalBagWeight > 0) {
+            itemBagWeight = totalBagWeight / historyCount;
+        }
+        if (itemKatta === 0 && totalKatta > 0) {
+            itemKatta = totalKatta / historyCount;
+        }
+        if (itemLayer === 0 && totalLayer > 0) {
+            itemLayer = totalLayer / historyCount;
+        }
 
+        $('#total_weight' + row).text(itemNetWeight.toFixed(2));
+        $('#total_bag'    + row).text(itemBagWeight.toFixed(2));
+        $('#total_katta'  + row).text(itemKatta.toFixed(2));
+        $('#total_layer'  + row).text(itemLayer.toFixed(2));
+    });
 
-            // show total row
-            $('#total_row').show();
-          }
-        
+    calculateTotals();
+    $('#total_row').show();
+} else if (i) {
+          // Fallback: no history array, show single row from header data
+          addRow(2);
+          var row = parseInt($('#row_id').val());
+
+          $('#order_id' + row).text(i.InwardsID || '');
+          $('#gate_pass' + row).text(i.GatePass || '');
+          $('#inward_date' + row).text(moment(i.TransDate).format('DD/MM/YYYY'));
+          $('#account_id' + row).text(i.AccountID || '');
+          $('#party_name' + row).text(i.company || '');
+          $('#booking_id' + row).text(i.OrderID || '');
+          $('#item_id' + row).text('');
+          $('#item_name' + row).text('');
+          $('#total_weight' + row).text(parseFloat(i.TotalWeight || 0).toFixed(2));
+          $('#total_bag' + row).text(parseFloat(i.BagWeight || 0).toFixed(2));
+          $('#total_katta' + row).text(parseFloat(i.TotalKatta || 0).toFixed(2));
+          $('#total_layer' + row).text(i.TotalLayer || 0);
+          $('#status' + row).text(i.gate_Status || '');
+
+          calculateTotals();
+          $('#total_row').show();
+        }
+
         $('.selectpicker').selectpicker('refresh');
         $('#form_mode').val('add');
         $('.saveBtn').show();
         $('.updateBtn').hide();
         $('.printBtn').hide();
         $('#ListModal').modal('hide');
-
       }
     });
   }
-
 
 
   function calculateShortage() {
@@ -407,13 +456,13 @@ if ($last_date_yr < $curr_date_new) {
     $('#ShortageAmt').val(shortageAmt.toFixed(2));
 
     // Auto-select Status based on weight comparison
-  if (bookingWt > 0 && bookingWt === inwardWt) {
-    $('#Status').val('1').selectpicker('refresh'); // Completed
-  } else if (inwardWt > 0 && inwardWt < bookingWt) {
-    $('#Status').val('2').selectpicker('refresh'); // Partial Completed
-  } else {
-    $('#Status').val('').selectpicker('refresh');  // Reset
-  }
+    if (bookingWt > 0 && bookingWt === inwardWt) {
+      $('#Status').val('1').selectpicker('refresh'); // Completed
+    } else if (inwardWt > 0 && inwardWt < bookingWt) {
+      $('#Status').val('2').selectpicker('refresh'); // Partial Completed
+    } else {
+      $('#Status').val('').selectpicker('refresh'); // Reset
+    }
   }
 
   $('.printBtn').hide();
@@ -501,34 +550,60 @@ if ($last_date_yr < $curr_date_new) {
 
 
 
+  // function calculateTotals() {
+  //   let totalWeight = 0;
+  //   let totalBag = 0;
+  //   let totalKatta = 0;
+
+  //   $('.net_weight').each(function() {
+  //     totalWeight += parseFloat($(this).text()) || 0;
+  //   });
+
+  //   $('.total_bag').each(function() {
+  //     totalBag += parseFloat($(this).text()) || 0;
+  //   });
+
+  //   $('.total_katta').each(function() {
+  //     totalKatta += parseFloat($(this).text()) || 0;
+  //   });
+
+  //   $('#total_weight').text(totalWeight.toFixed(2));
+  //   $('#total_bag').text(totalBag.toFixed(2));
+  //   $('#total_katta').text(totalKatta.toFixed(2));
+  // }
+
+  // function get_required_fields(form_id) {
+  //   let fields = [];
+  //   $('#' + form_id + ' [required]').each(function() {
+  //     fields.push($(this).attr('id'));
+  //   });
+  //   return fields;
+  // }
+
   function calculateTotals() {
     let totalWeight = 0;
     let totalBag = 0;
     let totalKatta = 0;
 
-    $('.net_weight').each(function() {
-      totalWeight += parseFloat($(this).text()) || 0;
+    // Sum all tbody data cells (text nodes, not the tfoot)
+    $('#items_body tr').each(function() {
+      totalWeight += parseFloat($(this).find('.net_weight').text()) || 0;
+      totalBag += parseFloat($(this).find('.total_bag').text()) || 0;
+      totalKatta += parseFloat($(this).find('.total_katta').text()) || 0;
     });
 
-    $('.total_bag').each(function() {
-      totalBag += parseFloat($(this).text()) || 0;
-    });
+    // Update tfoot totals
+    $('#tfoot_weight').text(totalWeight.toFixed(2));
+    $('#tfoot_bag').text(totalBag.toFixed(2));
+    $('#tfoot_katta').text(totalKatta.toFixed(2));
 
-    $('.total_katta').each(function() {
-      totalKatta += parseFloat($(this).text()) || 0;
-    });
-
-    $('#total_weight').text(totalWeight.toFixed(2));
-    $('#total_bag').text(totalBag.toFixed(2));
-    $('#total_katta').text(totalKatta.toFixed(2));
-  }
-
-  function get_required_fields(form_id) {
-    let fields = [];
-    $('#' + form_id + ' [required]').each(function() {
-      fields.push($(this).attr('id'));
-    });
-    return fields;
+    // ✅ Validate: tfoot total weight must equal InwardWt from header
+    var inwardWt = parseFloat($('#InwardWt').val()) || 0;
+    if (inwardWt > 0 && Math.abs(totalWeight - inwardWt) > 0.01) {
+      $('#tfoot_weight').css('color', 'red'); // mismatch — highlight in red
+    } else {
+      $('#tfoot_weight').css('color', 'green'); // matches — highlight in green
+    }
   }
 
 
