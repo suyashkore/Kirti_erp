@@ -153,8 +153,51 @@ th { background: #50607b; color: #fff !important; }
   </div>
 </div>
 
+<?php
+    $fy = $this->session->userdata('finacial_year');
+    $fy_new = $fy + 1;
+    $lastdate_date = '20'.$fy_new.'-03-31';
+    $curr_date = date('Y-m-d');
+    $curr_date_new = new DateTime($curr_date);
+    $last_date_yr = new DateTime($lastdate_date);
+    if($last_date_yr < $curr_date_new){
+        $max_date_php = $lastdate_date;
+    } else {
+        $max_date_php = $curr_date;
+    }
+?>
 <?php init_tail(); ?>
 <script>
+
+$(document).ready(function(){
+    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year    = "20" + fin_y;
+    var cur_y   = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+        var fy_new   = parseInt(fin_y) + 1;
+        var fy_new_s = "20" + fy_new;
+        maxEndDate   = new Date(fy_new_s + '/03/31');
+    } else {
+        maxEndDate = new Date();
+    }
+
+    // Order Date — restricted within FY, up to today or March 31
+    $('#asn_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+});
+  
+  
+
   $(document).ready(function() {
     // setTimeout(() => {
     //   $('#filter_list_form').submit();

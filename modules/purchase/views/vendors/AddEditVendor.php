@@ -475,7 +475,7 @@
                                                 <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label class="control-label">Grace Days</label>
-                                                        <input type="number" class="form-control" id="credit_days"
+                                                        <input type="text" class="form-control" id="credit_days"
                                                             name="credit_days" value="0">
                                                     </div>
                                                 </div>
@@ -562,8 +562,8 @@
                                                     <div class="form-group">
                                                         <label class="control-label">Is Active ?</label>
                                                         <select name="blocked" class="selectpicker form-control">
-                                                            <option value="0">No</option>
                                                             <option value="1">Yes</option>
+                                                            <option value="0">NO</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -1232,15 +1232,20 @@ $(document).ready(function() {
                 $('#vat').val(data.GSTIN || data.vat || '');
                 $('#email').val(data.Email || data.email || '');
                 $('#phonenumber').val(data.MobileNo || data.phonenumber || data.Phone || '');
+                $('#telephone').val(data.AltMobileNo || data.AltMobileNo || data.Phone || '');
                 $('#billing_address').val(data.address || data.billing_address || '');
                 $('#billing_zip').val(data.zip || data.billing_zip || data.PostalCode || '');
-                
+                var isActiveRaw = data.IsActive || data.active || '';
+                        var active = (isActiveRaw === 'Y' || isActiveRaw === 'y' || isActiveRaw === '1' || isActiveRaw === 1 || isActiveRaw === true) ? '1' : '0';
+                        $('select[name="blocked"]').val(active).selectpicker('refresh');
+            // =============================================                
                 // Populate vendor type/category - try multiple possible field names
                 var categoryId = data.ActSubGroupID2 || data.ActSubGroupID || data.SubActGroupID || data.SubActGroupID2 || data.ActSubGroupID1 || null;
                 if (categoryId) {
                     $('#vendor_type').val(categoryId).selectpicker('refresh');
                 }
-                
+                $('#billing_country').val(data.billing_country).selectpicker('refresh');
+
                 // Populate state
                 if (data.state || data.billing_state) {
                     var stateId = data.state || data.billing_state;
@@ -1514,28 +1519,26 @@ $(document).ready(function() {
         jQuery.ajax({
             type: 'POST',
             url: url,
-            data: {
-                id: id
-            },
+            data: { id: id },
             dataType: 'json',
             success: function(data) {
-                $("#city").children().remove();
+                // ✅ billing_city clear 
+                $('#billing_city').empty();
+                $('#billing_city').append('<option value="">None selected</option>');
+                
                 $.each(data, function(index, value) {
-                    // APPEND OR INSERT DATA TO SELECT ELEMENT.
-                    $('#billing_city').append('<option value="' + value.id + '">' + value
-                        .city_name + '</option>');
+                    $('#billing_city').append(
+                        '<option value="' + value.id + '">' + value.city_name + '</option>'
+                    );
                 });
-                // Refresh or initialize the selectpicker for billing city
-                var $city = $("#city");
-                if (typeof $city.selectpicker === 'function') {
+                
+                // ✅ billing_city selectpicker refresh
+                if (typeof $('#billing_city').selectpicker === 'function') {
                     try {
-                        $city.selectpicker('refresh');
+                        $('#billing_city').selectpicker('refresh');
                     } catch (e) {
-                        $city.selectpicker();
+                        $('#billing_city').selectpicker();
                     }
-                } else {
-                    $city.addClass('selectpicker');
-                    $city.selectpicker();
                 }
             }
         });
@@ -1552,11 +1555,38 @@ $(document).ready(function() {
         $('#vat').val('');
         $('#pan').val('');
         $('#vendor_type').val('');
+        $('#gst_type').val('');
+        $('#organisation_type').val('');
+        $('#billing_state').val('');
+        $('#billing_city').val('');
+        $('#billing_country').val('');
+        // $('#credit_days').val('');
+        $('#is_bank_detail').val('');
+        $('#ifsc_code').val('');
+        $('#bank_name').val('');
+        $('#bank_branch').val('');
+        $('#bank_address').val('');
+        $('#account_number').val('');
+        $('#gst_type').val('');
+        $('#account_holder_name').val('');
+        $('#pay_term').val('');
+        $('#payment_cycle_type').val('');
+        // $('#credit_days').val('');
+        $('#website').val('');
+        $('#freight_terms').val('');
+        $('#food_lic_n').val('');
+        $('#priority').val('');
+        $('#territory').val('');
+        $('#attachment').val('');
+        $('#additional_info').val('');
+        $('#payment_cycle').val('');
+        $('#favouring_name').val('');
+        $('#telephone').val('');
         $('select[name=vendor_type]').attr('disabled', false);
         $('.selectpicker').selectpicker('refresh');
 
-        $('#credit_days').val('30');
-        $('#pay_term').val('Credit');
+        $('#credit_days').val('');
+        $('#pay_term').val('');
         $('.selectpicker').selectpicker('refresh');
 
         $('#food_lic_n').val('');
@@ -1604,9 +1634,9 @@ $(document).ready(function() {
     $(".cancelBtn").click(function() {
         ResetForm();
         // Reload entire form/page
-        setTimeout(function() {
-            location.reload();
-        }, 0000);
+        // setTimeout(function() {
+        //     location.reload();
+        // }, 0000);
     });
 
 
@@ -1804,9 +1834,9 @@ $(document).ready(function() {
                 if (data && data.success) {
                     alert_float('success', 'Vendor created successfully...');
                     ResetForm();
-                    setTimeout(function() {
-                        location.reload();
-                    }, 0000);
+                    // setTimeout(function() {
+                    //     location.reload();
+                    // }, 0000);
                 } else {
                     var msg = (data && data.message) ? data.message : 'Something went wrong...';
                     alert_float('warning', msg);
@@ -1973,9 +2003,9 @@ $(document).ready(function() {
                 if (data && data.success) {
                     alert_float('success', 'Vendor updated successfully...');
                     ResetForm();
-                    setTimeout(function() {
-                        location.reload();
-                    }, 0000);
+                    // setTimeout(function() {
+                    //     location.reload();
+                    // }, 0000);
                 } else {
                     var msg = (data && data.message) ? data.message : 'Something went wrong...';
                     alert_float('warning', msg);
@@ -2713,13 +2743,13 @@ function verifyGSTIN() {
 
                 let gstinDropdown = $('#gstin_select');
                 if (gstinDropdown.length > 0) {
-                    gstinDropdown.after(
-                        '<small style="color: red; display: block; margin-top: 8px; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-times"></i> ' +
-                        msgText + '</small>');
+                    // gstinDropdown.after(
+                    //     '<small style="color: red; display: block; margin-top: 8px; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-times"></i> ' +
+                    //     msgText + '</small>');
                 } else {
-                    $('.gst_denger').append(
-                        '<br><small style="color: red; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-times"></i> ' +
-                        msgText + '</small>');
+                    // $('.gst_denger').append(
+                    //     '<br><small style="color: red; font-weight: bold;" class="gstin-verify-msg"><i class="fa fa-times"></i> ' +
+                    //     msgText + '</small>');
                 }
             }
         },
@@ -3166,6 +3196,14 @@ function populateLocationDataFromGSTIN(gstinData) {
         alert_float('success', 'Location data populated from GSTIN');
     }
 }
+
+$(document).on('click', '.removeLocationBtn', function(e) {
+    e.preventDefault();
+    $(this).closest('tr').remove();
+});
+$(document).on('click', '.removeContactBtn', function() {
+    $(this).closest('tr').remove();
+});
 </script>
 <style>
 #AccountID {

@@ -1,19 +1,60 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <style>
-.table-list { overflow: auto; max-height: 55vh; width:100%; position:relative; top: 0px; }
-.table-list thead th { position: sticky; top: 0; z-index: 1; }
-.table-list tbody th { position: sticky; left: 0; }
-table { border-collapse: collapse; width: 100%; }
-th, td { padding: 1px 5px !important; white-space: nowrap; border:1px solid !important; font-size:11px; line-height:1.42857143 !important; vertical-align: middle !important;}
-th { background: #50607b; color: #fff !important; }
-.sortable { cursor: pointer; }
-.a-link { color: #0000ff !important; border: 1px solid #000 !important; cursor: pointer; }
-@media screen and (max-width: 767px) {
-  #header nav ul{
-    display: none !important;
+  .table-list {
+    overflow: auto;
+    max-height: 55vh;
+    width: 100%;
+    position: relative;
+    top: 0px;
   }
-}
+
+  .table-list thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .table-list tbody th {
+    position: sticky;
+    left: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 1px 5px !important;
+    white-space: nowrap;
+    border: 1px solid !important;
+    font-size: 11px;
+    line-height: 1.42857143 !important;
+    vertical-align: middle !important;
+  }
+
+  th {
+    background: #50607b;
+    color: #fff !important;
+  }
+
+  .sortable {
+    cursor: pointer;
+  }
+
+  .a-link {
+    color: #0000ff !important;
+    border: 1px solid #000 !important;
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 767px) {
+    #header nav ul {
+      display: none !important;
+    }
+  }
 </style>
 <div id="wrapper">
   <div class="content">
@@ -23,36 +64,43 @@ th { background: #50607b; color: #fff !important; }
           <div class="panel-body">
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb custombreadcrumb" style="background-color:#fff !important; margin-Bottom:0px !important;">
-                <li class="breadcrumb-item"><a href="<?= admin_url();?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
-                <li class="breadcrumb-item active text-capitalize"><b>Purchase</b></li><li class="breadcrumb-item active" aria-current="page"><b>Inwards Reports</b></li>
-							</ol>
-						</nav>
+                <li class="breadcrumb-item"><a href="<?= admin_url(); ?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
+                <li class="breadcrumb-item active text-capitalize"><b>Purchase</b></li>
+                <li class="breadcrumb-item active" aria-current="page"><b>Inwards Reports</b></li>
+              </ol>
+            </nav>
             <hr class="hr_style">
             <form action="" method="post" id="filter_list_form">
               <div class="row">
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="from_date">
+                    <?= render_date_input('from_date', 'From Date', date('01/m/Y'), []); ?>
+                  </div>
+                  <!-- <div class="form-group" app-field-wrapper="from_date">
                     <label for="from_date" class="control-label">From Date</label>
                     <div class="input-group date">
-                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y")?>" app-field-label="From Date" onchange="resetForm();">
+                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y") ?>" app-field-label="From Date" onchange="resetForm();">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="to_date">
+                    <?= render_date_input('to_date', 'To Date', date('d/m/Y'), []); ?>
+                  </div>
+                  <!-- <div class="form-group" app-field-wrapper="to_date">
                     <label for="to_date" class="control-label">To Date</label>
                     <div class="input-group date">
-                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y")?>" app-field-label="To Date" onchange="resetForm();">
+                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y") ?>" app-field-label="To Date" onchange="resetForm();">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="vendor_id">
                     <label for="vendor_id" class="control-label">Vendor</label>
                     <select name="vendor_id" id="vendor_id" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Vendor" onchange="getVendorDetailsLocation(); resetForm();">
@@ -60,14 +108,14 @@ th { background: #50607b; color: #fff !important; }
                       <?php
                       if (!empty($vendor_list)) :
                         foreach ($vendor_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' ('.$value['AccountID'].')</option>';
+                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' (' . $value['AccountID'] . ')</option>';
                         endforeach;
                       endif;
                       ?>
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="broker_id">
                     <label for="broker_id" class="control-label">Broker</label>
                     <select name="broker_id" id="broker_id" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Broker" onchange="resetForm();">
@@ -75,16 +123,16 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="status">
                     <label for="status" class="control-label">Status</label>
                     <select name="status" id="status" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Status" onchange="resetForm();">
                       <option value="" selected>None selected</option>
                       <?php
-											$status = [1 => 'Pending', 2 =>'Cancel', 3 =>'Expired', 4 =>'Approved', 5 =>'Inprogress', 6 =>'Complete', 7 =>'Partially Complete'];
+                      $status = [1 => 'Pending', 2 => 'Cancel', 3 => 'Expired', 4 => 'Approved', 5 => 'Inprogress', 6 => 'Complete', 7 => 'Partially Complete'];
                       if (!empty($status)) :
                         foreach ($status as $key => $value) :
-                          echo '<option value="' . $key . '" '.($key == 1 ? 'selected' : '').'>' . $value . '</option>';
+                          echo '<option value="' . $key . '" ' . ($key == 1 ? 'selected' : '') . '>' . $value . '</option>';
                         endforeach;
                       endif;
                       ?>
@@ -136,36 +184,80 @@ th { background: #50607b; color: #fff !important; }
                       </tr>
                     </thead>
                     <tbody></tbody>
-                  </table>   
+                  </table>
                 </div>
               </div>
             </div>
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   </div>
 </div>
+<?php
+$fy = $this->session->userdata('finacial_year');
+$fy_new = $fy + 1;
+$lastdate_date = '20' . $fy_new . '-03-31';
+$curr_date = date('Y-m-d');
+$curr_date_new = new DateTime($curr_date);
+$last_date_yr = new DateTime($lastdate_date);
+if ($last_date_yr < $curr_date_new) {
+  $max_date_php = $lastdate_date;
+} else {
+  $max_date_php = $curr_date;
+}
+?>
+
 <?php init_tail(); ?>
 <script>
+  $(document).ready(function() {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
+    } else {
+      maxEndDate = new Date();
+    }
+
+    $('#from_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+    $('#to_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+  });
   $(document).ready(function() {
     resetForm();
     $('#filter_list_form').submit();
   })
 
-  function resetForm(){
+  function resetForm() {
     $('.exportBtn').hide();
     $('#table-list tbody').html('');
-    
+
     let filterHtml = '';
-    $('.filterInput').each(function () {
+    $('.filterInput').each(function() {
       let label = $(this).attr('app-field-label') || '';
       let value = $(this).val();
 
       if ($(this).is('select') && value) {
         value = $(this).find('option:selected').text().trim();
-      } 
-      else if ($(this).is('input, textarea')) {
+      } else if ($(this).is('input, textarea')) {
         value = $(this).val().trim();
       }
 
@@ -185,15 +277,17 @@ th { background: #50607b; color: #fff !important; }
     $.ajax({
       url: '<?= admin_url('purchase/Quotation/getVendorDetailsLocation'); ?>',
       type: 'POST',
-      data: { vendor_id: vendorId },
+      data: {
+        vendor_id: vendorId
+      },
       dataType: 'json',
-      success: function (response) {
+      success: function(response) {
         if (response.success == true) {
           html = '<option value="" selected>None selected</option>';
-          $.each(response.broker_list, function (index, loc) {
-            if(loc.AccountID == null || loc.AccountID == '') return;
+          $.each(response.broker_list, function(index, loc) {
+            if (loc.AccountID == null || loc.AccountID == '') return;
             html += `<option value="${loc.AccountID}">${loc.company} (${loc.AccountID})</option>`;
-					});
+          });
           $('#broker_id').html(html);
 
           $('.selectpicker').selectpicker('refresh');
@@ -202,7 +296,7 @@ th { background: #50607b; color: #fff !important; }
     });
   }
 
-  $('#filter_list_form').submit(function(e){
+  $('#filter_list_form').submit(function(e) {
     e.preventDefault();
 
     let form = this;
@@ -227,44 +321,52 @@ th { background: #50607b; color: #fff !important; }
         data: form_data,
         processData: false,
         contentType: false,
-        success: function(res){
+        success: function(res) {
           let json = JSON.parse(res);
-          if(!json.success){
+          if (!json.success) {
             $('#searchBtn').prop('disabled', false);
-            if(offset === 0){
+            if (offset === 0) {
               $('#table-list tbody').html(
                 '<tr><td colspan="10" class="text-center">No Data Found</td></tr>'
               );
             }
             return;
           }
-          if(offset === 0){
+          if (offset === 0) {
             totalRecords = parseInt(json.total) || 0;
           }
-          if(json.rows && json.rows.length > 0){
+          if (json.rows && json.rows.length > 0) {
             appendRows(json.rows);
             loadedRecords += json.rows.length;
             offset += limit;
           }
           updateProgress(loadedRecords, totalRecords);
-          if(loadedRecords >= totalRecords){
+          if (loadedRecords >= totalRecords) {
             $('#searchBtn').prop('disabled', false);
             $('#fetchProgress').css('width', '0%')
             $('.exportBtn').show();
             return;
           }
           fetchChunk();
-          
+
         }
       });
     }
     fetchChunk();
   });
 
-  function appendRows(rows){
+  function appendRows(rows) {
     let html = '';
-    let status_list = {1 : 'Pending', 2 :'Cancel', 3 :'Expired', 4 :'Approved', 5 :'Inprogress', 6 :'Complete', 7 :'Partially Complete'};
-    rows.forEach(function(row){
+    let status_list = {
+      1: 'Pending',
+      2: 'Cancel',
+      3: 'Expired',
+      4: 'Approved',
+      5: 'Inprogress',
+      6: 'Complete',
+      7: 'Partially Complete'
+    };
+    rows.forEach(function(row) {
       html += `<tr onclick="window.location.href='<?= admin_url('purchase/Inwards/Details/') ?>${row.InwardsID}'">
         <td class="text-center" >${row.InwardsID}</td>
         <td>${moment(row.TransDate).format('DD/MM/YYYY')}</td>
@@ -280,7 +382,7 @@ th { background: #50607b; color: #fff !important; }
     $('#table-list tbody').append(html);
   }
 
-  function updateProgress(loaded, total){
+  function updateProgress(loaded, total) {
     let percent = Math.floor((loaded / total) * 100);
     $('#fetchProgress').css('width', percent + '%')
   }
@@ -303,44 +405,44 @@ th { background: #50607b; color: #fff !important; }
       processData: false,
       contentType: false,
       cache: false,
-      success: function (res) {
+      success: function(res) {
 
         $('.exportBtn').prop('disabled', false);
 
         if (res.success) {
-          window.location.href = res.file_url;   // download file
+          window.location.href = res.file_url; // download file
         } else {
           console.log(res);
         }
       },
-      error: function () {
+      error: function() {
         $('.exportBtn').prop('disabled', false);
       }
     });
   }
 </script>
 <script>
-  $(document).on("click", ".sortable", function () {
-		var table = $("#table-list tbody");
-		var rows = table.find("tr").toArray();
-		var index = $(this).index();
-		var ascending = !$(this).hasClass("asc");
-		$(".sortable").removeClass("asc desc");
-		$(".sortable span").remove();
-		// Add sort classes and arrows
-		$(this).addClass(ascending ? "asc" : "desc");
-		$(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
-		rows.sort(function (a, b) {
-			var valA = $(a).find("td").eq(index).text().trim();
-			var valB = $(b).find("td").eq(index).text().trim();
-			if ($.isNumeric(valA) && $.isNumeric(valB)) {
-				return ascending ? valA - valB : valB - valA;
-				} else {
-				return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-			}
-		});
-		table.append(rows);
-	});
+  $(document).on("click", ".sortable", function() {
+    var table = $("#table-list tbody");
+    var rows = table.find("tr").toArray();
+    var index = $(this).index();
+    var ascending = !$(this).hasClass("asc");
+    $(".sortable").removeClass("asc desc");
+    $(".sortable span").remove();
+    // Add sort classes and arrows
+    $(this).addClass(ascending ? "asc" : "desc");
+    $(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
+    rows.sort(function(a, b) {
+      var valA = $(a).find("td").eq(index).text().trim();
+      var valB = $(b).find("td").eq(index).text().trim();
+      if ($.isNumeric(valA) && $.isNumeric(valB)) {
+        return ascending ? valA - valB : valB - valA;
+      } else {
+        return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+    });
+    table.append(rows);
+  });
 
   function printPage() {
     $('.mainHead').show();

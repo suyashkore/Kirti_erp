@@ -28,7 +28,7 @@ th { background: #50607b; color: #fff !important; }
                   <div class="form-group" app-field-wrapper="from_date">
                     <label for="from_date" class="control-label">From Date</label>
                     <div class="input-group date">
-                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y")?>" app-field-label="From Date" onchange="applyClientFilter();">
+                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y")?>" app-field-label="From Date">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
@@ -39,7 +39,7 @@ th { background: #50607b; color: #fff !important; }
                   <div class="form-group" app-field-wrapper="to_date">
                     <label for="to_date" class="control-label">To Date</label>
                     <div class="input-group date">
-                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y")?>" app-field-label="To Date" onchange="applyClientFilter();">
+                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y")?>" app-field-label="To Date">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
@@ -72,7 +72,7 @@ th { background: #50607b; color: #fff !important; }
 								<div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="status">
                     <label for="status" class="control-label">Status</label>
-                    <select name="status" id="status" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Status" onchange="applyClientFilter();">
+                    <select name="status" id="status" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Status">
                       <option value="" selected>None selected</option>
                       <?php
 											$status = [1 => 'Pending', 2 =>'Cancel', 3 =>'Expired', 4 =>'Approved', 5 =>'Inprogress', 6 =>'Complete', 7 =>'Partially Complete'];
@@ -86,7 +86,7 @@ th { background: #50607b; color: #fff !important; }
                   </div>
                 </div>
                 <div class="col-md-9 mbot5" style="padding-top: 20px;">
-                  <button type="submit" class="btn btn-success" id="searchBtn"><i class="fa fa-list"></i> Show</button>
+                  <button type="submit" class="btn btn-success" id="searchBtn" onclick="applyClientFilter()"><i class="fa fa-list"></i> Show</button>
                   <button type="button" class="btn btn-info exportBtn" onclick="exportTableToExcel()" style="display: none;"><i class="fa fa-file-excel"></i> Excel</button>
                   <button type="button" class="btn btn-info exportBtn" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>
                 </div>
@@ -152,10 +152,6 @@ th { background: #50607b; color: #fff !important; }
 <?php init_tail(); ?>
 <script>
 
-$(document).on('change', '.filterInput', function() {
-    applyClientFilter();
-});
-
 $('#myInput1').on('keyup', function() {
     var filter = this.value.toUpperCase();
     $('#table-list tbody tr').each(function() {
@@ -194,7 +190,6 @@ function applyClientFilter() {
         if (isVisible) visibleCount++;
     });
 
-    // ✅ कोणताही row दिसत नसेल तर "No Data Found" दाखवा
     if (visibleCount === 0 && $('#table-list tbody tr').length > 0) {
         $('#table-list tbody').append(
             '<tr class="no-data-row"><td colspan="16" class="text-center">No Data Found</td></tr>'
@@ -280,7 +275,7 @@ function parseDate(dateStr) {
     function fetchChunk() {
         var form_data = new FormData(form);
         form_data.append('offset', offset);
-        form_data.append('limit', limit); // ✅ limit pan send करा
+        form_data.append('limit', limit);
         form_data.append(
             '<?= $this->security->get_csrf_token_name(); ?>',
             $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
@@ -312,7 +307,7 @@ function parseDate(dateStr) {
                 if (json.rows && json.rows.length > 0) {
                     appendRows(json.rows);
                     loadedRecords += json.rows.length;
-                    offset += limit; // ✅ 100 ने वाढेल
+                    offset += limit;
                 }
 
                 updateProgress(loadedRecords, totalRecords);
@@ -324,7 +319,7 @@ function parseDate(dateStr) {
                     return;
                 }
 
-                fetchChunk(); // ✅ अजून records असतील तरच recursive call
+                fetchChunk();
             }
         });
     }
@@ -348,8 +343,8 @@ function parseDate(dateStr) {
             data-date="${dateStr}">
         <td class="text-center">${row.QuotationID}</td>
         <td>${moment(row.TransDate).format('DD/MM/YYYY')}</td>
-        <td>${row.customer_name} (${row.AccountID})</td>
-        <td>${row.broker_name || ''} (${row.BrokerID || ''})</td>
+        <td>${row.customer_name} - ${row.billing_state} (${row.AccountID})</td>
+        <td>${row.broker_name || ''} - ${row.broker_state} (${row.BrokerID || ''})</td>
         <td class="text-center">${Number(row.NetAmt) || '-'}</td>
         <td class="text-center">${Number(row.TotalWeight / 100) || '-'}</td>
 
@@ -367,7 +362,7 @@ function parseDate(dateStr) {
       </tr>`;
     });
     $('#table-list tbody').append(html);
-    applyClientFilter();
+
   }
 
   function updateProgress(loaded, total){
@@ -398,7 +393,7 @@ function parseDate(dateStr) {
         $('.exportBtn').prop('disabled', false);
 
         if (res.success) {
-          window.location.href = res.file_url;   // download file
+          window.location.href = res.file_url;
         } else {
           console.log(res);
         }
@@ -417,7 +412,7 @@ function parseDate(dateStr) {
 		var ascending = !$(this).hasClass("asc");
 		$(".sortable").removeClass("asc desc");
 		$(".sortable span").remove();
-		// Add sort classes and arrows
+
 		$(this).addClass(ascending ? "asc" : "desc");
 		$(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
 		rows.sort(function (a, b) {

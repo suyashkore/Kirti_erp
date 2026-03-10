@@ -198,17 +198,62 @@ function purchase_module_init_menu_items()
                 'slug' => 'purchase-invoice',
                 'name' => "Purchase Invoice",
                 'icon' => 'fa fa-file-invoice',
-                'href' => admin_url('purchase/AddPurchaseInvoice'),
+                'href' => admin_url('purchase/Invoice'),
                 'position' => 12,
             ]);
         }
-            if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('purchase-invoice', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
                 'slug' => 'purchase-invoice',
                 'name' => "Goods Receive Note (GRN)",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Grn'),
                 'position' => 13,
+            ]);
+        }
+        if (has_permission_new('purchase-invoice', '', 'view')) {
+            $CI->app_menu->add_sidebar_children_item('purchase', [
+                'slug' => 'purchase-invoice',
+                'name' => "Direct Purchase",
+                'icon' => 'fa fa-file-invoice',
+                'href' => admin_url('purchase/Direct'),
+                'position' => 14,
+            ]);
+        }
+        if (has_permission_new('purchase-invoice', '', 'view')) {
+            $CI->app_menu->add_sidebar_children_item('purchase', [
+                'slug' => 'purchase-invoice',
+                'name' => "Direct Purchase List",
+                'icon' => 'fa fa-file-invoice',
+                'href' => admin_url('purchase/Direct/List'),
+                'position' => 15,
+            ]);
+        }
+        if (has_permission_new('purchase-invoice', '', 'view')) {
+            $CI->app_menu->add_sidebar_children_item('purchase', [
+                'slug' => 'purchase-invoice',
+                'name' => "Mandi Purchase",
+                'icon' => 'fa fa-file-invoice',
+                'href' => admin_url('purchase/Mandi'),
+                'position' => 16,
+            ]);
+        }
+        if (has_permission_new('purchase-invoice', '', 'view')) {
+            $CI->app_menu->add_sidebar_children_item('purchase', [
+                'slug' => 'purchase-invoice',
+                'name' => "Mandi Purchase List",
+                'icon' => 'fa fa-file-invoice',
+                'href' => admin_url('purchase/Mandi/MandiPurchaselist'),
+                'position' => 17,
+            ]);
+        }
+        if (has_permission_new('purchase-invoice', '', 'view')) {
+            $CI->app_menu->add_sidebar_children_item('purchase', [
+                'slug' => 'purchase-invoice',
+                'name' => "Trade Settlement",
+                'icon' => 'fa fa-file-invoice',
+                'href' => admin_url('TradeSettlement/Purchase'),
+                'position' => 18,
             ]);
         }
         // if (has_permission_new('purchase-pending-order-po-list', '', 'view')) {

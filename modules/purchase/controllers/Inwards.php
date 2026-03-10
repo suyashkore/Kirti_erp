@@ -18,7 +18,7 @@ class Inwards extends AdminController
 		$data['title'] = 'Inwards Master';
 		$data['vendor_list'] = $this->Inwards_model->getVendorDropdownByPO();
 		$data['inwards_list'] = $this->Inwards_model->getInwardsList();
-		$data['gatein_list'] = $this->Inwards_model->getDropdown('GateMaster', 'id, GateINID, VehicleNo', ['InwardID' => null], 'id', 'DESC');
+		$data['gatein_list'] = $this->Inwards_model->getDropdown('GateMaster', 'id, GateINID, VehicleNo', ['InwardID' => null, 'Type' => 'P'], 'id', 'DESC');
 
 		$selected_company = $this->session->userdata('root_company');
 		$data['company_detail'] = $this->Quotation_model->get_company_detail($selected_company);
@@ -46,9 +46,10 @@ class Inwards extends AdminController
 		}
 		$order_details = $this->Inwards_model->getPurchaseOrderDetails($order_id);
 		$item_list = $this->Quotation_model->getDropdown('items', 'ItemId, ItemName', ['ItemCategoryCode' => $order_details['ItemCategory'], 'IsActive' => 'Y'], 'ItemName', 'ASC') ?? [];
+		$godown_list = $this->Quotation_model->getDropdown('godownmaster', 'id, GodownCode, GodownName', ['LocationID' => $order_details['PurchaseLocation'], 'IsActive' => 'Y'], 'GodownName', 'ASC') ?? [];
 		$inwards_no = $this->Inwards_model->getNextInwardsNoByCategory($order_details['ItemCategory']);
 
-		echo json_encode(['success' => true, 'data' => $order_details, 'item_list' => $item_list, 'inwards_no' => $inwards_no]);
+		echo json_encode(['success' => true, 'data' => $order_details, 'item_list' => $item_list, 'godown_list' => $godown_list, 'inwards_no' => $inwards_no]);
 	}
 
 	public function SaveInwards(){
@@ -65,7 +66,7 @@ class Inwards extends AdminController
 		foreach ($field_names as $key => $value) {
 			if(!is_array($data[$value])) $data[$value] = trim($data[$value]);
 		}
-		$required_fields = ['vendor_id', 'purchase_order', 'inwards_no', 'inwards_date'];
+		$required_fields = ['vendor_id', 'purchase_order', 'inwards_no', 'inwards_date', 'godown_id'];
 		
 		foreach ($required_fields as $key => $value) {
 			if (empty($data[$value])) {
@@ -85,6 +86,7 @@ class Inwards extends AdminController
 		$purchase_order = $data['purchase_order'] ?? '';
 		$inwards_no = $data['inwards_no'] ?? '';
 		$gatein_no = $data['gatein_no'] ?? '';
+		$godown_id = $data['godown_id'] ?? '';
 		if($data['inwards_date']){
 			$inwards_date = date('Y-m-d', strtotime(str_replace('/', '-', $data['inwards_date'])));
 		}else{
@@ -122,11 +124,12 @@ class Inwards extends AdminController
 			'PurchaseLocation' => $order_details['PurchaseLocation'] ?? '',
 			'InwardsID' => $inwards_no,
 			'OrderID' => $purchase_order,
+			'GodownID' => $godown_id,
 			'TransDate' => $inwards_date,
 			'ItemType' => $order_details['ItemType'] ?? '',
 			'ItemCategory' => $order_details['ItemCategory'] ?? '',
 			'AccountID' => $vendor_id,
-			'BrokerID' => '',
+			'BrokerID' => $order_details['BrokerID'] ?? '',
 			'VendorLocation' => $order_details['DeliveryLocation'] ?? '',
 			'DeliveryFrom' => $order_details['DeliveryFrom'] ?? date('Y-m-d'),
 			'DeliveryTo' => $order_details['DeliveryTo'] ?? date('Y-m-d', strtotime('+10 days')),
@@ -141,6 +144,9 @@ class Inwards extends AdminController
 			'CGSTAmt' => $cgst_amt,
 			'SGSTAmt' => $sgst_amt,
 			'IGSTAmt' => $igst_amt,
+			'TDSSection' => $order_details['TDSSection'] ?? '',
+			'TDSPercentage' => $order_details['TDSPercentage'] ?? '',
+			'TDSAmt' => $order_details['TDSAmt'] ?? '',
 			'RoundOffAmt' => $round_off_amt,
 			'NetAmt' => $net_amt
 		];
@@ -175,7 +181,10 @@ class Inwards extends AdminController
 				'uom' => $data['uom'] ?? [],
 				'quantity' => $data['min_qty'] ?? [],
 				'amount' => $data['amount'] ?? [],
-				'gst' => $data['gst'] ?? []
+				'gst' => $data['gst'] ?? [],
+				'TType' => 'P',
+				'TType2' => 'Inward',
+				'GodownID' => $godown_id
 			];
 			$this->Inwards_model->saveMultiData($multi_insert_data);
 
@@ -246,43 +255,48 @@ class Inwards extends AdminController
 		* ========================= */
 	public function Details($gatein_no){
 		$data['title'] = 'Inwards Master';
-		$data['gatein'] = $this->Inwards_model->getGateinDetails($gatein_no);
+		$gatein = $this->Inwards_model->getGateinDetails($gatein_no);
+		$statusArray = [1 =>  'Gate IN Generated', 2 => 'Gross Weight Captured', 3 => 'Conveyor Assigned', 4 => 'QC Stack Captured', 5 => 'Tare Weight Captured', 6 => 'Gate Out Pass Generated', 7 => 'Vehicle Exit', 8 => 'QC', 9 => 'Purchase Invoice Generated', 10 => 'Complete'];
+		$gatein->StatusName = $statusArray[$gatein->status];
+		$data['gatein'] = $gatein;
 		if(!$data['gatein']){
 			redirect(admin_url('purchase/Inwards'));
 		}
 		$data['inward'] = $this->Inwards_model->getInwardsDetails($data['gatein']->InwardID) ?? [];
 		if($data['inward']){
 			$data['order'] = $this->Inwards_model->getPurchaseOrderDetails($data['inward']['OrderID']) ?? [];
+			$data['chamber'] = $this->Inwards_model->getDropdown('ChamberMaster', 'id, ChamberCode, ChamberName', ['GodownID' => $data['inward']['GodownID']], 'id', 'DESC') ?? [];
 		}else{
-			$data['order'] = [];
+			$data['order'] = $data['chamber'] = [];
 		}
 		$gateDetails = $this->Inwards_model->getAllINDetails($gatein_no);
 		foreach ($gateDetails as $key => $val) {
 			$data[$key] = $val;
 		}
 		$data['gateDetails'] = $gateDetails;
+		$data['stack_qc_details'] = $this->Inwards_model->getStackQcDetails($gatein_no);
 
 		$this->load->view('admin/Inwards/InwardsDetails', $data);
 	}
 
 	private function validateStage($GateINID, $currentStage){
-		// $gateStatus = $this->Inwards_model->getData('GateMaster','status',['GateINID'=>$GateINID])['status'] ?? 0;
+		$gateStatus = $this->Inwards_model->getData('GateMaster','status',['GateINID'=>$GateINID])['status'] ?? 0;
 
-		// // Cannot skip stage
-		// if($currentStage > ($gateStatus + 1)){
-		// 	return [
-		// 		'success'=>false,
-		// 		'message'=>'Previous stage not completed.'
-		// 	];
-		// }
+		// Cannot skip stage
+		if($currentStage > ($gateStatus + 1)){
+			return [
+				'success'=>false,
+				'message'=>'Previous stage not completed.'
+			];
+		}
 
-		// // Cannot go back
-		// if($currentStage < $gateStatus){
-		// 	return [
-		// 		'success'=>false,
-		// 		'message'=>'Cannot modify previous stage.'
-		// 	];
-		// }
+		// Cannot go back
+		if($currentStage < $gateStatus){
+			return [
+				'success'=>false,
+				'message'=>'Cannot modify previous stage.'
+			];
+		}
 
 		return ['success'=>true];
 	}
@@ -374,13 +388,13 @@ class Inwards extends AdminController
 				$attachmentUrl = 'uploads/GateInDetails/' . $file_data['file_name'];
 				$valueArray[$value] = $attachmentUrl;
 			}else{
-				if($form_mode == 'add'){
-					echo json_encode([
-						'success' => false,
-						'message' => 'Please upload '.$key
-					]);
-					die;
-				}
+				// if($form_mode == 'add'){
+				// 	echo json_encode([
+				// 		'success' => false,
+				// 		'message' => 'Please upload '.$key
+				// 	]);
+				// 	die;
+				// }
 			}
 		}
 		$insertData['value'] = json_encode($valueArray);
@@ -389,11 +403,11 @@ class Inwards extends AdminController
 			$insertData['TransDate'] = date('Y-m-d H:i:s');
 			$result = $this->Inwards_model->saveData('GateMasterDetails', $insertData);
 			$details = $this->Inwards_model->getINDetails($result);
-			$this->Inwards_model->updateData('GateMaster', ['status' => 2], ['GateINID' => $GateINID]);
 		} else {
 			$result = $this->Inwards_model->updateData('GateMasterDetails', $insertData, ['id' => $update_id]);
 			$details = $this->Inwards_model->getINDetails($update_id);
 		}
+		$this->Inwards_model->updateData('GateMaster', ['status' => 2], ['GateINID' => $GateINID]);
 		if ($result) {
 			echo json_encode([
 				'success' => true,
@@ -467,11 +481,11 @@ class Inwards extends AdminController
 			$insertData['TransDate'] = date('Y-m-d H:i:s');
 			$result = $this->Inwards_model->saveData('GateMasterDetails', $insertData);
 			$details = $this->Inwards_model->getINDetails($result);
-			$this->Inwards_model->updateData('GateMaster', ['status' => 3], ['GateINID' => $GateINID]);
 		} else {
 			$result = $this->Inwards_model->updateData('GateMasterDetails', $insertData, ['id' => $update_id]);
 			$details = $this->Inwards_model->getINDetails($update_id);
 		}
+		$this->Inwards_model->updateData('GateMaster', ['status' => 3], ['GateINID' => $GateINID]);
 		if ($result) {
 			echo json_encode([
 				'success' => true,
@@ -496,41 +510,68 @@ class Inwards extends AdminController
 		echo json_encode($data);
 	}
 
-	public function SaveStackQCDetails(){
-		if (empty($this->input->post())) {
-			echo json_encode(['success' => false, 'message' => 'No data received']);
+	public function StackListByChamber(){
+		$chamber_id = $this->input->post('chamber_id') ?? '';
+		if(empty($chamber_id)){
+			echo json_encode([]);
 			return;
 		}
-		
-		$PlantID = $this->session->userdata('root_company');
-		$UserID = $this->session->userdata('username');
-		$FY = $this->session->userdata('finacial_year');
-		$data = $this->input->post(null, true);
-		$field_names = array_keys($data);
-		foreach ($field_names as $key => $value) {
-			if(!is_array($data[$value])) $data[$value] = trim($data[$value]);
+		$data = $this->Inwards_model->getDropdown('StackMaster', 'id, StackCode, StackName', ['ChamberID' => $chamber_id], 'id', 'DESC');
+		echo json_encode($data);
+	}
+
+	public function LotListByStack(){
+		$stack_id = $this->input->post('stack_id') ?? '';
+		if(empty($stack_id)){
+			echo json_encode([]);
+			return;
 		}
-		$required_fields = ['GateINID'];
-		foreach ($required_fields as $key => $value) {
-			if (empty($data[$value])) {
-				echo json_encode([
-					'success' => false,
-					'message' => 'Please fill '.$value.' fields'
-				]);
-				die;
-			}
+		$data = $this->Inwards_model->getDropdown('LotMaster', 'id, LotCode, LotName', ['StackID' => $stack_id], 'id', 'DESC');
+		echo json_encode($data);
+	}
+
+	public function SaveStackQCDetails(){
+		if (empty($this->input->post())) {
+			echo json_encode(['success'=>false,'message'=>'No data received']);
+			return;
 		}
 
-		$GateINID = $data['GateINID'] ?? '';
+		$PlantID = $this->session->userdata('root_company');
+		$UserID  = $this->session->userdata('username');
+		$FY      = $this->session->userdata('finacial_year');
+
+		$data = $this->input->post(null,true);
+
+		foreach ($data as $k=>$v){
+			if(!is_array($v)) $data[$k] = trim($v);
+		}
+
+		if(empty($data['GateINID'])){
+			echo json_encode(['success'=>false,'message'=>'GateINID required']);
+			return;
+		}
+
+		$GateINID = $data['GateINID'];
 		$form_mode = $data['form_mode'] ?? 'add';
-		$update_id = $data['update_id'] ?? '';
-		$item_id = $data['item_id'] ?? [];
-		$chamber = $data['chamber'] ?? [];
-		$stack = $data['stack'] ?? [];
-		$lot = $data['lot'] ?? [];
-		$weight = $data['weight'] ?? [];
-		$bag_qty = $data['bag_qty'] ?? [];
-		$qc = $data['qc'] ?? [];
+		$godown = $data['godown'] ?? '';
+		$rows = [];
+
+		if (!empty($data['rows_json'])) {
+				$rows = json_decode($data['rows_json'], true);
+		}
+
+		if (!is_array($rows)) {
+				echo json_encode([
+						'success' => false,
+						'message' => 'Invalid QC details data'
+				]);
+				return;
+		}
+
+		if(empty($rows)){
+			echo json_encode(['success'=>false,'message'=>'QC details missing']);
+			return;
+		}
 
 		$check = $this->validateStage($GateINID,4);
 		if(!$check['success']){
@@ -538,59 +579,103 @@ class Inwards extends AdminController
 			die;
 		}
 
-		if($form_mode == 'add'){
-			$check = $this->Quotation_model->checkDuplicate('GateMasterDetails', ['GateINID' => $GateINID, 'type' => 'StackQC']);
-			if ($check) {
-				echo json_encode([
-					'success' => false,
-					'message' => 'Record already exists.'
-				]);
-				die;
-			}
+		$gateinData = $this->Inwards_model->getGateinDetails($GateINID);
+		if(!$gateinData){
+			echo json_encode(['success'=>false,'message'=>'Gate in not found']);
+			return;
 		}
 
-		$valueArray = [];
-		for($i = 0; $i < count($item_id); $i++){
-			$valueArray[] = [
-				'item_id' => $item_id[$i],
-				'chamber' => $chamber[$i],
-				'stack' => $stack[$i],
-				'lot' => $lot[$i],
-				'weight' => $weight[$i],
-				'bag_qty' => $bag_qty[$i],
-				'qc' => $qc[$i]
+		$inwardData = $this->Inwards_model->getInwardsDetails($gateinData->InwardID);
+		if(!$inwardData){
+			echo json_encode(['success'=>false,'message'=>'Inward not found']);
+			return;
+		}
+
+		foreach ($rows as $i=>$row){
+			$insertData = [
+				'PlantID'=>$PlantID,
+				'FY'=>$FY,
+				'PurchID'=>$inwardData['OrderID'],
+				'GateINID'=>$GateINID,
+				'InwardID'=>$inwardData['InwardsID'],
+				'QCID'=>$i+1,
+				'CenterQCApprove'=>'Y',
+				'ROQCApprove'=>'Y',
+				'HOQCApprove'=>'Y',
+				'TType'=>'P',
+				'ItemID'=>$row['item_id'],
+				'AccountID'=>$inwardData['AccountID'],
+				'LocationID'=>$inwardData['PurchaseLocation'],
+				'WHID'=>$godown,
+				'CHID'=>$row['chamber'],
+				'StackID'=>$row['stack'],
+				'LOTID'=>$row['lot'],
+				'Weight'=>$row['weight'],
+				'BagQty'=>$row['bag_qty']
 			];
+
+			$where = [
+				'GateINID'=>$GateINID,
+				'ItemID'=>$row['item_id'],
+				'TType'=>'P',
+			];
+
+			$check = $this->Inwards_model->checkDuplicate('stockInventory',$where);
+
+			if($check){
+				$this->Inwards_model->updateData('stockInventory',$insertData,$where);
+				$last_id = $this->Inwards_model->getRowData('stockInventory','id',$where)->id;
+			}else{
+				$insertData['TransDate'] = date('Y-m-d H:i:s');
+				$last_id = $this->Inwards_model->saveData('stockInventory',$insertData);
+			}
+			$this->Inwards_model->updateData('GateMaster',['status'=>4],['GateINID'=>$GateINID]);
+
+			if(!empty($row['qc'])){
+				foreach($row['qc'] as $qc){
+					$multiData = [
+						'PurchID'=>$inwardData['OrderID'],
+						'GateINID'=>$GateINID,
+						'InwardID'=>$inwardData['InwardsID'],
+						'TType'=>'P',
+						'ItemID'=>$row['item_id'],
+						'layer_number'=>$last_id,
+						'ItemParameterID'=>$qc['parameter_id'],
+						'ParameterValue'=>$qc['value'],
+						'EParameterValue'=>$qc['value'],
+						'HParameterValue'=>$qc['value'],
+						'deductionAmt'=>$qc['deductionamt'],
+					];
+
+					$whereQC = [
+						'GateINID'=>$GateINID,
+						'ItemID'=>$row['item_id'],
+						'ItemParameterID'=>$qc['parameter_id'],
+						'layer_number'=>$last_id
+					];
+
+					$checkQC = $this->Inwards_model->checkDuplicate('QCParameterValues',$whereQC);
+
+					if($checkQC){
+						$this->Inwards_model->updateData('QCParameterValues',$multiData,$whereQC);
+					}
+					else{
+						$multiData['TransDate']=date('Y-m-d H:i:s');
+						$this->Inwards_model->saveData('QCParameterValues',$multiData);
+					}
+
+				}
+
+			}
+
 		}
 
-		$insertData = [
-			'PlantID' => $PlantID,
-			'FY' => $FY,
-			'GateINID' => $GateINID,
-			'type' => 'StackQC',
-			'value' => json_encode($valueArray)
-		];
+		echo json_encode([
+			'success'=>true,
+			'message'=>'Stack details '.($form_mode=='add'?'added':'updated').' successfully',
+			'data' => $this->Inwards_model->getStackQcDetails($GateINID)
 
-		if ($form_mode == 'add') {
-			$insertData['TransDate'] = date('Y-m-d H:i:s');
-			$result = $this->Inwards_model->saveData('GateMasterDetails', $insertData);
-			$details = $this->Inwards_model->getINDetails($result);
-			$this->Inwards_model->updateData('GateMaster', ['status' => 4], ['GateINID' => $GateINID]);
-		} else {
-			$result = $this->Inwards_model->updateData('GateMasterDetails', $insertData, ['id' => $update_id]);
-			$details = $this->Inwards_model->getINDetails($update_id);
-		}
-		if ($result) {
-			echo json_encode([
-				'success' => true,
-				'message' => 'Stack details '.($form_mode == 'add' ? 'added' : 'updated').' successfully',
-				'data' => $details
-			]);
-		} else {
-			echo json_encode([
-				'success' => false,
-				'message' => 'Error while saving data'
-			]);
-		}
+		]);
 	}
 
 	public function SaveTareWeight(){
@@ -680,13 +765,13 @@ class Inwards extends AdminController
 				$attachmentUrl = 'uploads/GateInDetails/' . $file_data['file_name'];
 				$valueArray[$value] = $attachmentUrl;
 			}else{
-				if($form_mode == 'add'){
-					echo json_encode([
-						'success' => false,
-						'message' => 'Please upload '.$key
-					]);
-					die;
-				}
+				// if($form_mode == 'add'){
+				// 	echo json_encode([
+				// 		'success' => false,
+				// 		'message' => 'Please upload '.$key
+				// 	]);
+				// 	die;
+				// }
 			}
 		}
 		$insertData['value'] = json_encode($valueArray);
@@ -695,11 +780,11 @@ class Inwards extends AdminController
 			$insertData['TransDate'] = date('Y-m-d H:i:s');
 			$result = $this->Inwards_model->saveData('GateMasterDetails', $insertData);
 			$details = $this->Inwards_model->getINDetails($result);
-			$this->Inwards_model->updateData('GateMaster', ['status' => 5], ['GateINID' => $GateINID]);
 		} else {
 			$result = $this->Inwards_model->updateData('GateMasterDetails', $insertData, ['id' => $update_id]);
 			$details = $this->Inwards_model->getINDetails($update_id);
 		}
+		$this->Inwards_model->updateData('GateMaster', ['status' => 5], ['GateINID' => $GateINID]);
 		if ($result) {
 			echo json_encode([
 				'success' => true,
@@ -903,6 +988,88 @@ class Inwards extends AdminController
 		}
 	}
 
+	/* =========================
+		* HEAD QC Details
+		* ========================= */
+	public function HeadQC($gatein_no){
+		$data['title'] = 'Inwards Master';
+		$data['gatein'] = $this->Inwards_model->getGateinDetails($gatein_no);
+		if(!$data['gatein']){
+			redirect(admin_url('purchase/Inwards'));
+		}
+		$data['inward'] = $this->Inwards_model->getInwardsDetails($data['gatein']->InwardID) ?? [];
+		if($data['inward']){
+			$data['order'] = $this->Inwards_model->getPurchaseOrderDetails($data['inward']['OrderID']) ?? [];
+			$data['chamber'] = $this->Inwards_model->getDropdown('ChamberMaster', 'id, ChamberCode, ChamberName', ['GodownID' => $data['inward']['GodownID']], 'id', 'DESC') ?? [];
+		}else{
+			$data['order'] = $data['chamber'] = [];
+		}
+		$gateDetails = $this->Inwards_model->getAllINDetails($gatein_no);
+		foreach ($gateDetails as $key => $val) {
+			$data[$key] = $val;
+		}
+		$data['gateDetails'] = $gateDetails;
+		$data['stack_qc_details'] = $this->Inwards_model->getStackQcDetails($gatein_no);
+
+		$this->load->view('admin/HeadQC/Head_qc', $data);
+	}
+
+	public function SaveHeadQCDetails(){
+		if (empty($this->input->post())) {
+			echo json_encode(['success'=>false,'message'=>'No data received']);
+			return;
+		}
+
+		$PlantID = $this->session->userdata('root_company');
+		$UserID  = $this->session->userdata('username');
+		$FY      = $this->session->userdata('finacial_year');
+
+		$data = $this->input->post(null,true);
+
+		foreach ($data as $k=>$v){
+			if(!is_array($v)) $data[$k] = trim($v);
+		}
+
+		if(empty($data['GateINID'])){
+			echo json_encode(['success'=>false,'message'=>'GateINID required']);
+			return;
+		}
+
+		$GateINID = $data['GateINID'];
+		$form_mode = $data['form_mode'] ?? 'add';
+		$id = $data['id'] ?? [];
+		$hvalue = $data['value'] ?? [];
+		$deductionAmt = $data['deductionAmt'] ?? [];
+		
+		if(empty($id) || empty($hvalue) || empty($deductionAmt)){
+			echo json_encode(['success'=>false,'message'=>'QC details missing']);
+			return;
+		}
+
+		// $check = $this->validateStage($GateINID,4);
+		// if(!$check['success']){
+		// 	echo json_encode($check);
+		// 	die;
+		// }
+
+		for($i=0; $i<count($id); $i++){
+			$multiData = [
+				'HParameterValue'=>$hvalue[$i],
+				'deductionAmt'=>$deductionAmt[$i],
+			];
+			$checkQC = $this->Inwards_model->checkDuplicate('QCParameterValues', ['GateINID'=>$GateINID,'id'=>$id[$i]]);
+			if($checkQC){
+				$this->Inwards_model->updateData('QCParameterValues',$multiData, ['id' => $id[$i]]);
+			}
+		}
+		
+		echo json_encode([
+			'success'=>true,
+			'message'=>'Head QC '.($form_mode=='add'?'added':'updated').' successfully',
+			'data' => $this->Inwards_model->getStackQcDetails($GateINID)
+
+		]);
+	}
 	/* =========================
 		* REPORTS PAGE
 		* ========================= */

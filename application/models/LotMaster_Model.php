@@ -19,22 +19,44 @@
 		}
 
 		// ChamberMaster Table Data
-		public function get_ChamberMaster_data(){
+		// public function get_ChamberMaster_data(){
 			
-			$this->db->select(db_prefix() . 'ChamberMaster.*');
-			$this->db->from(db_prefix() . 'ChamberMaster');
-			$this->db->order_by('id', 'ASC');
-			return $this->db->get()->result_array();
-		}
+		// 	$this->db->select(db_prefix() . 'ChamberMaster.*');
+		// 	$this->db->from(db_prefix() . 'ChamberMaster');
+		// 	$this->db->order_by('id', 'ASC');
+		// 	return $this->db->get()->result_array();
+		// }
 
-		// StackMaster Table Data
-		public function get_StackMaster_data(){
+		// // StackMaster Table Data
+		// public function get_StackMaster_data(){
 			
-			$this->db->select(db_prefix() . 'StackMaster.*');
-			$this->db->from(db_prefix() . 'StackMaster');
-			$this->db->order_by('id', 'ASC');
-			return $this->db->get()->result_array();
-		}
+		// 	$this->db->select(db_prefix() . 'StackMaster.*');
+		// 	$this->db->from(db_prefix() . 'StackMaster');
+		// 	$this->db->order_by('id', 'ASC');
+		// 	return $this->db->get()->result_array();
+		// }
+
+
+		// Get Chambers filtered by GodownID
+public function get_ChambersByGodown($GodownID)
+{
+    $this->db->select('id, ChamberName');
+    $this->db->from(db_prefix() . 'ChamberMaster');
+    $this->db->where('GodownID', $GodownID);
+    $this->db->order_by('id', 'ASC');
+    return $this->db->get()->result_array();
+}
+
+// Get Stacks filtered by GodownID AND ChamberID
+public function get_StacksByGodownAndChamber($GodownID, $ChamberID)
+{
+    $this->db->select('id, StackName');
+    $this->db->from(db_prefix() . 'StackMaster');
+    $this->db->where('GodownID', $GodownID);
+    $this->db->where('ChamberID', $ChamberID);
+    $this->db->order_by('id', 'ASC');
+    return $this->db->get()->result_array();
+}
 
 		// LotMaster Table Data
 		public function get_LotMaster_data()

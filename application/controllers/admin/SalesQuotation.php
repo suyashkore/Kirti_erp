@@ -142,6 +142,59 @@ class SalesQuotation extends AdminController
 			}
 		}
 
+		// =============================================
+		// Financial Year Date Validation
+		// =============================================
+		$FY_int      = (int) $FY;
+		$fy_start    = '20' . str_pad($FY_int, 2, '0', STR_PAD_LEFT) . '-04-01';          // e.g. 2024-04-01
+		$fy_end      = '20' . str_pad($FY_int + 1, 2, '0', STR_PAD_LEFT) . '-03-31';      // e.g. 2025-03-31
+
+		$today       = date('Y-m-d');
+		// Max allowed for order/delivery_from: lesser of today or FY end
+		$max_txn_date = ($fy_end < $today) ? $fy_end : $today;
+
+		// --- order_date check ---
+		if ($quotation_date < $fy_start || $quotation_date > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Quotation Date (' . date('d/m/Y', strtotime($quotation_date)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+
+		// --- delivery_from check ---
+		if ($delivery_from < $fy_start || $delivery_from > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery From Date (' . date('d/m/Y', strtotime($delivery_from)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+
+		// --- delivery_to check (allows up to FY end for future scheduling) ---
+		if ($delivery_to < $fy_start || $delivery_to > $fy_end) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery To Date (' . date('d/m/Y', strtotime($delivery_to)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($fy_end)) . ').'
+			]);
+			return;
+		}
+
+		// --- delivery_to must not be before delivery_from ---
+		if ($delivery_to < $delivery_from) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery To Date (' . date('d/m/Y', strtotime($delivery_to)) . ') cannot be earlier than Delivery From Date (' . date('d/m/Y', strtotime($delivery_from)) . ').'
+			]);
+			return;
+		}
+		// =============================================
+		// End of Date Validation
+		// =============================================
+
 		$insertData = [
 			'PlantID' => $PlantID,
 			'FY' => $FY,
@@ -270,10 +323,17 @@ class SalesQuotation extends AdminController
     $offset      = (int)$this->input->post('offset');
     $limit       = (int)$this->input->post('limit') ?: 100;
 	
-    $this->db->select('q.*, c.company as customer_name, b.company as broker_name,  IFNULL(som.so_total_weight,0) as so_total_weight');
-    $this->db->from(db_prefix() . 'SalesQuotationMaster q');
-    $this->db->join('tblclients c', 'c.AccountID = q.AccountID', 'left');
-    $this->db->join('tblclients b', 'b.AccountID = q.BrokerID', 'left');
+    // $this->db->select('q.*,c.billing_state , c.company as customer_name,b.billing_state as broker_state, b.company as broker_name,  IFNULL(som.so_total_weight,0) as so_total_weight');
+    // $this->db->from(db_prefix() . 'SalesQuotationMaster q');
+   $this->db->select('q.*, c.billing_state, c.company as customer_name, 
+    IFNULL(b.billing_state, \'\') as broker_state, 
+    IFNULL(b.company, \'\') as broker_name,  
+    IFNULL(som.so_total_weight, 0) as so_total_weight');
+$this->db->from(db_prefix() . 'SalesQuotationMaster q');
+$this->db->join('tblclients c', 'c.AccountID = q.AccountID', 'left');
+$this->db->join('tblclients b', 
+    'TRIM(b.AccountID) = TRIM(q.BrokerID) AND q.BrokerID IS NOT NULL AND q.BrokerID != \'\'', 
+    'left');
 	$this->db->join(
     '(SELECT QuotationID, SUM(TotalWeight) as so_total_weight 
       FROM '.db_prefix().'SalesOrderMaster 
@@ -435,6 +495,7 @@ class SalesQuotation extends AdminController
 			'file_url' => base_url('uploads/exports/' . $filename)
 		]);
 	}
+
 	function GetCustomDropdownList()
 	{
 		if ($this->input->post()) {

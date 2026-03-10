@@ -19,9 +19,9 @@ class Lot extends AdminController
 
 		$data['godown'] = $this->LotMaster_Model->get_GodownMaster_data();
 
-		$data['chamber'] = $this->LotMaster_Model->get_ChamberMaster_data();
+		// $data['chamber'] = $this->LotMaster_Model->get_ChamberMaster_data();
 
-		$data['stack'] = $this->LotMaster_Model->get_StackMaster_data();
+		// $data['stack'] = $this->LotMaster_Model->get_StackMaster_data();
 
 
 		$this->load->view('admin/Lot/AddEditLot.php', $data);
@@ -56,6 +56,25 @@ class Lot extends AdminController
 			echo json_encode(null);
 		}
 	}
+
+	// Get Chambers filtered by GodownID
+public function GetChambersByGodown()
+{
+    $GodownID = $this->input->post('GodownID');
+    $chambers = $this->LotMaster_Model->get_ChambersByGodown($GodownID);
+    $this->output->set_content_type('application/json');
+    echo json_encode($chambers);
+}
+
+// Get Stacks filtered by GodownID + ChamberID
+public function GetStacksByGodownAndChamber()
+{
+    $GodownID  = $this->input->post('GodownID');
+    $ChamberID = $this->input->post('ChamberID');
+    $stacks    = $this->LotMaster_Model->get_StacksByGodownAndChamber($GodownID, $ChamberID);
+    $this->output->set_content_type('application/json');
+    echo json_encode($stacks);
+}
 
 
 	/* Save New  Lot / ajax */

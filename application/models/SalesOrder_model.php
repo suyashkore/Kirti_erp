@@ -60,7 +60,7 @@ class SalesOrder_model extends App_Model
 
   public function getCustomerDropdown()
   {
-    $this->db->select('c.userid, c.AccountID, c.company');
+    $this->db->select('c.userid, c.AccountID, c.company,c.billing_state');
     $this->db->from(db_prefix() . 'clients c');
     $this->db->join(
       db_prefix() . 'AccountSubGroup2 a',
@@ -159,6 +159,8 @@ class SalesOrder_model extends App_Model
         'OrderAmt' => $data['quantity'][$i] * $data['unit_rate'][$i],
         'NetOrderAmt' => $data['amount'][$i],
         'Ordinalno' =>  $i+1,
+        'TType' => 'S',
+        'TType2' => 'Order',
       ];
       //   echo json_encode($item_data);
       // exit;
@@ -181,15 +183,19 @@ class SalesOrder_model extends App_Model
     $this->db->from(db_prefix() . 'SalesOrderMaster pm');
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pm.AccountID', 'left');
     $this->db->join(db_prefix() . 'ItemCategoryMaster icm', 'icm.id = pm.ItemCategory', 'left');
-    $this->db->where('pm.TransDate >=', date('Y-m-01'));
-    $this->db->order_by('pm.TransDate', 'DESC');
+    $this->db->order_by('pm.TransDate', 'ASC');
     return $this->db->get()->result_array();
   }
 
   public function getOrderDetails($id)
   {
-    $this->db->select('pm.*, c.company');
+    $this->db->select('pm.*, c.company, icm.CategoryName as CategoryName');
     $this->db->from(db_prefix() . 'SalesOrderMaster pm');
+     $this->db->join(
+      db_prefix() . 'ItemCategoryMaster icm',
+      'icm.Id = pm.ItemCategory',
+      'left'
+    );
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pm.AccountID', 'left');
     $this->db->where('pm.id', $id);
     $master = $this->db->get()->row_array();
@@ -209,7 +215,7 @@ class SalesOrder_model extends App_Model
   }
   public function getCustomerBrokerList($customer_id)
   {
-    $this->db->select('c.AccountID, c.company');
+    $this->db->select('c.AccountID, c.company, c.billing_state');
     $this->db->from(db_prefix() . 'PartyBrokerMaster pbm');
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pbm.BrokerID', 'left');
     $this->db->where('pbm.AccountID', $customer_id);

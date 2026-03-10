@@ -1,18 +1,80 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <style>
-.table-list { overflow: auto; max-height: 55vh; width:100%; position:relative; top: 0px; }
-.table-list thead th { position: sticky; top: 0; z-index: 1; }
-.table-list tbody th { position: sticky; left: 0; }
-table { border-collapse: collapse; width: 100%; }
-th, td { padding: 1px 5px !important; white-space: nowrap; border:1px solid !important; font-size:11px; line-height:1.42857143 !important; vertical-align: middle !important;}
-th { background: #50607b; color: #fff !important; }
-.tableFixHead2 { overflow: auto; max-height: 50vh; }
-.sortable, .get_Details { cursor: pointer; }
-.total-label-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
-.total-label-row .total-display { flex: 1; padding: 0; text-align: right; font-weight: 600; }
-.fixed-td { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.get_Details.processing { pointer-events: none; opacity: 0.9; }
+  .table-list {
+    overflow: auto;
+    max-height: 55vh;
+    width: 100%;
+    position: relative;
+    top: 0px;
+  }
+
+  .table-list thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .table-list tbody th {
+    position: sticky;
+    left: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 1px 5px !important;
+    white-space: nowrap;
+    border: 1px solid !important;
+    font-size: 11px;
+    line-height: 1.42857143 !important;
+    vertical-align: middle !important;
+  }
+
+  th {
+    background: #50607b;
+    color: #fff !important;
+  }
+
+  .tableFixHead2 {
+    overflow: auto;
+    max-height: 50vh;
+  }
+
+  .sortable,
+  .get_Details {
+    cursor: pointer;
+  }
+
+  .total-label-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .total-label-row .total-display {
+    flex: 1;
+    padding: 0;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .fixed-td {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .get_Details.processing {
+    pointer-events: none;
+    opacity: 0.9;
+  }
 </style>
 <div id="wrapper">
   <div class="content">
@@ -22,17 +84,18 @@ th { background: #50607b; color: #fff !important; }
           <div class="panel-body">
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb custombreadcrumb" style="background-color:#fff !important; margin-Bottom:0px !important;">
-                <li class="breadcrumb-item"><a href="<?= admin_url();?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
-                <li class="breadcrumb-item active text-capitalize"><b>Purchase</b></li><li class="breadcrumb-item active" aria-current="page"><b>Quotation</b></li>
-							</ol>
-						</nav>
+                <li class="breadcrumb-item"><a href="<?= admin_url(); ?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
+                <li class="breadcrumb-item active text-capitalize"><b>Purchase</b></li>
+                <li class="breadcrumb-item active" aria-current="page"><b>Quotation</b></li>
+              </ol>
+            </nav>
             <hr class="hr_style">
             <br>
             <form action="" method="post" id="main_save_form">
-							<input type="hidden" name="form_mode" id="form_mode" value="add">
-							<input type="hidden" name="update_id" id="update_id" value="">
+              <input type="hidden" name="form_mode" id="form_mode" value="add">
+              <input type="hidden" name="update_id" id="update_id" value="">
               <div class="row">
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="item_type">
                     <label for="item_type" class="control-label"><small class="req text-danger">* </small> Item / Service</label>
                     <select name="item_type" id="item_type" class="form-control selectpicker" data-live-search="true" app-field-label="Item / Service" required onchange="getCustomDropdownList('item_type', this.value, 'item_category');">
@@ -47,7 +110,7 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="item_category">
                     <label for="item_category" class="control-label"><small class="req text-danger">* </small> Category</label>
                     <select name="item_category" id="item_category" class="form-control selectpicker" data-live-search="true" app-field-label="Category" required onchange="getNextQuotationNo();">
@@ -55,18 +118,18 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="quotation_no">
                     <label for="quotation_no" class="control-label"><small class="req text-danger">* </small> Quotation No</label>
-										<input type="text" name="quotation_no" id="quotation_no" class="form-control" app-field-label="Quotation No" required readonly placeholder="Auto Generated">
+                    <input type="text" name="quotation_no" id="quotation_no" class="form-control" app-field-label="Quotation No" required readonly placeholder="Auto Generated">
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="quotation_date">
-                    <?= render_date_input('quotation_date','Quotation Date', date('d/m/Y'), []); ?>
+                    <?= render_date_input('quotation_date', 'Quotation Date', date('d/m/Y'), []); ?>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="purchase_location">
                     <label for="purchase_location" class="control-label"><small class="req text-danger">* </small> Purchase Location</label>
                     <select name="purchase_location" id="purchase_location" class="form-control selectpicker" data-live-search="true" app-field-label="Purchase Location" required>
@@ -81,7 +144,7 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="freight_terms">
                     <label for="freight_terms" class="control-label"><small class="req text-danger">* </small> Freight Terms</label>
                     <select name="freight_terms" id="freight_terms" class="form-control selectpicker" data-live-search="true" app-field-label="Freight Terms" required>
@@ -96,7 +159,7 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="vendor_id">
                     <label for="vendor_id" class="control-label"><small class="req text-danger">* </small> Vendor Name</label>
                     <select name="vendor_id" id="vendor_id" class="form-control selectpicker" data-live-search="true" app-field-label="Vendor Name" required onchange="getVendorDetailsLocation();">
@@ -104,7 +167,7 @@ th { background: #50607b; color: #fff !important; }
                       <?php
                       if (!empty($vendor_list)) :
                         foreach ($vendor_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' ('.$value['AccountID'].')</option>';
+                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' - ' . $value['billing_state'] . '' . ' (' . $value['AccountID'] . ')</option>';
                         endforeach;
                       endif;
                       ?>
@@ -115,7 +178,7 @@ th { background: #50607b; color: #fff !important; }
                     <input type="hidden" name="vendor_address" id="vendor_address" class="form-control" readonly>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="vendor_location">
                     <label for="vendor_location" class="control-label"><small class="req text-danger">* </small> Vendor Location</label>
                     <select name="vendor_location" id="vendor_location" class="form-control selectpicker" data-live-search="true" app-field-label="Vendor Location" required>
@@ -123,7 +186,7 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="broker_id">
                     <label for="broker_id" class="control-label"><small class="req text-danger">* </small> Broker Name</label>
                     <select name="broker_id" id="broker_id" class="form-control selectpicker" data-live-search="true" app-field-label="Broker Name" required>
@@ -133,15 +196,15 @@ th { background: #50607b; color: #fff !important; }
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="delivery_from">
-                    <?= render_date_input('delivery_from','Delivery From', date('d/m/Y'), []); ?>
+                    <?= render_date_input('delivery_from', 'Delivery From', date('d/m/Y'), []); ?>
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="delivery_to">
-                    <?= render_date_input('delivery_to','Delivery To', date('d/m/Y', strtotime('+10 days')), []); ?>
+                    <?= render_date_input('delivery_to', 'Delivery To', date('d/m/Y', strtotime('+10 days')), []); ?>
                   </div>
                 </div>
-								<div class="col-md-2 mbot5">
+                <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="payment_terms">
                     <label for="payment_terms" class="control-label"><small class="req text-danger">* </small> Payment Terms</label>
                     <select name="payment_terms" id="payment_terms" class="form-control selectpicker" data-live-search="true" app-field-label="Payment Terms" required>
@@ -152,7 +215,7 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
-                
+
                 <div class="col-md-12 mbot5">
                   <h4 class="bold p_style">Items / Services:</h4>
                   <hr class="hr_style">
@@ -160,20 +223,20 @@ th { background: #50607b; color: #fff !important; }
                 <div class="col-md-12 mbot5">
                   <input type="hidden" id="row_id" value="0">
                   <table width="100%" class="table" id="items_table">
-										<thead>
-											<tr style="text-align: center;">
-												<th>Item Name</th>
-												<th>HSN Code</th>
-												<th>UOM</th>
-												<th>Unit Wt (Kg)</th>
-												<th>Min Qty</th>
-												<th>Max Qty</th>
-												<th>Disc Amt</th>
-												<th>Unit Rate</th>
-												<th>GST %</th>
-												<th>Amount</th>
-												<th>Action</th>
-											</tr>
+                    <thead>
+                      <tr style="text-align: center;">
+                        <th>Item Name</th>
+                        <th>HSN Code</th>
+                        <th>UOM</th>
+                        <th>Unit Wt (Kg)</th>
+                        <th>Min Qty</th>
+                        <th>Max Qty</th>
+                        <th>Disc Amt/Unit</th>
+                        <th>Unit Rate</th>
+                        <th>GST %</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                      </tr>
                       <tr>
                         <td style="width: 250px;">
                           <select id="item_id" class="form-control fixed_row dynamic_row dynamic_item selectpicker" data-live-search="true" app-field-label="Item Name" onchange="getItemDetails(this.value, '');">
@@ -193,11 +256,11 @@ th { background: #50607b; color: #fff !important; }
                           <button type="button" class="btn btn-success" onclick="addRow();"><i class="fa fa-plus"></i></button>
                         </td>
                       </tr>
-										</thead>
-										<tbody id="items_body">
+                    </thead>
+                    <tbody id="items_body">
 
                     </tbody>
-									</table>
+                  </table>
                 </div>
 
                 <div class="col-md-6"></div>
@@ -282,17 +345,17 @@ th { background: #50607b; color: #fff !important; }
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-									<button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
-									<button type="button" class="btn btn-danger" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
-									<button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
+                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="button" class="btn btn-danger" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
+                  <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
                 </div>
               </div>
             </form>
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   </div>
@@ -310,25 +373,31 @@ th { background: #50607b; color: #fff !important; }
           <div class="row">
             <div class="col-md-2 mbot5">
               <div class="form-group" app-field-wrapper="from_date">
+                <?= render_date_input('from_date', 'From Date', date('01/m/Y'), []); ?>
+              </div>
+              <!-- <div class="form-group" app-field-wrapper="from_date">
                 <label for="from_date" class="control-label">From Date</label>
                 <div class="input-group date">
-                  <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y")?>" app-field-label="From Date" onchange="resetForm();">
+                  <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y") ?>" app-field-label="From Date" onchange="resetForm();">
                   <div class="input-group-addon">
                     <i class="fa-regular fa-calendar calendar-icon"></i>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
             <div class="col-md-2 mbot5">
               <div class="form-group" app-field-wrapper="to_date">
+                <?= render_date_input('to_date', 'To Date', date('d/m/Y'), []); ?>
+              </div>
+              <!-- <div class="form-group" app-field-wrapper="to_date">
                 <label for="to_date" class="control-label">To Date</label>
                 <div class="input-group date">
-                  <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y")?>" app-field-label="To Date" onchange="resetForm();">
+                  <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y") ?>" app-field-label="To Date" onchange="resetForm();">
                   <div class="input-group-addon">
                     <i class="fa-regular fa-calendar calendar-icon"></i>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
             <!-- <div class="col-md-3 mbot5">
               <div class="form-group" app-field-wrapper="vendor_id">
@@ -353,7 +422,7 @@ th { background: #50607b; color: #fff !important; }
                   <?php
                   if (!empty($quotation_category)) :
                     foreach ($quotation_category as $value) :
-                      echo '<option value="'.$value['id'].'">'.$value['CategoryCode'].'</option>';
+                      echo '<option value="' . $value['id'] . '">' . $value['CategoryCode'] . '</option>';
                     endforeach;
                   endif;
                   ?>
@@ -396,19 +465,19 @@ th { background: #50607b; color: #fff !important; }
             </thead>
             <tbody>
               <?php
-							if(!empty($quotation_list)):
-								foreach ($quotation_list as $key => $value):
-								?>
-								<tr class="get_Details" data-id="<?= $value["id"]; ?>" onclick="getDetails(<?= $value['id']; ?>)">
-									<td><?= $value["QuotatioonID"];?></td>
-									<td><?= date('d/m/Y', strtotime($value["TransDate"]));?></td>
-									<td><?= $value["company"];?></td>
-									<td><?= $value["TotalWeight"];?></td>
-									<td><?= $value["NetAmt"];?></td>
-								</tr>
-								<?php
-								endforeach;
-							endif;
+              if (!empty($quotation_list)):
+                foreach ($quotation_list as $key => $value):
+              ?>
+                  <tr class="get_Details" data-id="<?= $value["id"]; ?>" onclick="getDetails(<?= $value['id']; ?>)">
+                    <td><?= $value["QuotatioonID"]; ?></td>
+                    <td><?= date('d/m/Y', strtotime($value["TransDate"])); ?></td>
+                    <td><?= $value["company"]; ?></td>
+                    <td><?= $value["TotalWeight"]; ?></td>
+                    <td><?= $value["NetAmt"]; ?></td>
+                  </tr>
+              <?php
+                endforeach;
+              endif;
               ?>
             </tbody>
           </table>
@@ -419,66 +488,138 @@ th { background: #50607b; color: #fff !important; }
   </div>
 </div>
 
+<?php
+$fy = $this->session->userdata('finacial_year');
+$fy_new = $fy + 1;
+$lastdate_date = '20' . $fy_new . '-03-31';
+$curr_date = date('Y-m-d');
+$curr_date_new = new DateTime($curr_date);
+$last_date_yr = new DateTime($lastdate_date);
+if ($last_date_yr < $curr_date_new) {
+  $max_date_php = $lastdate_date;
+} else {
+  $max_date_php = $curr_date;
+}
+?>
+
 <?php init_tail(); ?>
 <script>
-  $(document).ready(function(){
+  $(document).ready(function() {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
+    } else {
+      maxEndDate = new Date();
+    }
+
+    // Order Date — restricted within FY, up to today or March 31
+    $('#quotation_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+
+    // Delivery From — same FY restriction
+    $('#delivery_from').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+
+    // Delivery To — min is today, max is March 31 of FY end
+    var fy_end_year = "20" + (parseInt(fin_y) + 1);
+    var fyEndDate = new Date(fy_end_year + '/03/31');
+
+    $('#delivery_to').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate, // can't go before FY start
+      maxDate: fyEndDate, // always allows up to March 31 for delivery planning
+      timepicker: false
+    });
+
+    $('#from_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+    $('#to_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+  });
+  $(document).ready(function() {
     setTimeout(() => {
       $('#filter_list_form').submit();
     }, 800);
   });
 
-	function ResetForm(){
-		$('#main_save_form')[0].reset();
-		$('#form_mode').val('add');
-		$('#update_id').val('');
-		$('.updateBtn').hide();
-		$('.saveBtn').show();
-		$('.selectpicker').selectpicker('refresh');
+  function ResetForm() {
+    $('#main_save_form')[0].reset();
+    $('#form_mode').val('add');
+    $('#update_id').val('');
+    $('.updateBtn').hide();
+    $('.saveBtn').show();
+    $('.selectpicker').selectpicker('refresh');
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
-	}
+  }
 
-  $(document).on('input', 'input[type="tel"]', function () {
+  $(document).on('input', 'input[type="tel"]', function() {
     this.value = this.value
-        .replace(/[^0-9.]/g, '')        // allow digits + dot
-        .replace(/(\..*?)\..*/g, '$1'); // allow only one dot
-    });
-	
-	function validate_fields(fields){ 
-		let data = {};
-		for(let i = 0; i < fields.length; i++){
-			let value = $('#' + fields[i]).val();
+      .replace(/[^0-9.]/g, '') // allow digits + dot
+      .replace(/(\..*?)\..*/g, '$1'); // allow only one dot
+  });
 
-			if(value === '' || value === null){
-				let label = fields[i].replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-				alert_float('warning', 'Please enter ' + label);
-				$('#'+fields[i]).focus();
-				return false;
-			} else {
-				data[fields[i]] = value.trim();
-			}
-		}
-		return data;
-	}
+  function validate_fields(fields) {
+    let data = {};
+    for (let i = 0; i < fields.length; i++) {
+      let value = $('#' + fields[i]).val();
 
-	function addRow(row = null){
+      if (value === '' || value === null) {
+        let label = fields[i].replace(/[_-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        alert_float('warning', 'Please enter ' + label);
+        $('#' + fields[i]).focus();
+        return false;
+      } else {
+        data[fields[i]] = value.trim();
+      }
+    }
+    return data;
+  }
+
+  function addRow(row = null) {
     $('#item_id').focus();
-		var row_id = $('#row_id').val();
-		var next_id = parseInt(row_id) + 1;
-		if(row == null){
-			let fields = ['item_id', 'min_qty', 'max_qty', 'disc_amt', 'unit_rate'];
-			let data = validate_fields(fields);
-			if (data === false) {
-				return false;
-			}
+    var row_id = $('#row_id').val();
+    var next_id = parseInt(row_id) + 1;
+    if (row == null) {
+      let fields = ['item_id', 'min_qty', 'max_qty', 'disc_amt', 'unit_rate'];
+      let data = validate_fields(fields);
+      if (data === false) {
+        return false;
+      }
 
-			var row_btn = `<button type="button" class="btn btn-danger" onclick="$(this).closest('tr').remove();" style="float:right; padding: 2px; width: 30px;"><i class="fa fa-xmark"></i></button>`;
-		}else{
-			var row_btn = '';
-		}
-		let item_option = $('#item_id').html();
-		$('#items_body').append(`
+      var row_btn = `<button type="button" class="btn btn-danger" onclick="$(this).closest('tr').remove();" style="float:right; padding: 2px; width: 30px;"><i class="fa fa-xmark"></i></button>`;
+    } else {
+      var row_btn = '';
+    }
+    let item_option = $('#item_id').html();
+    $('#items_body').append(`
       <tr>
         <td style="width: 250px;">
           <input type="hidden" name="item_uid[]" id="item_uid${next_id}" value="0">
@@ -496,40 +637,41 @@ th { background: #50607b; color: #fff !important; }
         <td>${row_btn}</td>
       </tr>
 		`);
-		if(row == null){
-			$('#item_id'+next_id).val($('#item_id').val());
-			$('#hsn_code'+next_id).val($('#hsn_code').val());
-			$('#uom'+next_id).val($('#uom').val());
-			$('#unit_weight'+next_id).val($('#unit_weight').val());
-      $('#min_qty'+next_id).val($('#min_qty').val());
-      $('#max_qty'+next_id).val($('#max_qty').val());
-      $('#disc_amt'+next_id).val($('#disc_amt').val());
-      $('#unit_rate'+next_id).val($('#unit_rate').val());
-      $('#gst'+next_id).val($('#gst').val());
-      $('#amount'+next_id).val($('#amount').val());
+    if (row == null) {
+      $('#item_id' + next_id).val($('#item_id').val());
+      $('#hsn_code' + next_id).val($('#hsn_code').val());
+      $('#uom' + next_id).val($('#uom').val());
+      $('#unit_weight' + next_id).val($('#unit_weight').val());
+      $('#min_qty' + next_id).val($('#min_qty').val());
+      $('#max_qty' + next_id).val($('#max_qty').val());
+      $('#disc_amt' + next_id).val($('#disc_amt').val());
+      $('#unit_rate' + next_id).val($('#unit_rate').val());
+      $('#gst' + next_id).val($('#gst').val());
+      $('#amount' + next_id).val($('#amount').val());
       $('.fixed_row').val('');
       calculateAmount(next_id);
-		}
-		$('#row_id').val(next_id);
+    }
+    $('#row_id').val(next_id);
     $('.selectpicker').selectpicker('refresh');
-	}
+  }
 
   function calculateAmount(row) {
-    var minQty = parseFloat($('#min_qty'+row).val()) || 0;
-    var unitRate = parseFloat($('#unit_rate'+row).val()) || 0;
-    var discAmt = parseFloat($('#disc_amt'+row).val()) || 0;
-    var gstPercent = parseFloat($('#gst'+row).val()) || 0;
+    var minQty = parseFloat($('#min_qty' + row).val()) || 0;
+    var unitRate = parseFloat($('#unit_rate' + row).val()) || 0;
+    var discAmt = parseFloat($('#disc_amt' + row).val()) || 0;
+    var gstPercent = parseFloat($('#gst' + row).val()) || 0;
+    $('#max_qty' + row).val(minQty + 2);
 
     var taxableAmt = (unitRate - discAmt) * minQty;
     var gstAmt = taxableAmt * (gstPercent / 100);
     var netAmt = taxableAmt + gstAmt;
-    if(isNaN(netAmt) || netAmt < 0){
+    if (isNaN(netAmt) || netAmt < 0) {
       netAmt = 0;
     }
 
-    $('#amount'+row).val(netAmt.toFixed(2));
+    $('#amount' + row).val(netAmt.toFixed(2));
     calculateTotals();
-    if((row == '' || row == null) && minQty > 0 && unitRate > 0 && discAmt >= 0 && gstPercent >= 0){
+    if ((row == '' || row == null) && minQty > 0 && unitRate > 0 && discAmt >= 0 && gstPercent >= 0) {
       addRow();
     }
   }
@@ -542,7 +684,7 @@ th { background: #50607b; color: #fff !important; }
     var totalTaxableAmt = 0;
     var totalGstAmt = 0;
 
-    $('#items_body tr').each(function () {
+    $('#items_body tr').each(function() {
       var row = $(this);
       var qty = parseFloat(row.find('.min-qty').val()) || 0;
       var weight = parseFloat(row.find('.unit-weight').val()) || 0;
@@ -574,11 +716,15 @@ th { background: #50607b; color: #fff !important; }
 
     // GST Calculation based on State
     var vendorState = $('#vendor_state').val().trim().toUpperCase();
-    var cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
-    var cgstPercent = 0, sgstPercent = 0, igstPercent = 0;
+    var cgstAmt = 0,
+      sgstAmt = 0,
+      igstAmt = 0;
+    var cgstPercent = 0,
+      sgstPercent = 0,
+      igstPercent = 0;
     var totalGstPercent = 0;
     if (totalTaxableAmt > 0) {
-      $('#items_body tr').each(function () {
+      $('#items_body tr').each(function() {
         var row = $(this);
         var qty = parseFloat(row.find('.min-qty').val()) || 0;
         var rate = parseFloat(row.find('.unit-rate').val()) || 0;
@@ -605,7 +751,7 @@ th { background: #50607b; color: #fff !important; }
     // $('#cgst_percent_label').text((cgstPercent ? cgstPercent.toFixed(2) : '0') + '%');
     // $('#sgst_percent_label').text((sgstPercent ? sgstPercent.toFixed(2) : '0') + '%');
     // $('#igst_percent_label').text((igstPercent ? igstPercent.toFixed(2) : '0') + '%');
-    
+
     var netAmtBeforeRound = totalTaxableAmt + totalGstAmt;
     var netAmtRounded = Math.round(netAmtBeforeRound);
     var roundOffAmt = netAmtRounded - netAmtBeforeRound;
@@ -626,17 +772,17 @@ th { background: #50607b; color: #fff !important; }
     $('#net_amt_hidden').val(netAmtRounded.toFixed(2));
   }
 
-	function get_required_fields(form_id){
-		let fields = [];
-		$('#' + form_id + ' [required]').each(function(){
-				fields.push($(this).attr('id'));
-		});
-		return fields;
-	}
+  function get_required_fields(form_id) {
+    let fields = [];
+    $('#' + form_id + ' [required]').each(function() {
+      fields.push($(this).attr('id'));
+    });
+    return fields;
+  }
 
-	function getCustomDropdownList(parent_id, parent_value, child_id, selected_value = null, callback = null){
+  function getCustomDropdownList(parent_id, parent_value, child_id, selected_value = null, callback = null) {
     $.ajax({
-      url:"<?= admin_url(); ?>ItemMaster/GetCustomDropdownList",
+      url: "<?= admin_url(); ?>ItemMaster/GetCustomDropdownList",
       type: 'POST',
       dataType: 'json',
       data: {
@@ -644,24 +790,24 @@ th { background: #50607b; color: #fff !important; }
         parent_value: parent_value,
         child_id: child_id
       },
-      success: function(response){
-        if(response.success == true){
+      success: function(response) {
+        if (response.success == true) {
           let html = `<option value="" selected disabled>None selected</option>`;
 
-          for(var i = 0; i < response.data.length; i++){
+          for (var i = 0; i < response.data.length; i++) {
             html += `<option value="${response.data[i].id}">${response.data[i].name}</option>`;
           }
 
-          $('#'+child_id).html(html);
-          if(selected_value){
-            $('#'+child_id).val(selected_value);
+          $('#' + child_id).html(html);
+          if (selected_value) {
+            $('#' + child_id).val(selected_value);
           }
           $('.selectpicker').selectpicker('refresh');
-          if(callback){
+          if (callback) {
             callback();
           }
-        }else{
-          $('#'+child_id).html('<option value="" selected disabled>None selected</option>');
+        } else {
+          $('#' + child_id).html('<option value="" selected disabled>None selected</option>');
           $('.selectpicker').selectpicker('refresh');
         }
       }
@@ -677,18 +823,20 @@ th { background: #50607b; color: #fff !important; }
     $.ajax({
       url: '<?= admin_url('purchase/Quotation/getNextQuotationNo'); ?>',
       type: 'POST',
-      data: { category_id: categoryId },
+      data: {
+        category_id: categoryId
+      },
       dataType: 'json',
-      success: function (response) {
+      success: function(response) {
         if (response.success == true) {
           let form_mode = $('#form_mode').val();
           if (form_mode == 'add') {
             $('#quotation_no').val(response.quote_no);
           }
           var html = '<option value="" selected disabled>Select Item</option>';
-          $.each(response.item_list, function (index, val) {
+          $.each(response.item_list, function(index, val) {
             html += '<option value="' + val.ItemId + '">' + val.ItemName + '</option>';
-						});
+          });
           $('#item_id').html(html);
           $('.selectpicker').selectpicker('refresh');
         } else {
@@ -698,7 +846,7 @@ th { background: #50607b; color: #fff !important; }
           callback();
         }
       },
-      error: function () {
+      error: function() {
         $('#quotation_no').val('');
       }
     });
@@ -714,9 +862,11 @@ th { background: #50607b; color: #fff !important; }
     $.ajax({
       url: '<?= admin_url('purchase/Quotation/getVendorDetailsLocation'); ?>',
       type: 'POST',
-      data: { vendor_id: vendorId },
+      data: {
+        vendor_id: vendorId
+      },
       dataType: 'json',
-      success: function (response) {
+      success: function(response) {
         if (response.success == true) {
           var data = response.data;
           $('#vendor_gst_no').val(data.GSTIN || '');
@@ -725,18 +875,18 @@ th { background: #50607b; color: #fff !important; }
           $('#vendor_address').val(data.billing_address || '');
 
           var html = '<option value="" selected disabled>None selected</option>';
-          $.each(response.location, function (index, loc) {
-            if(loc.id == null || loc.id == '') return;
+          $.each(response.location, function(index, loc) {
+            if (loc.id == null || loc.id == '') return;
             html += '<option value="' + loc.id + '">' + loc.city + '</option>';
-						});
+          });
           $('#vendor_location').html(html);
 
-          
+
           html = '<option value="" selected disabled>None selected</option>';
-          $.each(response.broker_list, function (index, loc) {
-            if(loc.AccountID == null || loc.AccountID == '') return;
-            html += `<option value="${loc.AccountID}">${loc.company} (${loc.AccountID})</option>`;
-						});
+          $.each(response.broker_list, function(index, loc) {
+            if (loc.AccountID == null || loc.AccountID == '') return;
+            html += `<option value="${loc.AccountID}">${loc.company} - ${loc.billing_state} (${loc.AccountID})</option>`;
+          });
           $('#broker_id').html(html);
 
           $('.selectpicker').selectpicker('refresh');
@@ -749,10 +899,10 @@ th { background: #50607b; color: #fff !important; }
     });
   }
 
-  function getItemDetails(itemId, id=''){
+  function getItemDetails(itemId, id = '') {
     var isDuplicate = false;
 
-    $('.dynamic_item').not('#item_id'+id).each(function () {
+    $('.dynamic_item').not('#item_id' + id).each(function() {
       if ($(this).val() == itemId && itemId != '') {
         isDuplicate = true;
         return false;
@@ -760,78 +910,80 @@ th { background: #50607b; color: #fff !important; }
     });
     if (isDuplicate) {
       alert_float('warning', 'Please select other item, this item already selected.');
-      $('#item_id'+id).val('').focus();
+      $('#item_id' + id).val('').focus();
       $('.selectpicker').selectpicker('refresh');
       $('.fixed_row').val('');
-      $('.dynamic_row'+id).val('');
+      $('.dynamic_row' + id).val('');
       return;
     }
 
     $.ajax({
       url: '<?= admin_url('purchase/GetItemDetails'); ?>',
       type: 'POST',
-      data: { item_id: itemId },
+      data: {
+        item_id: itemId
+      },
       dataType: 'json',
-      success: function (response) {
+      success: function(response) {
         if (response.status === 'success' && response.data) {
           var data = response.data;
-          $('#hsn_code'+id).val(data.hsn_code || '');
-          $('#uom'+id).val(data.unit || '');
-          $('#unit_weight'+id).val(Number(data.UnitWeight) || 0);
-          $('#gst'+id).val(Number(data.tax) || 0);
-          $('#min_qty'+id).focus();
-        }else{
+          $('#hsn_code' + id).val(data.hsn_code || '');
+          $('#uom' + id).val(data.unit || '');
+          $('#unit_weight' + id).val(Number(data.UnitWeight) || 0);
+          $('#gst' + id).val(Number(data.tax) || 0);
+          $('#min_qty' + id).focus();
+        } else {
           $('.fixed_row').val('');
           $('.selectpicker').selectpicker('refresh');
         }
         calculateTotals();
       },
-      error: function (xhr, status, err) {
+      error: function(xhr, status, err) {
         console.log('Error fetching item details:', err);
       }
     });
   }
-	
-	$('#main_save_form').on('submit', function(e) {
-		e.preventDefault();
 
-		let form_mode = $('#form_mode').val();
-		
-		let required_fields = get_required_fields('main_save_form');
-		let validated = validate_fields(required_fields);
+  $('#main_save_form').on('submit', function(e) {
+    e.preventDefault();
 
-		if(validated === false){
-			return;
-		}
-		
-		var form_data = new FormData(this);
-		form_data.append(
-			'<?= $this->security->get_csrf_token_name(); ?>',
-			$('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
-		);
-		if(form_mode == 'edit'){
-			form_data.append('update_id', $('#update_id').val());
-		}
+    let form_mode = $('#form_mode').val();
 
-		$.ajax({
-			url:"<?= admin_url(); ?>purchase/Quotation/SaveQuotation",
-			method:"POST",
-			dataType:"JSON",
-			data:form_data,
-			contentType: false,
-			cache: false,
-			processData: false,
-			beforeSend: function () {
-				$('button[type=submit]').attr('disabled', true);
-			},
-			complete: function () {
-				$('button[type=submit]').attr('disabled', false);
-			},
-			success: function(response){
-				if(response.success == true){
-					alert_float('success', response.message);
-					let html = `<tr class="get_Details" data-id="${response.data.id}" onclick="getDetails(${response.data.id}, this)">
-						<td>${response.data.QuotatioonID}</td>
+    let required_fields = get_required_fields('main_save_form');
+    let validated = validate_fields(required_fields);
+
+    if (validated === false) {
+      return;
+    }
+
+    var form_data = new FormData(this);
+    form_data.append(
+      '<?= $this->security->get_csrf_token_name(); ?>',
+      $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
+    );
+    if (form_mode == 'edit') {
+      form_data.append('update_id', $('#update_id').val());
+    }
+
+    $.ajax({
+      url: "<?= admin_url(); ?>purchase/Quotation/SaveQuotation",
+      method: "POST",
+      dataType: "JSON",
+      data: form_data,
+      contentType: false,
+      cache: false,
+      processData: false,
+      beforeSend: function() {
+        $('button[type=submit]').attr('disabled', true);
+      },
+      complete: function() {
+        $('button[type=submit]').attr('disabled', false);
+      },
+      success: function(response) {
+        if (response.success == true) {
+          alert_float('success', response.message);
+          let html = `<tr class="get_Details" data-id="${response.data.id}" onclick="getDetails(${response.data.id}, this)">
+						<td class="text-center">${response.data.QuotatioonID}</td>
             <td>${moment(response.data.TransDate).format('DD/MM/YYYY')}</td>
             <td>${response.data.category_name}</td>
             <td class="fixed-td" title="${response.data.AccountID} - ${response.data.company}">${response.data.AccountID} - ${response.data.company}</td>
@@ -846,55 +998,55 @@ th { background: #50607b; color: #fff !important; }
             <td class="text-center">${Number(response.data.RoundOffAmt) || '-'}</td>
             <td class="text-center">${Number(response.data.NetAmt) || '-'}</td>
 					</tr>`;
-					if(form_mode == 'edit'){
-						$('.get_Details[data-id="'+response.data.id+'"]').replaceWith(html);
-					}else{
-						$('#table_ListModal tbody').prepend(html);
-					}
-					ResetForm();
-				}else{
-					alert_float('warning', response.message);
-				}
-			}
-		});
-	});
+          if (form_mode == 'edit') {
+            $('.get_Details[data-id="' + response.data.id + '"]').replaceWith(html);
+          } else {
+            $('#table_ListModal tbody').prepend(html);
+          }
+          ResetForm();
+        } else {
+          alert_float('warning', response.message);
+        }
+      }
+    });
+  });
 
-	function getDetails(id, row){
+  function getDetails(id, row) {
     let $row = $(row);
     if ($row.hasClass('processing')) return;
     $row.addClass('processing');
 
-		ResetForm();
-		$.ajax({
-			url:"<?= admin_url(); ?>purchase/Quotation/GetQuotationDetails",
-			method:"POST",
-			dataType:"JSON",
-			data: {
-				id: id,
-			},
-      complete: function(){
+    ResetForm();
+    $.ajax({
+      url: "<?= admin_url(); ?>purchase/Quotation/GetQuotationDetails",
+      method: "POST",
+      dataType: "JSON",
+      data: {
+        id: id,
+      },
+      complete: function() {
         $row.removeClass('processing');
       },
-			success: function(response){
-				if(response.success == true){
-					let d = response.data;
-					$('#update_id').val(id);
-					$('#item_type').val(d.ItemType);
-          getCustomDropdownList('item_type', d.ItemType, 'item_category', d.ItemCategory, function(){
-            getNextQuotationNo(function(){
+      success: function(response) {
+        if (response.success == true) {
+          let d = response.data;
+          $('#update_id').val(id);
+          $('#item_type').val(d.ItemType);
+          getCustomDropdownList('item_type', d.ItemType, 'item_category', d.ItemCategory, function() {
+            getNextQuotationNo(function() {
               let history = response.data.history;
-              for(var i = 0; i < history.length; i++){
+              for (var i = 0; i < history.length; i++) {
                 addRow(2);
-                $('#item_uid'+(i+1)).val(history[i].id);
-                $('#item_id'+(i+1)).val(history[i].ItemID);
-                getItemDetails(history[i].ItemID, (i+1));
-                $('#min_qty'+(i+1)).val(Number(history[i].OrderQty));
-                $('#max_qty'+(i+1)).val(Number(history[i].OrderQty));
-                $('#unit_rate'+(i+1)).val(Number(history[i].BasicRate));
-                $('#disc_amt'+(i+1)).val(Number(history[i].DiscAmt));
-                $('#amount'+(i+1)).val(Number(history[i].NetOrderAmt));
+                $('#item_uid' + (i + 1)).val(history[i].id);
+                $('#item_id' + (i + 1)).val(history[i].ItemID);
+                getItemDetails(history[i].ItemID, (i + 1));
+                $('#min_qty' + (i + 1)).val(Number(history[i].OrderQty));
+                $('#max_qty' + (i + 1)).val(Number(history[i].OrderQty));
+                $('#unit_rate' + (i + 1)).val(Number(history[i].BasicRate));
+                $('#disc_amt' + (i + 1)).val(Number(history[i].DiscAmt));
+                $('#amount' + (i + 1)).val(Number(history[i].NetOrderAmt));
                 $('.selectpicker').selectpicker('refresh');
-                calculateAmount(i+1);
+                calculateAmount(i + 1);
               }
             });
           });
@@ -902,7 +1054,7 @@ th { background: #50607b; color: #fff !important; }
           $('#quotation_date').val(moment(d.TransDate).format('DD/MM/YYYY'));
           $('#purchase_location').val(d.PurchaseLocation);
           $('#vendor_id').val(d.AccountID);
-          getVendorDetailsLocation(function(){
+          getVendorDetailsLocation(function() {
             $('#vendor_location').val(d.DeliveryLocation);
             $('#broker_id').val(d.BrokerID);
           });
@@ -912,19 +1064,19 @@ th { background: #50607b; color: #fff !important; }
           $('#payment_terms').val(d.PaymentTerms);
           $('#freight_terms').val(d.FreightTerms);
 
-					$('.selectpicker').selectpicker('refresh');
-					$('#form_mode').val('edit');
-					$('.saveBtn').hide();
-					$('.updateBtn').show();
-					$('#ListModal').modal('hide');
-				}else{
-					alert_float('warning', response.message);
-				}
-			}
-		});
-	}
+          $('.selectpicker').selectpicker('refresh');
+          $('#form_mode').val('edit');
+          $('.saveBtn').hide();
+          $('.updateBtn').show();
+          $('#ListModal').modal('hide');
+        } else {
+          alert_float('warning', response.message);
+        }
+      }
+    });
+  }
 
-  $('#filter_list_form').submit(function(e){
+  $('#filter_list_form').submit(function(e) {
     e.preventDefault();
 
     let form = this;
@@ -949,27 +1101,27 @@ th { background: #50607b; color: #fff !important; }
         data: form_data,
         processData: false,
         contentType: false,
-        success: function(res){
+        success: function(res) {
           let json = JSON.parse(res);
-          if(!json.success){
+          if (!json.success) {
             $('#searchBtn').prop('disabled', false);
-            if(offset === 0){
+            if (offset === 0) {
               $('#table_ListModal tbody').html(
                 '<tr><td colspan="14" class="text-center">No Data Found</td></tr>'
               );
             }
             return;
           }
-          if(offset === 0){
+          if (offset === 0) {
             totalRecords = parseInt(json.total) || 0;
           }
-          if(json.rows && json.rows.length > 0){
+          if (json.rows && json.rows.length > 0) {
             appendRows(json.rows);
             loadedRecords += json.rows.length;
             offset += limit;
           }
           updateProgress(loadedRecords, totalRecords);
-          if(loadedRecords >= totalRecords){
+          if (loadedRecords >= totalRecords) {
             $('#searchBtn').prop('disabled', false);
             $('#fetchProgress').css('width', '0%')
             return;
@@ -981,9 +1133,9 @@ th { background: #50607b; color: #fff !important; }
     fetchChunk();
   });
 
-  function appendRows(rows){
+  function appendRows(rows) {
     let html = '';
-    rows.forEach(function(row){
+    rows.forEach(function(row) {
       html += `<tr class="get_Details" data-id="${row.id}" onclick="getDetails(${row.id}, this)">
         <td class="text-center">${row.QuotatioonID}</td>
         <td>${moment(row.TransDate).format('DD/MM/YYYY')}</td>
@@ -1004,33 +1156,33 @@ th { background: #50607b; color: #fff !important; }
     $('#table_ListModal tbody').append(html);
   }
 
-  function updateProgress(loaded, total){
+  function updateProgress(loaded, total) {
     let percent = Math.floor((loaded / total) * 100);
     $('#fetchProgress').css('width', percent + '%')
   }
 </script>
 <script>
-  $(document).on("click", ".sortable", function () {
-		var table = $("#table_ListModal tbody");
-		var rows = table.find("tr").toArray();
-		var index = $(this).index();
-		var ascending = !$(this).hasClass("asc");
-		$(".sortable").removeClass("asc desc");
-		$(".sortable span").remove();
-		// Add sort classes and arrows
-		$(this).addClass(ascending ? "asc" : "desc");
-		$(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
-		rows.sort(function (a, b) {
-			var valA = $(a).find("td").eq(index).text().trim();
-			var valB = $(b).find("td").eq(index).text().trim();
-			if ($.isNumeric(valA) && $.isNumeric(valB)) {
-				return ascending ? valA - valB : valB - valA;
-				} else {
-				return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
-			}
-		});
-		table.append(rows);
-	});
+  $(document).on("click", ".sortable", function() {
+    var table = $("#table_ListModal tbody");
+    var rows = table.find("tr").toArray();
+    var index = $(this).index();
+    var ascending = !$(this).hasClass("asc");
+    $(".sortable").removeClass("asc desc");
+    $(".sortable span").remove();
+    // Add sort classes and arrows
+    $(this).addClass(ascending ? "asc" : "desc");
+    $(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
+    rows.sort(function(a, b) {
+      var valA = $(a).find("td").eq(index).text().trim();
+      var valB = $(b).find("td").eq(index).text().trim();
+      if ($.isNumeric(valA) && $.isNumeric(valB)) {
+        return ascending ? valA - valB : valB - valA;
+      } else {
+        return ascending ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+    });
+    table.append(rows);
+  });
 
   function myFunction2() {
     var input = document.getElementById("myInput1");

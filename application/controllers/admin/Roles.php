@@ -95,22 +95,46 @@ class Roles extends AdminController
   }
     
     //------------------- List of menu permission-------------------------------
-    public function get_permission_by_staff()
-    {
-        $staff_id = $this->input->post('staff_id'); 
-        $plant_fy = $this->input->post('plant_fy'); 
-        $aa = explode("-",$plant_fy);
+    // public function get_permission_by_staff()
+    // {
+    //     $staff_id = $this->input->post('staff_id'); 
+    //     $plant_fy = $this->input->post('plant_fy'); 
+    //     $aa = explode("-",$plant_fy);
         
-        $plant_id= $aa[0];
-        $year = $aa[1];
-        $member = $this->staff_model->get_new($staff_id,$plant_id,$year);
-        $role               = $this->roles_model->get($staff_id);
-        $data['role']       = $role;
-            if(isset($member)) {
-                $permissionsData['member'] = $member;
-            }
-       return $this->load->view('admin/staff/permissions_new', $permissionsData);
+    //     $plant_id= $aa[0];
+    //     $year = $aa[1];
+    //     $member = $this->staff_model->get_new($staff_id,$plant_id,$year);
+    //     $role               = $this->roles_model->get($staff_id);
+    //     $data['role']       = $role;
+    //         if(isset($member)) {
+    //             $permissionsData['member'] = $member;
+    //         }
+    //    return $this->load->view('admin/staff/permissions_new', $permissionsData);
+    // }
+
+    public function get_permission_by_staff()
+{
+    $staff_id  = $this->input->post('staff_id'); 
+    $plant_fy  = $this->input->post('plant_fy'); 
+    $aa        = explode("-", $plant_fy);
+    
+    $plant_id  = $aa[0];
+    $year      = $aa[1];
+    
+    $member    = $this->staff_model->get_new($staff_id, $plant_id, $year);
+    $role      = $this->roles_model->get($staff_id);
+
+    $permissionsData = [];
+    $permissionsData['funcData'] = null; // or whatever value get_available_staff_permissions() needs
+
+    if (isset($member)) {
+        $permissionsData['member'] = $member;
     }
+
+    $permissionsData['role'] = $role;
+
+    return $this->load->view('admin/staff/permissions_new', $permissionsData);
+}
     
     //------------------- List of Company selection-------------------------------
     public function get_company_list()

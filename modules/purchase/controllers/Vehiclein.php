@@ -71,6 +71,7 @@ class Vehiclein extends AdminController
 		}else{
 			$gatein_date = date('Y-m-d H:i:s');
 		}
+		$type = $data['type'] ?? 'P';
 		$form_mode = $data['form_mode'] ?? 'add';
 		$update_id = $data['update_id'] ?? '';
 
@@ -86,9 +87,35 @@ class Vehiclein extends AdminController
 			$gatein_no = $this->Inwards_model->GetGateInNo($location_id);
 		}
 
+		// =============================================
+		// Financial Year Date Validation
+		// =============================================
+		$FY_int      = (int) $FY;
+		$fy_start    = '20' . str_pad($FY_int, 2, '0', STR_PAD_LEFT) . '-04-01';          // e.g. 2024-04-01
+		$fy_end      = '20' . str_pad($FY_int + 1, 2, '0', STR_PAD_LEFT) . '-03-31';      // e.g. 2025-03-31
+
+		$today       = date('Y-m-d');
+		// Max allowed for order/delivery_from: lesser of today or FY end
+		$max_txn_date = ($fy_end < $today) ? $fy_end : $today;
+
+		// --- order_date check ---
+		if ($gatein_date < $fy_start || $gatein_date > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Gate In Date (' . date('d/m/Y', strtotime($gatein_date)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+		// =============================================
+		// End of Date Validation
+		// =============================================
+
+
 		$insertData = [
 			'PlantID' => $PlantID,
 			'FY' => $FY,
+			'Type' => $type,
 			'LocationID' => $location_id,
 			'GateINID' => $gatein_no,
 			'TransDate' => $gatein_date,
@@ -176,6 +203,7 @@ class Vehiclein extends AdminController
 		if ($this->input->post()) {
 			$data = $this->input->post(null, true);
       
+      $list  = $data['list'] ?? null;
       $limit  = $data['limit'] ?? 100;
       $offset = $data['offset'] ?? 0;
       if($data['from_date']){
@@ -185,12 +213,12 @@ class Vehiclein extends AdminController
       }
       
       if($data['to_date']){
-        $data['to_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['to_date'])));
+        $data['to_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['to_date']))).' 23:59:59';
       }else{
-        $data['to_date'] = date('Y-m-d');
+        $data['to_date'] = date('Y-m-d').' 23:59:59';
       }
 
-			$result  = $this->Inwards_model->getGateInListByFilter($data, $limit, $offset);
+			$result  = $this->Inwards_model->getGateInListByFilter($data, $limit, $offset, $list);
 			if (!empty($result['rows'])) {
 				echo json_encode([
 					'success' => true,
@@ -357,20 +385,15 @@ class Vehiclein extends AdminController
 	}
 	
 	//======================= View GateinPass_pdf Print ============================
-    public function GateinPassPrint($gatein_no)
-    {
-		// echo"";
-		// print_r($GateINID);die;
-		// $GateINID = 'PO251DO00001';
-        if (!$gatein_no) {
-            redirect(admin_url('purchase/AddPurchaseOrder'));
-        }
-        
-        if (!has_permission_new('CashPurchaseList', '', 'view')) {
-            access_denied('Invoices');
-        }
-        $invoice = [];
-		$data['title'] = 'Inwards Master';
+	public function GateinPassPrint($gatein_no){
+		if (!$gatein_no) {
+			redirect(admin_url('purchase/AddPurchaseOrder'));
+		}
+		
+		if (!has_permission_new('CashPurchaseList', '', 'view')) {
+			access_denied('Invoices');
+		}
+		$invoice = [];
 		$data['gatein'] = $this->Inwards_model->getGateinDetails($gatein_no);
 		if(!$data['gatein']){
 			redirect(admin_url('purchase/Inwards'));
@@ -378,40 +401,43 @@ class Vehiclein extends AdminController
 		$data['inward'] = $this->Inwards_model->getInwardsDetails($data['gatein']->InwardID) ?? [];
 		if($data['inward']){
 			$data['order'] = $this->Inwards_model->getPurchaseOrderDetails($data['inward']['OrderID']) ?? [];
+			$data['chamber'] = $this->Inwards_model->getDropdown('ChamberMaster', 'id, ChamberCode, ChamberName', ['GodownID' => $data['inward']['GodownID']], 'id', 'DESC') ?? [];
 		}else{
-			$data['order'] = [];
+			$data['order'] = $data['chamber'] = [];
 		}
 		$gateDetails = $this->Inwards_model->getAllINDetails($gatein_no);
 		foreach ($gateDetails as $key => $val) {
 			$data[$key] = $val;
 		}
-		$data['gateDetails'] = $gateDetails; 
+		$data['gateDetails'] = $gateDetails;
+		$data['stack_qc_details'] = $this->Inwards_model->getStackQcDetails($gatein_no);
 
-			$invoice = [
-				'invoice' => $data,
-			];
-        try {
-            $pdf = GateinPass_pdf($invoice);
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            echo $message;
-            if (strpos($message, 'Unable to get the size of the image') !== false) {
-                show_pdf_unable_to_get_image_size_error();
-            }
-            die;
-        }
-        
-        $type = 'I';
-        
-        if ($this->input->get('output_type')) {
-            $type = $this->input->get('output_type');
-        }
-        
-        if ($this->input->get('print')) {
-            $type = 'I';
-        }
-        
-        $pdf->Output(mb_strtoupper(slug_it($gatein_no)) . '-GateinPassSlip.pdf', $type);
-    }
+		$invoice = [
+			'invoice' => $data,
+		];
+	
+		try {
+			$pdf = GateinPass_pdf($invoice);
+		} catch (Exception $e) {
+			$message = $e->getMessage();
+			echo $message;
+			if (strpos($message, 'Unable to get the size of the image') !== false) {
+				show_pdf_unable_to_get_image_size_error();
+			}
+			die;
+		}
+		
+		$type = 'I';
+		
+		if ($this->input->get('output_type')) {
+			$type = $this->input->get('output_type');
+		}
+		
+		if ($this->input->get('print')) {
+			$type = 'I';
+		}
+		
+		$pdf->Output(mb_strtoupper(slug_it($gatein_no)) . '-GateinPassSlip.pdf', $type);
+	}
 
 }

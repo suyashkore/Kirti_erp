@@ -108,6 +108,7 @@
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="order_date">
+                    
                     <?= render_date_input('order_date', 'Order Date', date('d/m/Y'), []); ?>
                   </div>
                 </div>
@@ -135,7 +136,7 @@
                       <?php
                       if (!empty($customer_list)) :
                         foreach ($customer_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' (' . $value['AccountID'] . ')</option>';
+                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] .' - '. $value['billing_state'] . ' (' . $value['AccountID'] . ')</option>';
                         endforeach;
                       endif;
                       ?>
@@ -233,8 +234,6 @@
                   </table>
                 </div>
 
-
-                <!-- <div class="row"> -->
 
                 <!-- LEFT SIDE (6 columns) -->
                 <div class="col-md-6">
@@ -376,11 +375,10 @@
                     </div>
                   </div>
                 </div>
-                <!-- </div> -->
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="button" class="btn btn-primary printBtn style="display: none;" onclick="printPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</button>
+                  <button type="button" class="btn btn-primary printBtn" style="display: none;" onclick="printPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</button>
                   <script>
                     // Print PDF function
                     function printPurchaseOrderPdf() {
@@ -449,16 +447,10 @@
               </div>
             </div>
           </div>
-          <!-- <div class="col-md-2"> -->
-          <!-- <div class="form-group" app-field-wrapper="customer_id"> -->
+
           <div class="filter-group">
             <label for="customer_id" class="control-label">Category</label>
-            <!-- <select name="customer_id" id="customer_id" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Customer"> -->
-            <select name="filter_category"
-              id="filter_category"
-              class="form-control selectpicker filterInput"
-              data-live-search="true">
-
+            <select name="filter_category" id="filter_category" class="selectpicker filterInput" data-live-search="true">
               <option value="" selected>None selected</option>
               <?php
               if (!empty($category_list)) :
@@ -469,21 +461,17 @@
               ?>
             </select>
           </div>
-          <!-- </div> -->
 
           <!-- Search Button -->
           <div class="filter-group" style="align-self:flex-end;">
             <button type="button" class="btn btn-success" id="searchBtn">
               <i class="fa fa-list"></i> Show
             </button>
-
           </div>
 
         </div>
 
       </div>
-
-
 
       <div class="modal-body" style="padding:0px 5px !important">
 
@@ -491,25 +479,19 @@
           <table class="tree table table-striped table-bordered table-ListModal tableFixHead2" id="table_ListModal" width="100%">
             <thead>
               <tr>
-                <th class="sortablePop">Quotation No</th>
-                <th class="sortablePop">Quotation Date</th>
+                <th class="sortablePop">Sales Order No</th>
+                <th class="sortablePop">Order Date</th>
                 <th class="sortablePop">Item Category</th>
-
-
                 <th class="sortablePop">Customer</th>
-
                 <th class="sortablePop">Total Weight</th>
-
                 <th class="sortablePop">Total Qty</th>
                 <th class="sortablePop">Item Total</th>
                 <th class="sortablePop">Total Disc</th>
                 <th class="sortablePop">Taxable Amt</th>
-
                 <th class="sortablePop">CGST Amt</th>
                 <th class="sortablePop">SGST Amt</th>
                 <th class="sortablePop">IGST Amt</th>
                 <th class="sortablePop">Round Off</th>
-
                 <th class="sortablePop">Amount</th>
               </tr>
             </thead>
@@ -522,23 +504,17 @@
                     <td><?= $value["OrderID"]; ?></td>
                     <td><?= date('d/m/Y', strtotime($value["TransDate"])); ?></td>
                     <td><?= $value["CategoryName"]; ?></td>
-
-
                     <td><?= $value["company"]; ?></td>
-                    <td><?= $value["TotalWeight"]; ?></td>
-
-                    <td><?= $value["TotalQuantity"]; ?></td>
-                    <td><?= $value["ItemAmt"]; ?></td>
-                    <td><?= $value["DiscAmt"]; ?></td>
-                    <td><?= $value["TaxableAmt"]; ?></td>
-
-                    <td><?= $value["CGSTAmt"]; ?></td>
-                    <td><?= $value["SGSTAmt"]; ?></td>
-                    <td><?= $value["IGSTAmt"]; ?></td>
-                    <td><?= $value["RoundOffAmt"]; ?></td>
-
-
-                    <td><?= $value["NetAmt"]; ?></td>
+                    <td><?= number_format((float)$value["TotalWeight"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["TotalQuantity"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["ItemAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["DiscAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["TaxableAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["CGSTAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["SGSTAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["IGSTAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["RoundOffAmt"], 2, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["NetAmt"], 2, '.', ''); ?></td>
                   </tr>
               <?php
                 endforeach;
@@ -555,14 +531,84 @@
   </div>
 </div>
 
+<?php
+    $fy = $this->session->userdata('finacial_year');
+    $fy_new = $fy + 1;
+    $lastdate_date = '20'.$fy_new.'-03-31';
+    $curr_date = date('Y-m-d');
+    $curr_date_new = new DateTime($curr_date);
+    $last_date_yr = new DateTime($lastdate_date);
+    if($last_date_yr < $curr_date_new){
+        $max_date_php = $lastdate_date;
+    } else {
+        $max_date_php = $curr_date;
+    }
+?>
 <?php init_tail(); ?>
 <script>
+
+$(document).ready(function(){
+    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year    = "20" + fin_y;
+    var cur_y   = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+        var fy_new   = parseInt(fin_y) + 1;
+        var fy_new_s = "20" + fy_new;
+        maxEndDate   = new Date(fy_new_s + '/03/31');
+    } else {
+        maxEndDate = new Date();
+    }
+
+    // Order Date — restricted within FY, up to today or March 31
+    $('#order_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+    // Delivery From — same FY restriction
+    $('#delivery_from').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+    // Delivery To — min is today, max is March 31 of FY end
+    var fy_end_year = "20" + (parseInt(fin_y) + 1);
+    var fyEndDate   = new Date(fy_end_year + '/03/31');
+
+    $('#delivery_to').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,    // can't go before FY start
+        maxDate: fyEndDate,       // always allows up to March 31 for delivery planning
+        timepicker: false
+    });
+});
+
+
+  // Helper: safely format a number to 2 decimal places
+  function fmt(val) {
+    var n = parseFloat(val);
+    return isNaN(n) ? '0.00' : n.toFixed(2);
+  }
+
   $('.printBtn').hide();
+  $('#ListModal').on('shown.bs.modal', function() {
+    $('#searchBtn').trigger('click');
+  });
   $('#searchBtn').on('click', function() {
 
     var fromDate = $('#from_date').val();
     var toDate = $('#to_date').val();
-    var categoryId = $('#filter_category').val(); // FIXED
+    var categoryId = $('#filter_category').val();
 
     if (!fromDate || !toDate) {
       alert_float('warning', 'Please select both From Date and To Date');
@@ -578,23 +624,15 @@
     var to = parseDate(toDate);
 
     $('#table_ListModal tbody tr').each(function() {
-
       var rowDateText = $(this).find('td').eq(1).text().trim();
       var rowDate = parseDate(rowDateText);
-
-      var rowCategoryId = $(this).data('category'); // from data-category
+      var rowCategoryId = $(this).data('category');
 
       var dateMatch = (rowDate >= from && rowDate <= to);
       var categoryMatch = (!categoryId || categoryId == rowCategoryId);
 
-      if (dateMatch && categoryMatch) {
-        $(this).show();
-      } else {
-        $(this).hide();
-      }
-
+      $(this).toggle(dateMatch && categoryMatch);
     });
-
   });
 
 
@@ -612,10 +650,11 @@
     $('.total-display').text('0.00');
     $('#row_id').val(0);
   }
+
   $(document).on('input', 'input[type="tel"]', function() {
     this.value = this.value
-      .replace(/[^0-9.]/g, '') // allow digits + dot
-      .replace(/(\..*?)\..*/g, '$1'); // allow only one dot
+      .replace(/[^0-9.]/g, '')
+      .replace(/(\..*?)\..*/g, '$1');
   });
 
   function validate_fields(fields) {
@@ -668,7 +707,7 @@
         <td><input type="tel" name="amount[]" id="amount${next_id}" class="form-control dynamic_row${next_id}" readonly tabindex="-1"></td>
         <td>${row_btn}</td>
       </tr>
-		`);
+    `);
     if (row == null) {
       $('#item_id' + next_id).val($('#item_id').val());
       $('#hsn_code' + next_id).val($('#hsn_code').val());
@@ -688,121 +727,108 @@
   }
 
   function calculateAmount(row) {
-    var minQty = parseFloat($('#min_qty' + row).val()) || 0;
-    var unitRate = parseFloat($('#unit_rate' + row).val()) || 0;
-    var discAmt = parseFloat($('#disc_amt' + row).val()) || 0;
+    var minQty    = parseFloat($('#min_qty' + row).val()) || 0;
+    var unitRate  = parseFloat($('#unit_rate' + row).val()) || 0;
+    var discAmt   = parseFloat($('#disc_amt' + row).val()) || 0;
     var gstPercent = parseFloat($('#gst' + row).val()) || 0;
 
-    var taxableAmt = (unitRate - discAmt) * minQty;
-    var gstAmt = taxableAmt * (gstPercent / 100);
-    var netAmt = taxableAmt + gstAmt;
-    if (isNaN(netAmt) || netAmt < 0) {
-      netAmt = 0;
-    }
+    $('#max_qty' + row).val(minQty + 2);
 
-    $('#amount' + row).val(netAmt.toFixed(2));
+    var taxableAmt = (unitRate - discAmt) * minQty;
+    var gstAmt     = taxableAmt * (gstPercent / 100);
+    var netAmt     = taxableAmt + gstAmt;
+    if (isNaN(netAmt) || netAmt < 0) netAmt = 0;
+
+    $('#amount' + row).val(fmt(netAmt));
     calculateTotals();
+
     if ((row == '' || row == null) && minQty > 0 && unitRate > 0 && discAmt >= 0 && gstPercent >= 0) {
       addRow();
     }
   }
 
   function calculateTotals() {
-    var totalWeight = 0;
-    var totalQty = 0;
-    var itemTotalAmt = 0;
-    var totalDiscAmt = 0;
+    var totalWeight     = 0;
+    var totalQty        = 0;
+    var itemTotalAmt    = 0;
+    var totalDiscAmt    = 0;
     var totalTaxableAmt = 0;
-    var totalGstAmt = 0;
+    var totalGstAmt     = 0;
 
     $('#items_body tr').each(function() {
-      var row = $(this);
-      var qty = parseFloat(row.find('.min-qty').val()) || 0;
-      var weight = parseFloat(row.find('.unit-weight').val()) || 0;
-      var rate = parseFloat(row.find('.unit-rate').val()) || 0;
-      var discAmt = parseFloat(row.find('.disc-amt').val()) || 0;
+      var row       = $(this);
+      var qty       = parseFloat(row.find('.min-qty').val()) || 0;
+      var weight    = parseFloat(row.find('.unit-weight').val()) || 0;
+      var rate      = parseFloat(row.find('.unit-rate').val()) || 0;
+      var discAmt   = parseFloat(row.find('.disc-amt').val()) || 0;
       var gstPercent = parseFloat(row.find('.gst-percent').val()) || 0;
 
-      var rowTotalWeight = weight * qty;
-      var rowItemTotal = rate * qty;
-      var rowTotalDisc = discAmt * qty;
-      var rowNetRate = rate - discAmt;
-      var rowTaxableAmt = rowNetRate * qty;
-      var rowGstAmt = rowTaxableAmt * (gstPercent / 100);
+      var rowNetRate     = rate - discAmt;
+      var rowTaxableAmt  = rowNetRate * qty;
+      var rowGstAmt      = rowTaxableAmt * (gstPercent / 100);
 
-      totalWeight += rowTotalWeight;
-      totalQty += qty;
-      itemTotalAmt += rowItemTotal;
-      totalDiscAmt += rowTotalDisc;
+      totalWeight     += weight * qty;
+      totalQty        += qty;
+      itemTotalAmt    += rate * qty;
+      totalDiscAmt    += discAmt * qty;
       totalTaxableAmt += rowTaxableAmt;
-      totalGstAmt += rowGstAmt;
+      totalGstAmt     += rowGstAmt;
     });
 
-    // Update Display Labels
-    $('#total_weight_display').text(totalWeight.toFixed(2));
-    $('#total_qty_display').text(totalQty.toFixed(2));
-    $('#item_total_amt_display').text(itemTotalAmt.toFixed(2));
-    $('#disc_amt_display').text(totalDiscAmt.toFixed(2));
-    $('#taxable_amt_display').text(totalTaxableAmt.toFixed(2));
+    $('#total_weight_display').text(fmt(totalWeight));
+    $('#total_qty_display').text(fmt(totalQty));
+    $('#item_total_amt_display').text(fmt(itemTotalAmt));
+    $('#disc_amt_display').text(fmt(totalDiscAmt));
+    $('#taxable_amt_display').text(fmt(totalTaxableAmt));
 
-    // GST Calculation based on State
+    // GST split by state
     var customerState = $('#customer_state').val();
-
-    // .trim().toUpperCase();
-    var cgstAmt = 0,
-      sgstAmt = 0,
-      igstAmt = 0;
-    var cgstPercent = 0,
-      sgstPercent = 0,
-      igstPercent = 0;
+    var cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
     var totalGstPercent = 0;
+
     if (totalTaxableAmt > 0) {
       $('#items_body tr').each(function() {
-        var row = $(this);
-        var qty = parseFloat(row.find('.min-qty').val()) || 0;
-        var rate = parseFloat(row.find('.unit-rate').val()) || 0;
-        var discAmt = parseFloat(row.find('.disc-amt').val()) || 0;
+        var row        = $(this);
+        var qty        = parseFloat(row.find('.min-qty').val()) || 0;
+        var rate       = parseFloat(row.find('.unit-rate').val()) || 0;
+        var discAmt    = parseFloat(row.find('.disc-amt').val()) || 0;
         var gstPercent = parseFloat(row.find('.gst-percent').val()) || 0;
-        var rowNetRate = rate - discAmt;
+        var rowNetRate    = rate - discAmt;
         var rowTaxableAmt = rowNetRate * qty;
-        totalGstPercent += (rowTaxableAmt / totalTaxableAmt) * gstPercent;
+        totalGstPercent  += (rowTaxableAmt / totalTaxableAmt) * gstPercent;
       });
     }
     totalGstPercent = Math.round(totalGstPercent * 100) / 100;
+
     if (customerState === '<?= $company_detail->state ?>') {
       cgstAmt = totalGstAmt / 2;
       sgstAmt = totalGstAmt / 2;
-      cgstPercent = sgstPercent = totalGstPercent / 2;
     } else {
       igstAmt = totalGstAmt;
-      igstPercent = totalGstPercent;
     }
 
-    $('#cgst_amt_display').text(cgstAmt.toFixed(2));
-    $('#sgst_amt_display').text(sgstAmt.toFixed(2));
-    $('#igst_amt_display').text(igstAmt.toFixed(2));
-    // $('#cgst_percent_label').text((cgstPercent ? cgstPercent.toFixed(2) : '0') + '%');
-    // $('#sgst_percent_label').text((sgstPercent ? sgstPercent.toFixed(2) : '0') + '%');
-    // $('#igst_percent_label').text((igstPercent ? igstPercent.toFixed(2) : '0') + '%');
+    $('#cgst_amt_display').text(fmt(cgstAmt));
+    $('#sgst_amt_display').text(fmt(sgstAmt));
+    $('#igst_amt_display').text(fmt(igstAmt));
 
     var netAmtBeforeRound = totalTaxableAmt + totalGstAmt;
-    var netAmtRounded = Math.round(netAmtBeforeRound);
-    var roundOffAmt = netAmtRounded - netAmtBeforeRound;
+    var netAmtRounded     = Math.round(netAmtBeforeRound);
+    var roundOffAmt       = netAmtRounded - netAmtBeforeRound;
 
-    $('#round_off_amt_display').text(roundOffAmt.toFixed(2));
-    $('#net_amt_display').text(netAmtRounded.toFixed(2));
+    $('#round_off_amt_display').text(fmt(roundOffAmt));
+    $('#net_amt_display').text(fmt(netAmtRounded));
 
-    // Update Hidden Inputs for Form Submission
-    $('#total_weight_hidden').val(totalWeight.toFixed(2));
-    $('#total_qty_hidden').val(totalQty.toFixed(2));
-    $('#item_total_amt_hidden').val(itemTotalAmt.toFixed(2));
-    $('#disc_amt_hidden').val(totalDiscAmt.toFixed(2));
-    $('#taxable_amt_hidden').val(totalTaxableAmt.toFixed(2));
-    $('#cgst_amt_hidden').val(cgstAmt.toFixed(2));
-    $('#sgst_amt_hidden').val(sgstAmt.toFixed(2));
-    $('#igst_amt_hidden').val(igstAmt.toFixed(2));
-    $('#round_off_amt_hidden').val(roundOffAmt.toFixed(2));
-    $('#net_amt_hidden').val(netAmtRounded.toFixed(2));
+    // Update hidden inputs
+    $('#total_weight_hidden').val(fmt(totalWeight));
+    $('#total_qty_hidden').val(fmt(totalQty));
+    $('#item_total_amt_hidden').val(fmt(itemTotalAmt));
+    $('#disc_amt_hidden').val(fmt(totalDiscAmt));
+    $('#taxable_amt_hidden').val(fmt(totalTaxableAmt));
+    $('#cgst_amt_hidden').val(fmt(cgstAmt));
+    $('#sgst_amt_hidden').val(fmt(sgstAmt));
+    $('#igst_amt_hidden').val(fmt(igstAmt));
+    $('#round_off_amt_hidden').val(fmt(roundOffAmt));
+    $('#net_amt_hidden').val(fmt(netAmtRounded));
   }
 
   function get_required_fields(form_id) {
@@ -826,19 +852,15 @@
       success: function(response) {
         if (response.success == true) {
           let html = `<option value="" selected disabled>None selected</option>`;
-
           for (var i = 0; i < response.data.length; i++) {
             html += `<option value="${response.data[i].id}">${response.data[i].name}</option>`;
           }
-
           $('#' + child_id).html(html);
           if (selected_value) {
             $('#' + child_id).val(selected_value);
           }
           $('.selectpicker').selectpicker('refresh');
-          if (callback) {
-            callback();
-          }
+          if (callback) callback();
         } else {
           alert_float('danger', response.message);
         }
@@ -855,9 +877,7 @@
     $.ajax({
       url: '<?= admin_url('SalesOrder/getNextSalesOrderNo'); ?>',
       type: 'POST',
-      data: {
-        category_id: categoryId
-      },
+      data: { category_id: categoryId },
       dataType: 'json',
       success: function(response) {
         if (response.success == true) {
@@ -874,9 +894,7 @@
         } else {
           $('#OrderID').val('');
         }
-        if (callback) {
-          callback();
-        }
+        if (callback) callback();
       },
       error: function() {
         $('#OrderID').val('');
@@ -884,10 +902,8 @@
     });
   }
 
-
   function getCustomerDetailsLocation(callback = null) {
     var CustomerId = $('#customer_id').val();
-
     if (!CustomerId) {
       $('#customer_location').html('<option value="" selected disabled>None selected</option>');
       $('.selectpicker').selectpicker('refresh');
@@ -896,9 +912,7 @@
     $.ajax({
       url: '<?= admin_url('SalesOrder/getCustomerDetailsLocation'); ?>',
       type: 'POST',
-      data: {
-        customer_id: CustomerId
-      },
+      data: { customer_id: CustomerId },
       dataType: 'json',
       success: function(response) {
         if (response.success == true) {
@@ -907,11 +921,8 @@
           $('#customer_country').val(data.country || '');
           $('#customer_state').val(data.state || '');
           $('#customer_address').val(data.address || '');
-
           $('#GSTIN').val(data.gst_no || '');
           $('#billing_state').val(data.state || '');
-
-
 
           var html = '<option value="" selected disabled>None selected</option>';
           $.each(response.location, function(index, loc) {
@@ -920,14 +931,12 @@
           });
           $('#customer_location').html(html);
 
-
           html = '<option value="" selected disabled>None selected</option>';
           $.each(response.broker_list, function(index, loc) {
             if (loc.AccountID == null || loc.AccountID == '') return;
-            html += `<option value="${loc.AccountID}">${loc.company} (${loc.AccountID})</option>`;
+            html += `<option value="${loc.AccountID}">${loc.company} - ${loc.billing_state} (${loc.AccountID})</option>`;
           });
           $('#broker_id').html(html);
-
 
           html = '<option value="" selected disabled>None selected</option>';
           $.each(response.quotation_list, function(index, loc) {
@@ -935,116 +944,71 @@
           });
           $('#quotation_id').html(html);
 
-          // html = '<option value="" selected disabled>None selected</option>';
-          // $.each(response.quotation_list, function(index, loc) {
-          //   if (loc.QuotationID == null || loc.QuotationID == '') return;
-          //   html += `<option value="${loc.QuotationID}">${loc.QuotationID}</option>`;
-          // });
-
-          // $('#quotation_id').html(html).prop('disabled', false);
-
-
-
-
           $('.selectpicker').selectpicker('refresh');
           calculateTotals();
-          if (callback) {
-            callback();
-          }
+          if (callback) callback();
         }
       }
     });
   }
 
   function getQuotationDetails(quotation_id) {
-
     if (!quotation_id) return;
     $.ajax({
       url: "<?= admin_url(); ?>SalesOrder/getQuotationDetails",
       type: "POST",
-      data: {
-        quotation_id: quotation_id,
-      },
+      data: { quotation_id: quotation_id },
       dataType: "json",
       success: function(response) {
-
         if (!response.success) return;
 
-        let items = response.items;
         let d = response.data;
-
-
-        // STEP 1: Set Item Type
         $('#item_type').val(d.ItemType);
         $('.selectpicker').selectpicker('refresh');
 
-        // STEP 2: Load Category
-        getCustomDropdownList(
-          'item_type',
-          d.ItemType,
-          'item_category',
-          d.ItemCategory,
-          function() {
+        getCustomDropdownList('item_type', d.ItemType, 'item_category', d.ItemCategory, function() {
+          getNextSalesOrderNo(function() {
+            let OrderID = $('#quotation_id').val();
+            if (!OrderID) return;
 
-            // STEP 3: After category load → load item dropdown
-            getNextSalesOrderNo(function() {
-              let OrderID = $('#quotation_id').val();
-              if (!OrderID) return;
+            $.ajax({
+              url: "<?= admin_url(); ?>SalesOrder/GetHistoryDetails",
+              method: "POST",
+              dataType: "JSON",
+              data: { OrderID: OrderID },
+              success: function(response) {
+                if (response.success === true) {
+                  let items = response.items;
+                  $('#items_body').html('');
+                  $('#row_id').val(0);
 
-              $.ajax({
-                url: "<?= admin_url(); ?>SalesOrder/GetHistoryDetails",
-                method: "POST",
-                dataType: "JSON",
-                data: {
-                  OrderID: OrderID
-                },
-
-                success: function(response) {
-
-                  if (response.success === true) {
-
-                    let items = response.items;
-
-                    // Clear old rows
-                    $('#items_body').html('');
-                    $('#row_id').val(0);
-
-                    // Loop items and add rows
-                    for (let i = 0; i < items.length; i++) {
-
-                      addRow(2); // create empty row
-                      let row = i + 1;
-
-                      $('#item_id' + row).val(items[i].ItemID);
-                      getItemDetails(items[i].ItemID, row);
-
-                      $('#min_qty' + row).val(items[i].OrderQty);
-                      $('#max_qty' + row).val(items[i].OrderQty);
-                      $('#unit_rate' + row).val(items[i].BasicRate);
-                      $('#disc_amt' + row).val(items[i].DiscAmt);
-
-                      calculateAmount(row);
-                    }
-
-                    $('.selectpicker').selectpicker('refresh');
-                    calculateTotals();
-
-                  } else {
-                    alert_float('warning', response.message);
+                  for (let i = 0; i < items.length; i++) {
+                    addRow(2);
+                    let row = i + 1;
+                    $('#item_id' + row).val(items[i].ItemID);
+                    getItemDetails(items[i].ItemID, row);
+                    $('#min_qty' + row).val(parseFloat(items[i].OrderQty || 0).toFixed(0));
+                    $('#max_qty' + row).val(items[i].OrderQty);
+                    $('#unit_rate' + row).val(parseFloat(items[i].BasicRate || 0).toFixed(0));
+                    $('#disc_amt' + row).val(parseFloat(items[i].DiscAmt || 0).toFixed(0));
+                    calculateAmount(row);
                   }
+
+                  $('.selectpicker').selectpicker('refresh');
+                  calculateTotals();
+                } else {
+                  alert_float('warning', response.message);
                 }
-              });
+              }
             });
-          }
-        );
+          });
+        });
       }
     });
   }
 
-
   function getItemDetails(itemId, id = '') {
     var isDuplicate = false;
-
     $('.dynamic_item').not('#item_id' + id).each(function() {
       if ($(this).val() == itemId && itemId != '') {
         isDuplicate = true;
@@ -1063,17 +1027,15 @@
     $.ajax({
       url: '<?= admin_url('SalesOrder/GetItemDetails'); ?>',
       type: 'POST',
-      data: {
-        item_id: itemId
-      },
+      data: { item_id: itemId },
       dataType: 'json',
       success: function(response) {
         if (response.status === 'success' && response.data) {
           var data = response.data;
           $('#hsn_code' + id).val(data.hsn_code || '');
           $('#uom' + id).val(data.unit || '');
-          $('#unit_weight' + id).val(Number(data.UnitWeight) || 0);
-          $('#gst' + id).val(Number(data.tax) || 0);
+          $('#unit_weight' + id).val(parseFloat(data.UnitWeight || 0).toFixed(0));
+          $('#gst' + id).val(parseFloat(data.tax || 0).toFixed(0));
           $('#min_qty' + id).focus();
         } else {
           $('.fixed_row').val('');
@@ -1091,13 +1053,9 @@
     e.preventDefault();
 
     let form_mode = $('#form_mode').val();
-
     let required_fields = get_required_fields('main_save_form');
     let validated = validate_fields(required_fields);
-
-    if (validated === false) {
-      return;
-    }
+    if (validated === false) return;
 
     var form_data = new FormData(this);
     form_data.append(
@@ -1126,28 +1084,28 @@
         if (response.success == true) {
           alert_float('success', response.message);
           ResetForm();
-          let html = `<tr class="get_Details" data-id="${response.data.id}" onclick="getDetails(${response.data.id})">
-						<td>${response.data.OrderID}</td>
-            <td>${moment(response.data.TransDate).format('DD/MM/YYYY')}</td>
-            <td>${response.data.CategoryName}</td>
-            <td>${response.data.company}</td>
-            <td>${response.data.TotalWeight}</td>
-            <td>${response.data.TotalQuantity}</td>
-            <td>${response.data.ItemAmt}</td>
-            <td>${response.data.DiscAmt}</td>
-            <td>${response.data.TaxableAmt}</td>
-            <td>${response.data.CGSTAmt}</td>
-            <td>${response.data.SGSTAmt}</td>
-            <td>${response.data.IGSTAmt}</td>
-            <td>${response.data.RoundOffAmt}</td>
-            <td>${response.data.NetAmt}</td>
-					</tr>`;
+          let d = response.data;
+          let html = `<tr class="get_Details" data-id="${d.id}" onclick="getDetails(${d.id})" data-category="${d.ItemCategory || ''}">
+            <td>${d.OrderID}</td>
+            <td>${moment(d.TransDate).format('DD/MM/YYYY')}</td>
+            <td>${d.CategoryName}</td>
+            <td>${d.company}</td>
+            <td>${fmt(d.TotalWeight)}</td>
+            <td>${fmt(d.TotalQuantity)}</td>
+            <td>${fmt(d.ItemAmt)}</td>
+            <td>${fmt(d.DiscAmt)}</td>
+            <td>${fmt(d.TaxableAmt)}</td>
+            <td>${fmt(d.CGSTAmt)}</td>
+            <td>${fmt(d.SGSTAmt)}</td>
+            <td>${fmt(d.IGSTAmt)}</td>
+            <td>${fmt(d.RoundOffAmt)}</td>
+            <td>${fmt(d.NetAmt)}</td>
+          </tr>`;
           if (form_mode == 'edit') {
-            $('.get_Details[data-id="' + response.data.id + '"]').replaceWith(html);
+            $('.get_Details[data-id="' + d.id + '"]').replaceWith(html);
           } else {
             $('#table_ListModal tbody').prepend(html);
           }
-
         } else {
           alert_float('warning', response.message);
         }
@@ -1155,16 +1113,13 @@
     });
   });
 
-
   function getDetails(id) {
     ResetForm();
     $.ajax({
       url: "<?= admin_url(); ?>SalesOrder/GetSalesOrderDetails",
       method: "POST",
       dataType: "JSON",
-      data: {
-        id: id,
-      },
+      data: { id: id },
       success: function(response) {
         if (response.success == true) {
           let d = response.data;
@@ -1178,38 +1133,32 @@
                 $('#item_uid' + (i + 1)).val(history[i].id);
                 $('#item_id' + (i + 1)).val(history[i].ItemID);
                 getItemDetails(history[i].ItemID, (i + 1));
-                $('#min_qty' + (i + 1)).val(Number(history[i].OrderQty));
-                $('#max_qty' + (i + 1)).val(Number(history[i].OrderQty));
-                $('#unit_rate' + (i + 1)).val(Number(history[i].BasicRate));
-                $('#disc_amt' + (i + 1)).val(Number(history[i].DiscAmt));
-                $('#amount' + (i + 1)).val(Number(history[i].NetOrderAmt));
+                $('#min_qty' + (i + 1)).val(fmt(history[i].OrderQty));
+                $('#max_qty' + (i + 1)).val(fmt(history[i].OrderQty));
+                $('#unit_rate' + (i + 1)).val(fmt(history[i].BasicRate));
+                $('#disc_amt' + (i + 1)).val(fmt(history[i].DiscAmt));
+                $('#amount' + (i + 1)).val(fmt(history[i].NetOrderAmt));
                 $('.selectpicker').selectpicker('refresh');
                 calculateAmount(i + 1);
               }
             });
           });
 
-
           $('#OrderID').val(d.OrderID);
           $('#order_date').val(moment(d.TransDate).format('DD/MM/YYYY'));
           $('#sales_location').val(d.SalesLocation);
-
           $('#customer_id').val(d.AccountID);
           getCustomerDetailsLocation(function() {
             $('#customer_location').val(d.DeliveryLocation);
             $('#broker_id').val(d.BrokerID);
-
             $('#quotation_id').empty();
             $('#quotation_id').append(
               '<option value="' + response.data.QuotationID + '">' +
-              response.data.QuotationID +
-              '</option>'
+              response.data.QuotationID + '</option>'
             );
             $('#quotation_id').selectpicker('refresh');
-
           });
 
-          // $('#quotation_id').val(d.QuotationID).selectpicker('refresh');
           $('#delivery_from').val(moment(d.DeliveryFrom).format('DD/MM/YYYY'));
           $('#delivery_to').val(moment(d.DeliveryTo).format('DD/MM/YYYY'));
           $('#payment_terms').val(d.PaymentTerms);
@@ -1236,7 +1185,6 @@
     var ascending = !$(this).hasClass("asc");
     $(".sortable").removeClass("asc desc");
     $(".sortable span").remove();
-    // Add sort classes and arrows
     $(this).addClass(ascending ? "asc" : "desc");
     $(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
     rows.sort(function(a, b) {
@@ -1254,7 +1202,6 @@
   function myFunction2() {
     var input = document.getElementById("myInput1");
     var filter = input.value.toUpperCase();
-
     var table = document.getElementById("table_ListModal");
     var tbody = table.getElementsByTagName("tbody")[0];
     var tr = tbody.getElementsByTagName("tr");
@@ -1262,7 +1209,6 @@
     for (var i = 0; i < tr.length; i++) {
       var tds = tr[i].getElementsByTagName("td");
       var rowMatch = false;
-
       for (var j = 0; j < tds.length; j++) {
         var txtValue = tds[j].textContent || tds[j].innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -1275,13 +1221,11 @@
   }
 </script>
 <style>
-  /* Remove default padding */
   .modal-header {
     padding: 0;
     border-bottom: none;
   }
 
-  /* Blue Gradient Top Bar */
   .custom-header .header-top {
     padding: 10px;
     display: flex;
@@ -1289,14 +1233,12 @@
     align-items: center;
   }
 
-  /* Title */
   .custom-header .modal-title {
     font-size: 18px;
     font-weight: 600;
     margin: 0;
   }
 
-  /* Close Button */
   .close-btn {
     background: transparent;
     border: none;
@@ -1304,7 +1246,6 @@
     cursor: pointer;
   }
 
-  /* Filter Section */
   .header-filters {
     padding: 10px;
     display: flex;
@@ -1312,7 +1253,6 @@
     gap: 25px;
   }
 
-  /* Each Filter */
   .filter-group {
     display: flex;
     flex-direction: column;
@@ -1325,13 +1265,11 @@
     color: #333;
   }
 
-  /* Input Styling */
   .filter-group .form-control {
     height: 36px;
     min-width: 200px;
   }
 
-  /* Search Button */
   .search-btn {
     background: #1fa0d8;
     color: #fff;
@@ -1347,5 +1285,8 @@
 
   #table_ListModal tbody tr {
     cursor: pointer;
+  }
+  #table_ListModal tbody tr:hover {
+    background-color: rgb(171, 174, 176);
   }
 </style>

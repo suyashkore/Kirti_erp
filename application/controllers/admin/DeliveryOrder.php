@@ -17,52 +17,28 @@ class DeliveryOrder extends AdminController
 	public function index()
 	{
 		$data['title'] = 'Delivery Order';
+		$selected_company = $this->session->userdata('root_company');
+		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
 		$data['item_type'] = $this->SalesQuotation_model->getDropdown('ItemTypeMaster', 'id, ItemTypeName', ['isActive' => 'Y'], 'id', 'ASC');
 		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
 		$data['category_list'] = $this->DO_model->getCategoryDropdown();
 		$data['FreightTerms'] = $this->SalesQuotation_model->get_freight_terms();
 		$data['dispatchlocation'] = $this->DO_model->get_dispatch_location();
 		$data['order_list'] = $this->DO_model->getOrderList();
-
 		$data['NextDONumber'] = $this->DO_model->getNextDONo();
 		$data['city_list'] = $this->DO_model->getCityList();
 		$data['so_list'] = $this->DO_model->getSODropdown();
 		$data['transporter_list'] = $this->DO_model->getTransporterDropdown();
 		$data['vehicle_no_list'] = $this->DO_model->getVehicleNoDropdown();
 		$data['deliveryorder_list'] = $this->DO_model->getDeliveryOrderList();
-
 		$data['history_list'] = $this->DO_model->gethistoryList();
 		$data['gate_in'] = $this->DO_model->getgateinList();
-
-
-
-
-
-
-		$selected_company = $this->session->userdata('root_company');
-		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
-
 
 		$this->load->view('admin/DO/DOAddEdit', $data);
 	}
 
-	public function getItemsDetailsonCategory()
-	{
-		$category_id = $this->input->post('category_id');
-
-		$this->db->where('ItemCategoryCode', $category_id);
-		$this->db->where('IsActive', 'Y');
-		$query = $this->db->get(db_prefix() . 'items');
-
-		echo json_encode([
-			'success'   => true,
-			'item_list' => $query->result_array()
-		]);
-	}
-
 	public function getItem()
 	{
-
 		$item_list = $this->DO_model->getDropdown(
 			'items',
 			'ItemId, ItemName',
@@ -84,10 +60,7 @@ class DeliveryOrder extends AdminController
 		}
 		$customer_details = $this->SalesOrder_model->getCustomerDetailByAccountID($customer_id);
 		$location_details = $this->SalesOrder_model->getShippingDatacity($customer_id);
-		$broker_list = $this->SalesOrder_model->getCustomerBrokerList($customer_id);
-		$quotation_list = $this->SalesOrder_model->getCustomerQuotationList($customer_id);
 		$valid_orders = $this->DO_model->getOrderList($customer_id, 'valid');
-		// echo"";print_r($valid_orders);die;
 		$invalid_orders = $this->DO_model->getOrderList($customer_id, 'invalid');
 
 		$locations = array();
@@ -103,8 +76,6 @@ class DeliveryOrder extends AdminController
 			'success' => true,
 			'data' => $customer_details,
 			'location' => $locations,
-			'broker_list' => $broker_list,
-			'quotation_list' => $quotation_list,
 			'valid_orders' => $valid_orders,
 			'invalid_orders' => $invalid_orders
 		]);
@@ -266,6 +237,40 @@ class DeliveryOrder extends AdminController
 				die;
 			}
 		}
+		
+		// =============================================
+		// Financial Year Date Validation
+		// =============================================
+		$FY_int      = (int) $FY;
+		$fy_start    = '20' . str_pad($FY_int, 2, '0', STR_PAD_LEFT) . '-04-01';          // e.g. 2024-04-01
+		$fy_end      = '20' . str_pad($FY_int + 1, 2, '0', STR_PAD_LEFT) . '-03-31';      // e.g. 2025-03-31
+
+		$today       = date('Y-m-d');
+		// Max allowed for order/delivery_from: lesser of today or FY end
+		$max_txn_date = ($fy_end < $today) ? $fy_end : $today;
+
+		// --- delivery_order_date check ---
+		if ($delivery_order_date < $fy_start || $delivery_order_date > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery Order Date (' . date('d/m/Y', strtotime($delivery_order_date)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+		// --- lr_date check ---
+		if ($lr_date < $fy_start || $lr_date > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'LR Date (' . date('d/m/Y', strtotime($lr_date)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+
+		// =============================================
+		// End of Date Validation
+		// =============================================
 
 		$insertData = [
 			'PlantID' => $PlantID,
@@ -471,10 +476,10 @@ class DeliveryOrder extends AdminController
 
 
 	public function GetHistoryDetails()
-{
-    $order_id = $this->input->post('OrderID');
+	{
+		$order_id = $this->input->post('OrderID');
 
-    $this->db->select("
+		$this->db->select("
         h.*,
         h.OrderQty AS TotalOrderQty,
         IFNULL(u.UsedOrderQty, 0) AS UsedOrderQty,
@@ -482,10 +487,10 @@ class DeliveryOrder extends AdminController
         h.TransID
     ", false);
 
-    $this->db->from(db_prefix() . 'history h');
+		$this->db->from(db_prefix() . 'history h');
 
-    // Subquery for used quantities
-    $used_subquery = "
+		// Subquery for used quantities
+		$used_subquery = "
         (
             SELECT 
                 OrderID,
@@ -497,36 +502,36 @@ class DeliveryOrder extends AdminController
         ) u
     ";
 
-    $this->db->join(
-        $used_subquery,
-        'u.OrderID = h.OrderID AND u.ItemID = h.ItemID',
-        'left',
-        false
-    );
+		$this->db->join(
+			$used_subquery,
+			'u.OrderID = h.OrderID AND u.ItemID = h.ItemID',
+			'left',
+			false
+		);
 
-    // Filter by OrderID if provided
-    if (!empty($order_id)) {
-        if (is_array($order_id)) {
-            $this->db->where_in('h.id', $order_id);
-        } else {
-            $this->db->where('h.id', $order_id);
-        }
-    }
+		// Filter by OrderID if provided
+		if (!empty($order_id)) {
+			if (is_array($order_id)) {
+				$this->db->where_in('h.id', $order_id);
+			} else {
+				$this->db->where('h.id', $order_id);
+			}
+		}
 
-    $items = $this->db->get()->result_array();
+		$items = $this->db->get()->result_array();
 
-    if (!empty($items)) {
-        echo json_encode([
-            'success' => true,
-            'items'   => $items
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Items not found'
-        ]);
-    }
-}
+		if (!empty($items)) {
+			echo json_encode([
+				'success' => true,
+				'items'   => $items
+			]);
+		} else {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Items not found'
+			]);
+		}
+	}
 
 	public function GetDeliveryOrderDetails()
 	{

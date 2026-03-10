@@ -1,13 +1,48 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <style>
-.table-list { overflow: auto; max-height: 55vh; width:100%; position:relative; top: 0px; }
-.table-list thead th { position: sticky; top: 0; z-index: 1; }
-.table-list tbody th { position: sticky; left: 0; }
-table { border-collapse: collapse; width: 100%; }
-th, td { padding: 1px 5px !important; white-space: nowrap; border:1px solid !important; font-size:11px; line-height:1.42857143 !important; vertical-align: middle !important;}
-th { background: #50607b; color: #fff !important; }
-.sortable { cursor: pointer; }
+  .table-list {
+    overflow: auto;
+    max-height: 55vh;
+    width: 100%;
+    position: relative;
+    top: 0px;
+  }
+
+  .table-list thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .table-list tbody th {
+    position: sticky;
+    left: 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 1px 5px !important;
+    white-space: nowrap;
+    border: 1px solid !important;
+    font-size: 11px;
+    line-height: 1.42857143 !important;
+    vertical-align: middle !important;
+  }
+
+  th {
+    background: #50607b;
+    color: #fff !important;
+  }
+
+  .sortable {
+    cursor: pointer;
+  }
 </style>
 <div id="wrapper">
   <div class="content">
@@ -17,7 +52,7 @@ th { background: #50607b; color: #fff !important; }
           <div class="panel-body">
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb custombreadcrumb" style="background-color:#fff !important; margin-Bottom:0px !important;">
-                <li class="breadcrumb-item"><a href="<?= admin_url();?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
+                <li class="breadcrumb-item"><a href="<?= admin_url(); ?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
                 <li class="breadcrumb-item active text-capitalize"><b>Purchase</b></li>
                 <li class="breadcrumb-item active" aria-current="page"><b>Gate In List</b></li>
               </ol>
@@ -27,25 +62,31 @@ th { background: #50607b; color: #fff !important; }
               <div class="row">
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="from_date">
+                    <?= render_date_input('from_date', 'From Date', date('01/m/Y'), []); ?>
+                  </div>
+                  <!-- <div class="form-group" app-field-wrapper="from_date">
                     <label for="from_date" class="control-label">From Date</label>
                     <div class="input-group date">
-                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y")?>" app-field-label="From Date">
+                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y") ?>" app-field-label="From Date">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="to_date">
+                    <?= render_date_input('to_date', 'To Date', date('d/m/Y'), []); ?>
+                  </div>
+                  <!-- <div class="form-group" app-field-wrapper="to_date">
                     <label for="to_date" class="control-label">To Date</label>
                     <div class="input-group date">
-                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y")?>" app-field-label="To Date">
+                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y") ?>" app-field-label="To Date">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                 </div>
                 <div class="col-md-5 mbot5" style="padding-top: 20px;">
                   <button type="submit" class="btn btn-success" id="searchBtn"><i class="fa fa-list"></i> Show</button>
@@ -95,36 +136,80 @@ th { background: #50607b; color: #fff !important; }
                       </tr>
                     </thead>
                     <tbody></tbody>
-                  </table>   
+                  </table>
                 </div>
               </div>
             </div>
           </div>
-        </div>  
+        </div>
       </div>
     </div>
   </div>
 </div>
+<?php
+$fy = $this->session->userdata('finacial_year');
+$fy_new = $fy + 1;
+$lastdate_date = '20' . $fy_new . '-03-31';
+$curr_date = date('Y-m-d');
+$curr_date_new = new DateTime($curr_date);
+$last_date_yr = new DateTime($lastdate_date);
+if ($last_date_yr < $curr_date_new) {
+  $max_date_php = $lastdate_date;
+} else {
+  $max_date_php = $curr_date;
+}
+?>
+
 <?php init_tail(); ?>
 <script>
+  $(document).ready(function() {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
+    } else {
+      maxEndDate = new Date();
+    }
+
+    $('#from_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+    $('#to_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+  });
   $(document).ready(function() {
     resetForm();
     $('#filter_list_form').submit();
   });
 
-  function resetForm(){
+  function resetForm() {
     $('.exportBtn').hide();
     $('#table-list tbody').html('');
-    
+
     let filterHtml = '';
-    $('.filterInput').each(function () {
+    $('.filterInput').each(function() {
       let label = $(this).attr('app-field-label') || '';
       let value = $(this).val();
 
       if ($(this).is('select') && value) {
         value = $(this).find('option:selected').text().trim();
-      } 
-      else if ($(this).is('input, textarea')) {
+      } else if ($(this).is('input, textarea')) {
         value = $(this).val().trim();
       }
 
@@ -140,7 +225,7 @@ th { background: #50607b; color: #fff !important; }
   }
 
 
-  $('#filter_list_form').submit(function(e){
+  $('#filter_list_form').submit(function(e) {
     e.preventDefault();
 
     let form = this;
@@ -166,11 +251,11 @@ th { background: #50607b; color: #fff !important; }
         data: form_data,
         processData: false,
         contentType: false,
-        success: function(res){
+        success: function(res) {
           let json = JSON.parse(res);
-          if(!json.success){
+          if (!json.success) {
             $('#searchBtn').prop('disabled', false);
-            if(offset === 0){
+            if (offset === 0) {
               // No data found - show message, hide export buttons
               $('#table-list tbody').html(
                 '<tr><td colspan="9" class="text-center">No Data Found</td></tr>'
@@ -179,16 +264,16 @@ th { background: #50607b; color: #fff !important; }
             }
             return;
           }
-          if(offset === 0){
+          if (offset === 0) {
             totalRecords = parseInt(json.total) || 0;
           }
-          if(json.rows && json.rows.length > 0){
+          if (json.rows && json.rows.length > 0) {
             appendRows(json.rows);
             loadedRecords += json.rows.length;
             offset += limit;
           }
           updateProgress(loadedRecords, totalRecords);
-          if(loadedRecords >= totalRecords){
+          if (loadedRecords >= totalRecords) {
             $('#searchBtn').prop('disabled', false);
             $('#fetchProgress').css('width', '0%');
             $('.exportBtn').show(); // Show export buttons only when data is loaded
@@ -210,10 +295,21 @@ th { background: #50607b; color: #fff !important; }
     return d.isValid() ? d.format('DD/MM/YYYY') : '-';
   }
 
-  function appendRows(rows){
+  function appendRows(rows) {
     let html = '';
-    let status_list = {1 : 'Gate IN Generated', 2 :'Gross Weight Captured', 3 :'Conveyor Assigned', 4 :'QC Stack Captured', 5 :'Tare Weight Captured', 6 :'Gate Out Pass Generated', 7 :'Vehicle Exit', 8 :'QC', 9 :'Purchase Invoice Generated', 10 :'Complete'};
-    rows.forEach(function(row){
+    let status_list = {
+      1: 'Gate IN Generated',
+      2: 'Gross Weight Captured',
+      3: 'Conveyor Assigned',
+      4: 'QC Stack Captured',
+      5: 'Tare Weight Captured',
+      6: 'Gate Out Pass Generated',
+      7: 'Vehicle Exit',
+      8: 'QC',
+      9: 'Purchase Invoice Generated',
+      10: 'Complete'
+    };
+    rows.forEach(function(row) {
       html += `<tr onclick="window.open('<?= admin_url('purchase/Inwards/Details/') ?>${row.GateINID}', '_blank')" style="cursor:pointer;">
         <td class="fixed-td" title="${row.GateINID || ''} - ${row.GateINID || ''}">${row.GateINID || ''}</td>
         <td>${formatDate(row.TransDate)}</td>
@@ -230,9 +326,9 @@ th { background: #50607b; color: #fff !important; }
     $('#table-list tbody').append(html);
   }
 
-  function updateProgress(loaded, total){
+  function updateProgress(loaded, total) {
     let percent = Math.floor((loaded / total) * 100);
-    $('#fetchProgress').css('width', percent + '%');  
+    $('#fetchProgress').css('width', percent + '%');
   }
 
   // Excel Export Button Logic
@@ -252,7 +348,7 @@ th { background: #50607b; color: #fff !important; }
         processData: false,
         contentType: false,
         cache: false,
-        success: function (res) {
+        success: function(res) {
           $('#exportExcelBtn').prop('disabled', false);
           if (res.success && res.file_url) {
             window.location.href = res.file_url;
@@ -260,7 +356,7 @@ th { background: #50607b; color: #fff !important; }
             alert(res.message || 'Failed to export Excel.');
           }
         },
-        error: function () {
+        error: function() {
           $('#exportExcelBtn').prop('disabled', false);
           alert('Error exporting Excel.');
         }
@@ -269,7 +365,7 @@ th { background: #50607b; color: #fff !important; }
   });
 </script>
 <script>
-  $(document).on("click", ".sortable", function () {
+  $(document).on("click", ".sortable", function() {
     var table = $("#table-list tbody");
     var rows = table.find("tr").toArray();
     var index = $(this).index();
@@ -278,7 +374,7 @@ th { background: #50607b; color: #fff !important; }
     $(".sortable span").remove();
     $(this).addClass(ascending ? "asc" : "desc");
     $(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
-    rows.sort(function (a, b) {
+    rows.sort(function(a, b) {
       var valA = $(a).find("td").eq(index).text().trim();
       var valB = $(b).find("td").eq(index).text().trim();
       if ($.isNumeric(valA) && $.isNumeric(valB)) {

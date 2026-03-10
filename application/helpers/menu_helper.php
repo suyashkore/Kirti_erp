@@ -238,14 +238,14 @@ function app_init_admin_sidebar_menu_items()
 		]);
 	}
 
-	if (has_permission_new('manage', '', 'view')) {
-		$CI->app_menu->add_sidebar_children_item('master', [
-			'slug' => 'CustomerCategory',
-			'name' => 'Customer Category Master',
-			'href' => admin_url('CustomerCategory'),
-			'position' => 20,
-		]);
-	}
+	// if (has_permission_new('manage', '', 'view')) {
+	// 	$CI->app_menu->add_sidebar_children_item('master', [
+	// 		'slug' => 'CustomerCategory',
+	// 		'name' => 'Customer Category Master',
+	// 		'href' => admin_url('CustomerCategory'),
+	// 		'position' => 20,
+	// 	]);
+	// }
 
 	if (has_permission_new('manage', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
@@ -808,6 +808,14 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 7,
 		]);
 	}
+	if (has_permission_new('SalesInvoice', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'sale-SalesInvoice',
+			'name' => 'Sales Invoice',
+			'href' => admin_url('SalesInvoice'),
+			'position' => 8,
+		]);
+	}
 	if (has_permission_new('sale_list', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
 			'slug' => 'sale-list',
@@ -841,6 +849,14 @@ function app_init_admin_sidebar_menu_items()
 			'name' => 'Change Vehicle',
 			'href' => admin_url('challan/VehicleUpdate'),
 			'position' => 9,
+		]);
+	}
+	if (has_permission_new('TradeSettlement', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'TradeSettlement',
+			'name' => 'Sales Trade Settlement',
+			'href' => admin_url('TradeSettlement/Sales'),
+			'position' => 11,
 		]);
 	}
 

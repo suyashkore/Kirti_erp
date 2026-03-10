@@ -2,8 +2,6 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 $PlantDetail = GetPlantDetails($invoice);
-// echo"<pre>";
-// print_r($invoice);die;
 
 // =============================================
 // DATA EXTRACT
@@ -24,37 +22,37 @@ $order_history_0 = isset($order['history'][0]) ? $order['history'][0] : [];
 // GATEIN — stdClass Object (->)
 // =============================================
 $GateINID     = isset($gatein->GateINID)       ? $gatein->GateINID                                       : '';
-$gateInNo     = isset($inward['gatein_no'])    ? $inward['gatein_no']                                    : 'N/A';
-$gateInTime   = isset($gatein->TransDate)      ? date('d-m-Y H:i', strtotime($gatein->TransDate))        : 'N/A';
+$gateInNo     = isset($inward['gatein_no'])    ? $inward['gatein_no']                                    : '--';
+$gateInTime   = isset($gatein->TransDate)      ? date('d-m-Y H:i', strtotime($gatein->TransDate))        : '--';
 $asnDate      = (isset($gatein->ASNDate) && $gatein->ASNDate != '')
                     ? date('d-m-Y H:i', strtotime($gatein->ASNDate))
                     : '-';
-$location     = isset($gatein->LocationName)   ? $gatein->LocationName                                   : 'N/A';
-$vehicleNo    = isset($gatein->VehicleNo)      ? $gatein->VehicleNo                                      : 'N/A';
-$driverName   = isset($gatein->DriverName)     ? $gatein->DriverName                                     : '-';
-$driverMobile = isset($gatein->DriverMobileNo) ? $gatein->DriverMobileNo                                 : '-';
-$actualWeight = isset($gatein->ActualWeight)   ? $gatein->ActualWeight                                   : '-';
-$bagWeight    = isset($gatein->BagWeight)      ? $gatein->BagWeight                                      : '-';
-$totalDeduct  = isset($gatein->TotalDeduction) ? $gatein->TotalDeduction                                 : '0';
-$gateinNetAmt = isset($gatein->NetAmt)         ? $gatein->NetAmt                                         : '0';
+$location     = isset($gatein->LocationName)   ? $gatein->LocationName                                   : '--';
+$vehicleNo    = isset($gatein->VehicleNo)      ? $gatein->VehicleNo                                      : '--';
+$driverName   = isset($gatein->DriverName)     ? $gatein->DriverName                                     : '--';
+$driverMobile = isset($gatein->DriverMobileNo) ? $gatein->DriverMobileNo                                 : '--';
+$actualWeight = isset($gatein->ActualWeight)   ? $gatein->ActualWeight                                   : '--';
+$bagWeight    = isset($gatein->BagWeight)      ? $gatein->BagWeight                                      : '--';
+$totalDeduct  = isset($gatein->TotalDeduction) ? $gatein->TotalDeduction                                 : '--';
+$gateinNetAmt = isset($gatein->NetAmt)         ? $gatein->NetAmt                                         : '--';
 
 // =============================================
 // INWARD — Array ([])
 // =============================================
-$bookingID    = isset($inward['InwardsID'])     ? $inward['InwardsID']                                   : 'N/A';
-$purchaseID   = isset($inward['OrderID'])       ? $inward['OrderID']                                     : 'N/A';
-$bookingDate  = isset($inward['TransDate'])     ? date('d-m-Y', strtotime($inward['TransDate']))         : 'N/A';
-$paymentTerms = isset($inward['PaymentTerms'])  ? $inward['PaymentTerms']                                : 'N/A';
-$orderID      = isset($inward['OrderID'])       ? $inward['OrderID']                                     : 'N/A';
-$partyName    = isset($inward['company'])       ? $inward['company']                                     : 'N/A';
-$totalWeight  = isset($inward['TotalWeight'])   ? $inward['TotalWeight']                                 : 'N/A';
-$noOfBags     = isset($inward['TotalQuantity']) ? $inward['TotalQuantity']                               : 'N/A';
-$netAmt       = isset($inward['NetAmt'])        ? $inward['NetAmt']                                      : 'N/A';
-$taxableAmt   = isset($inward['TaxableAmt'])    ? $inward['TaxableAmt']                                  : 'N/A';
-$cgstAmt      = isset($inward['CGSTAmt'])       ? $inward['CGSTAmt']                                     : '0';
-$sgstAmt      = isset($inward['SGSTAmt'])       ? $inward['SGSTAmt']                                     : '0';
-$igstAmt      = isset($inward['IGSTAmt'])       ? $inward['IGSTAmt']                                     : '0';
-$inwardGSTIN  = isset($inward['GSTIN'])         ? $inward['GSTIN']                                       : '-';
+$bookingID    = isset($inward['InwardsID'])     ? $inward['InwardsID']                                   : '--';
+$purchaseID   = isset($inward['OrderID'])       ? $inward['OrderID']                                     : '--';
+$bookingDate  = isset($inward['TransDate'])     ? date('d-m-Y', strtotime($inward['TransDate']))         : '--';
+$paymentTerms = isset($inward['PaymentTerms'])  ? $inward['PaymentTerms']                                : '--';
+$orderID      = isset($inward['OrderID'])       ? $inward['OrderID']                                     : '--';
+$partyName    = isset($inward['company'])       ? $inward['company']                                     : '--';
+$totalWeight  = isset($inward['TotalWeight'])   ? $inward['TotalWeight']                                 : '--';
+$noOfBags     = isset($inward['TotalQuantity']) ? $inward['TotalQuantity']                               : '--';
+$netAmt       = isset($inward['NetAmt'])        ? $inward['NetAmt']                                      : '--';
+$taxableAmt   = isset($inward['TaxableAmt'])    ? $inward['TaxableAmt']                                  : '--';
+$cgstAmt      = isset($inward['CGSTAmt'])       ? $inward['CGSTAmt']                                     : '--';
+$sgstAmt      = isset($inward['SGSTAmt'])       ? $inward['SGSTAmt']                                     : '--';
+$igstAmt      = isset($inward['IGSTAmt'])       ? $inward['IGSTAmt']                                     : '--';
+$inwardGSTIN  = isset($inward['GSTIN'])         ? $inward['GSTIN']                                       : '--';
 
 // =============================================
 // GATE OUT — stdClass Object (->)
@@ -130,20 +128,20 @@ if ($grossWeightVal !== '-' && $tareWeightVal !== '-') {
 // =============================================
 $commodityRows = '';
 foreach ($inward_history as $h) {
-    $h_commodity  = isset($h['item_name'])  ? $h['item_name']          : 'N/A';
-    $h_unit       = isset($h['SuppliedIn']) ? $h['SuppliedIn']         : 'MT';
-    $h_basicRate  = isset($h['BasicRate'])  ? number_format(floatval($h['BasicRate']), 2) : 'N/A';
-    $h_orderQty   = isset($h['OrderQty'])   ? $h['OrderQty']           : 'N/A';
-    $h_unitWeight = isset($h['UnitWeight']) ? $h['UnitWeight']         : 'N/A';
-    $h_cgst       = isset($h['cgst'])       ? $h['cgst']               : '0';
-    $h_sgst       = isset($h['sgst'])       ? $h['sgst']               : '0';
-    $h_igst       = isset($h['igst'])       ? $h['igst']               : '0';
-    $h_cgstamt    = isset($h['cgstamt'])    ? $h['cgstamt']            : '0';
-    $h_sgstamt    = isset($h['sgstamt'])    ? $h['sgstamt']            : '0';
-    $h_igstamt    = isset($h['igstamt'])    ? $h['igstamt']            : '0';
-    $h_orderAmt   = isset($h['OrderAmt'])   ? $h['OrderAmt']           : '0';
-    $h_netOrderAmt= isset($h['NetOrderAmt'])? $h['NetOrderAmt']        : '0';
-    $h_discAmt    = isset($h['DiscAmt'])    ? $h['DiscAmt']            : '0';
+    $h_commodity  = isset($h['item_name'])  ? $h['item_name']          : '--';
+    $h_unit       = isset($h['SuppliedIn']) ? $h['SuppliedIn']         : 'KG';
+    $h_basicRate  = isset($h['BasicRate'])  ? number_format(floatval($h['BasicRate']), 2) : '--';
+    $h_orderQty   = isset($h['OrderQty'])   ? number_format(floatval($h['OrderQty']), 2) : '--';
+    $h_unitWeight = isset($h['UnitWeight']) ? number_format(floatval($h['UnitWeight']), 2) : '--';
+    $h_cgst       = isset($h['cgst'])       ? $h['cgst']               : '--';
+    $h_sgst       = isset($h['sgst'])       ? $h['sgst']               : '--';
+    $h_igst       = isset($h['igst'])       ? $h['igst']               : '--';
+    $h_cgstamt    = isset($h['cgstamt'])    ? $h['cgstamt']            : '--';
+    $h_sgstamt    = isset($h['sgstamt'])    ? $h['sgstamt']            : '--';
+    $h_igstamt    = isset($h['igstamt'])    ? $h['igstamt']            : '--';
+    $h_orderAmt   = isset($h['OrderAmt'])   ? number_format(floatval($h['OrderAmt']), 2) : '--';
+    $h_netOrderAmt= isset($h['NetOrderAmt'])? number_format(floatval($h['NetOrderAmt']), 2) : '--';
+    $h_discAmt    = isset($h['DiscAmt'])    ? number_format(floatval($h['DiscAmt']), 2) : '--';
 
     $commodityRows .= '
     <tr>
@@ -159,9 +157,9 @@ foreach ($inward_history as $h) {
     </tr>
     <tr>
         <td style="background-color:#f5f5f5;"><b>Order Qty</b></td>
-        <td>' . $h_orderQty . ' ' . $h_unit . '</td>
+        <td>' . $h_orderQty . ' </td>
         <td style="background-color:#f5f5f5;"><b>Unit Weight</b></td>
-        <td>' . $h_unitWeight . ' ' . $h_unit . '</td>
+        <td>' . $h_unitWeight . '</td>
     </tr>
     <tr>
         <td style="background-color:#f5f5f5;"><b>Order Amt</b></td>
@@ -170,16 +168,8 @@ foreach ($inward_history as $h) {
         <td>Rs. ' . $h_discAmt . '</td>
     </tr>
     <tr>
-        <td style="background-color:#f5f5f5;"><b>CGST ' . $h_cgst . '%</b></td>
-        <td>Rs. ' . $h_cgstamt . '</td>
-        <td style="background-color:#f5f5f5;"><b>SGST ' . $h_sgst . '%</b></td>
-        <td>Rs. ' . $h_sgstamt . '</td>
-    </tr>
-    <tr>
-        <td style="background-color:#f5f5f5;"><b>IGST ' . $h_igst . '%</b></td>
-        <td>Rs. ' . $h_igstamt . '</td>
         <td style="background-color:#f5f5f5;"><b>Net Order Amt</b></td>
-        <td><b>Rs. ' . $h_netOrderAmt . '</b></td>
+        <td colspan="3"><b>Rs. ' . $h_netOrderAmt . '</b></td>
     </tr>';
 }
 
@@ -305,14 +295,12 @@ $html = '
     <tr>
         <td align="center" style="background-color:#f5f5f5;"><b>Gross Weight</b></td>
         <td align="center" style="background-color:#f5f5f5;"><b>Tare Weight</b></td>
-        <td align="center" style="background-color:#f5f5f5;"><b>Net Weight</b></td>
-        <td align="center" style="background-color:#f5f5f5;"><b>Actual Weight</b></td>
+        <td align="center" colspan="2" style="background-color:#f5f5f5;"><b>Net Weight</b></td>
     </tr>
     <tr>
         <td align="center">' . $grossWeightVal . '</td>
         <td align="center">' . $tareWeightVal  . '</td>
-        <td align="center">' . $netWeight      . '</td>
-        <td align="center">' . $actualWeight   . '</td>
+        <td align="center" colspan="2">' . $netWeight . '</td>
     </tr>
     <tr>
         <td style="background-color:#f5f5f5;"><b>Bag Weight</b></td>
@@ -328,32 +316,15 @@ $html = '
     <tr>
         <td style="background-color:#f5f5f5;"><b>Taxable Amount</b></td>
         <td>Rs. ' . $taxableAmt . '</td>
-        <td style="background-color:#f5f5f5;"><b>CGST Amt</b></td>
-        <td>Rs. ' . $cgstAmt . '</td>
-    </tr>
-    <tr>
-        <td style="background-color:#f5f5f5;"><b>SGST Amt</b></td>
-        <td>Rs. ' . $sgstAmt . '</td>
-        <td style="background-color:#f5f5f5;"><b>IGST Amt</b></td>
-        <td>Rs. ' . $igstAmt . '</td>
-    </tr>
-    <tr>
         <td style="background-color:#f5f5f5;"><b>Total Deduction</b></td>
         <td>Rs. ' . $totalDeduct . '</td>
-        <td style="background-color:#bdd0ea;"><b>Net Amount</b></td>
-        <td style="background-color:#bdd0ea;"><b>Rs. ' . $netAmt . '</b></td>
+    </tr>
+    <tr>
+        <td colspan="2" style="background-color:#bdd0ea;"><b>Net Amount</b></td>
+        <td colspan="2" style="background-color:#bdd0ea;"><b>Rs. ' . $netAmt . '</b></td>
     </tr>
 
-    <!-- ===== REMARKS ===== -->
-    <tr>
-        <td colspan="4" align="center" style="background-color:#bdd0ea;"><b>Remarks</b></td>
-    </tr>
-    <tr>
-        <td style="background-color:#f5f5f5;"><b>Internal Remark</b></td>
-        <td>' . $internalRmk . '</td>
-        <td style="background-color:#f5f5f5;"><b>Document Remark</b></td>
-        <td>' . $docRemark . '</td>
-    </tr>
+
 
     <!-- ===== SIGNATURE ===== -->
     <tr style="height:60px;">

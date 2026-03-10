@@ -167,7 +167,6 @@
                     <input type="hidden" name="customer_gst_no" id="customer_gst_no" class="form-control" readonly>
                     <input type="hidden" name="customer_country" id="customer_country" class="form-control" readonly>
                     <input type="hidden" name="customer_state" id="customer_state" class="form-control" readonly>
-                    <!-- <input type="hidden" name="customer_address" id="customer_address" class="form-control" readonly> -->
                   </div>
                 </div>
                 <div class="col-md-3 mbot5">
@@ -241,18 +240,12 @@
                   </table>
                 </div>
 
-
-                <!-- <div class="row"> -->
-
-                <!-- LEFT SIDE (6 columns) -->
                 <div class="col-md-8">
                   <div class="row">
-
                     <div class="col-md-12 mbot5">
                       <h4 class="bold p_style">Transporter Details:</h4>
                       <hr class="hr_style">
                     </div>
-
                     <div class="col-md-3 mbot5">
                       <div class="form-group" app-field-wrapper="trans_arranged">
                         <label for="trans_arranged" class="control-label"><small class="req text-danger">* </small>Trans Arranged</label>
@@ -265,8 +258,30 @@
                         </select>
                       </div>
                     </div>
-
                     <div id="transporter_section">
+                      <div class="col-md-3 mbot5">
+                        <div class="form-group" app-field-wrapper="VehicleNo">
+                          <label for="VehicleNo" class="control-label">
+                            <small class="req text-danger">* </small>Vehicle No
+                          </label>
+                          <select name="VehicleNo" id="VehicleNo"
+                            class="form-control selectpicker" data-live-search="true"
+                            app-field-label="Vehicle No" required
+                            onchange="getVehicleDetails();">
+                            <option value="" selected>None selected</option>
+                            <?php
+                            if (!empty($vehicle_no_list)) :
+                              foreach ($vehicle_no_list as $value) :
+                                echo '<option value="' . $value['VehicleNo'] . '">' . $value['VehicleNo'] . '</option>';
+                              endforeach;
+                            endif;
+                            ?>
+                          </select>
+                          <input type="text" name="VehicleNoManual" id="VehicleNoManual"
+                            class="form-control" placeholder="Vehicle No (from Gate Entry)"
+                            style="display:none;">
+                        </div>
+                      </div>
                       <div class="col-md-3 mbot5">
                         <div class="form-group" app-field-wrapper="transporter_name">
                           <label for="transporter_name" class="control-label"><small class="req text-danger">* </small>Transporter Name</label>
@@ -282,52 +297,6 @@
                           </select>
                         </div>
                       </div>
-
-                      <!-- <div class="col-md-3 mbot5">
-                        <div class="form-group" app-field-wrapper="VehicleNo">
-                          <label for="VehicleNo" class="control-label"><small class="req text-danger">* </small>Vehicle No</label>
-                          <select name="VehicleNo" id="VehicleNo" class="form-control selectpicker" data-live-search="true" app-field-label="Vehicle No" required onchange="getVehicleDetails();">
-                            <option value="" selected>None selected</option>
-                            <?php
-                            // if (!empty($vehicle_no_list)) :
-                            //   foreach ($vehicle_no_list as $value) :
-                            //     echo '<option value="' . $value['VehicleNo'] . '">' . $value['VehicleNo'] . '</option>';
-                            //   endforeach;
-                            // endif;
-                            ?>
-                          </select>
-                        </div>
-                      </div> -->
-
-                      <div class="col-md-3 mbot5">
-                        <div class="form-group" app-field-wrapper="VehicleNo">
-                          <label for="VehicleNo" class="control-label">
-                            <small class="req text-danger">* </small>Vehicle No
-                          </label>
-
-                          <!-- Existing dropdown -->
-                          <select name="VehicleNo" id="VehicleNo"
-                            class="form-control selectpicker" data-live-search="true"
-                            app-field-label="Vehicle No" required
-                            onchange="getVehicleDetails();">
-                            <option value="" selected>None selected</option>
-                            <?php
-                            if (!empty($vehicle_no_list)) :
-                              foreach ($vehicle_no_list as $value) :
-                                echo '<option value="' . $value['VehicleNo'] . '">' . $value['VehicleNo'] . '</option>';
-                              endforeach;
-                            endif;
-                            ?>
-                          </select>
-
-                          <!-- ✅ NEW: shown only when gate entry has a vehicle NOT in dropdown -->
-                          <input type="text" name="VehicleNoManual" id="VehicleNoManual"
-                            class="form-control" placeholder="Vehicle No (from Gate Entry)"
-                            style="display:none;">
-                        </div>
-                      </div>
-
-
                       <div class="col-md-3 mbot5">
                         <div class="form-group" app-field-wrapper="lr_no">
                           <label for="lr_no" class="control-label">LR No</label>
@@ -417,7 +386,6 @@
                   </div>
                 </div>
 
-                <!-- <div class="col-md-6"></div> -->
                 <div class="col-md-4">
                   <div class="row">
                     <div class="col-md-12">
@@ -443,22 +411,18 @@
                         <label>Total Weight:</label>
                         <div class="total-display" id="total_weight_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>Total Qty:</label>
                         <div class="total-display" id="total_qty_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>Item Total:</label>
                         <div class="total-display" id="item_total_amt_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>Total Disc:</label>
                         <div class="total-display" id="disc_amt_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>Taxable Amt:</label>
                         <div class="total-display" id="taxable_amt_display">0.00</div>
@@ -467,22 +431,18 @@
 
                     <!-- RIGHT COLUMN -->
                     <div class="col-md-6 col-sm-6 col-xs-6">
-
                       <div class="total-label-row">
                         <label>CGST Amt:</label>
                         <div class="total-display" id="cgst_amt_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>SGST Amt:</label>
                         <div class="total-display" id="sgst_amt_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>IGST Amt:</label>
                         <div class="total-display" id="igst_amt_display">0.00</div>
                       </div>
-
                       <div class="total-label-row">
                         <label>Round Off:</label>
                         <div class="total-display" id="round_off_amt_display">0.00</div>
@@ -546,14 +506,8 @@
               </tr>
             </thead>
             <tbody id="valid_so_body">
-
-
               <tr class="get_Details">
-
-
-                <td></td>
               </tr>
-
             </tbody>
           </table>
 
@@ -576,10 +530,8 @@
                 </tr>
               </thead>
               <tbody id="invalid_so_body">
-
                 <tr class="get_Details">
                 </tr>
-
               </tbody>
             </table>
       </div>
@@ -595,23 +547,17 @@
   </div>
 </div>
 
-
 <select id="so_list" name="so_list[]" multiple style="display:none;"></select>
-
-
 
 <div class="modal fade" id="ListModal" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
   <div class="modal-dialog modal-xl" role="document">
-
     <div class="modal-content">
       <div class="modal-header custom-header">
-
         <div class="header-top">
           <h4 class="modal-title">Delivery Order List </h4>
           <button type="button" class="close-btn"
             data-dismiss="modal">&times;</button>
         </div>
-
         <div class="header-filters">
 
           <!-- From Date -->
@@ -649,19 +595,12 @@
             <button type="button" class="btn btn-success" id="searchBtn">
               <i class="fa fa-list"></i> Show
             </button>
-
           </div>
 
         </div>
-
       </div>
 
-
-
-
-      <!-- <div class="modal-body" style="padding:0px 5px !important"> -->
       <div class="modal-body" style="padding:0px 5px !important; overflow-y:auto; max-height:65vh;">
-
         <div class="table-ListModal tableFixHead2" style="overflow-x:auto;">
           <table class="tree table table-striped table-bordered table-ListModal tableFixHead2" id="table_ListModal" width="100%">
             <thead>
@@ -669,26 +608,19 @@
                 <th class="sortablePop">Order ID</th>
                 <th class="sortablePop">Delivery Order Date</th>
                 <th class="sortablePop">Sales Category</th>
-
-
                 <th class="sortablePop">Customer</th>
-
                 <th class="sortablePop">Total Weight</th>
-
                 <th class="sortablePop">Total Qty</th>
                 <th class="sortablePop">Item Total</th>
                 <th class="sortablePop">Total Disc</th>
                 <th class="sortablePop">Taxable Amt</th>
-
                 <th class="sortablePop">CGST Amt</th>
                 <th class="sortablePop">SGST Amt</th>
                 <th class="sortablePop">IGST Amt</th>
                 <th class="sortablePop">Round Off</th>
-
                 <th class="sortablePop">Amount</th>
               </tr>
             </thead>
-
             <tbody>
               <?php
               if (!empty($deliveryorder_list)):
@@ -698,22 +630,16 @@
                     <td><?= $value["OrderID"]; ?></td>
                     <td><?= date('d/m/Y', strtotime($value["TransDate"])); ?></td>
                     <td><?= $value["CategoryName"]; ?></td>
-
-
                     <td><?= $value["company"]; ?></td>
                     <td><?= $value["TotalWt"]; ?></td>
-
                     <td><?= $value["TotalQty"]; ?></td>
                     <td><?= $value["ItemTotal"]; ?></td>
                     <td><?= $value["TotalDisc"]; ?></td>
                     <td><?= $value["TaxAmt"]; ?></td>
-
                     <td><?= $value["CGSTAmt"]; ?></td>
                     <td><?= $value["SGSTAmt"]; ?></td>
                     <td><?= $value["IGSTAmt"]; ?></td>
                     <td><?= $value["RoundOff"]; ?></td>
-
-
                     <td><?= $value["NetAmt"]; ?></td>
                   </tr>
               <?php
@@ -732,9 +658,111 @@
   </div>
 </div>
 
-
+<?php
+    $fy = $this->session->userdata('finacial_year');
+    $fy_new = $fy + 1;
+    $lastdate_date = '20'.$fy_new.'-03-31';
+    $curr_date = date('Y-m-d');
+    $curr_date_new = new DateTime($curr_date);
+    $last_date_yr = new DateTime($lastdate_date);
+    if($last_date_yr < $curr_date_new){
+        $max_date_php = $lastdate_date;
+    } else {
+        $max_date_php = $curr_date;
+    }
+?>
 <?php init_tail(); ?>
 <script>
+
+$(document).ready(function(){
+    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year    = "20" + fin_y;
+    var cur_y   = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+        var fy_new   = parseInt(fin_y) + 1;
+        var fy_new_s = "20" + fy_new;
+        maxEndDate   = new Date(fy_new_s + '/03/31');
+    } else {
+        maxEndDate = new Date();
+    }
+
+    // Order Date — restricted within FY, up to today or March 31
+    $('#delivery_order_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+    // Delivery From — same FY restriction
+    $('#lr_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+   
+});
+  
+  function renumberRows() {
+    $('#items_body tr').each(function(index) {
+      $(this).find('input[name="sr[]"]').val(index + 1);
+    });
+  }
+
+  function getItemsDetailsonSOAppend(callback) {
+    let OrderIDs = $('#so_list').val();
+    if (!OrderIDs || OrderIDs.length === 0) {
+      if (callback) callback();
+      return;
+    }
+    $.ajax({
+      url: "<?= admin_url(); ?>DeliveryOrder/GetHistoryDetails",
+      method: "POST",
+      dataType: "JSON",
+      data: {
+        OrderID: OrderIDs
+      },
+      success: function(response) {
+        if (response.success === true) {
+          let items = response.items;
+
+          loadItemDropdown(function() {
+            for (let i = 0; i < items.length; i++) {
+              addRow(2);
+              let row = parseInt($('#row_id').val());
+
+              $('#sr' + row).val(row);
+              $('#so_no' + row).val(items[i].OrderID);
+              $('#item_id' + row).val(items[i].ItemID);
+              $('#item_id' + row).selectpicker('refresh');
+              $('#dispatch_qty' + row).val('');
+              $('#balance_qty' + row).val(Number(items[i].BalanceQty).toFixed(0));
+              $('#min_qty' + row).val(Number(items[i].BalanceQty).toFixed(2));
+              $('#unit_rate' + row).val(Number(items[i].BasicRate).toFixed(2));
+              $('#disc_amt' + row).val(Number(items[i].DiscAmt).toFixed(2));
+              $('#total_weight' + row).val('0.00');
+              $('#total_amt' + row).val('0.00');
+              getItemDetails(items[i].ItemID, row);
+            }
+            $('.selectpicker').selectpicker('refresh');
+            if (callback) callback();
+          });
+        } else {
+          alert_float('warning', response.message);
+          if (callback) callback();
+        }
+      }
+    });
+  }
+
   function getGateEntryDetails() {
     var gateId = $('#gate_no').val();
     if (!gateId) return;
@@ -760,17 +788,13 @@
           return;
         }
 
-        // Always fill driver details from Gate Master
         $('#driver_name').val(response.driver_name || '');
         $('#lr_no').val(response.vehicle_no || '');
         $('#mobile').val(response.mobile || '');
         $('#license_no').val(response.license_no || '');
 
         if (response.vehicle_in_list) {
-          // ✅ Vehicle found in dropdown → show SELECT, hide INPUT
           $('#VehicleNoManual').hide().val('').removeAttr('required');
-
-          // Show the bootstrap-select wrapper and the original select
           $('#VehicleNo').closest('.bootstrap-select').show();
           $('#VehicleNo').attr('required', true)
             .val(response.vehicle_no)
@@ -781,7 +805,6 @@
           }
 
         } else {
-          // ✅ Vehicle NOT in dropdown → hide SELECT, show INPUT
           $('#VehicleNo').closest('.bootstrap-select').hide();
           $('#VehicleNo').removeAttr('required').val('').selectpicker('refresh');
 
@@ -793,11 +816,9 @@
     });
   }
 
-
   function validateFreightFields() {
     var totalFreight = parseFloat($('#total_freight').val()) || 0;
 
-    // Only validate if Total Freight has been entered
     if (totalFreight <= 0) return true;
 
     var payCash = parseFloat($('#pay_cash').val()) || 0;
@@ -853,8 +874,6 @@
   $('#confirm_so_btn').on('click', function() {
 
     let selectedOrders = [];
-
-    // get all checked rows from BOTH tables
     $('#valid_so_body .row_checkbox:checked, #invalid_so_body .row_checkbox:checked')
       .each(function() {
         selectedOrders.push($(this).val());
@@ -865,21 +884,60 @@
       return;
     }
 
-    // Clear old values
-    $('#so_list').html('');
+    var alreadyPresentSoNos = [];
+    $('#items_body tr').each(function() {
+      var soVal = $(this).find('input[name="so_no[]"]').val();
+      if (soVal) alreadyPresentSoNos.push(soVal.trim());
+    });
 
-    // Add selected OrderIDs into hidden select
-    selectedOrders.forEach(function(orderID) {
+    var historyToSoNo = {};
+    $('#valid_so_body tr, #invalid_so_body tr').each(function() {
+      var cb = $(this).find('.row_checkbox');
+      if (cb.length) {
+        var histId = cb.val().trim();
+        var soNoTxt = $(this).find('td').eq(2).text().trim(); // 3rd col = SO No
+        historyToSoNo[histId] = soNoTxt;
+      }
+    });
+
+    var newIds = selectedOrders.filter(function(histId) {
+      var soNo = historyToSoNo[histId] || histId;
+      return alreadyPresentSoNos.indexOf(soNo) === -1 &&
+        alreadyPresentSoNos.indexOf(histId) === -1;
+    });
+
+    var selectedSoNos = selectedOrders.map(function(histId) {
+      return historyToSoNo[histId] || histId;
+    });
+
+    $('#items_body tr').each(function() {
+      var soVal = $(this).find('input[name="so_no[]"]').val();
+      if (!soVal) return;
+      soVal = soVal.trim();
+      if (selectedSoNos.indexOf(soVal) === -1 && selectedOrders.indexOf(soVal) === -1) {
+        $(this).remove();
+      }
+    });
+
+    $('#CustomerSOModal').modal('hide');
+
+    if (newIds.length === 0) {
+      renumberRows();
+      calculateTotals();
+      return;
+    }
+
+    $('#so_list').html('');
+    newIds.forEach(function(id) {
       $('#so_list').append(
-        `<option value="${orderID}" selected>${orderID}</option>`
+        `<option value="${id}" selected>${id}</option>`
       );
     });
 
-    // Close modal
-    $('#CustomerSOModal').modal('hide');
-
-    // 🔥 NOW CALL YOUR FUNCTION
-    getItemsDetailsonSO();
+    getItemsDetailsonSOAppend(function() {
+      renumberRows();
+      calculateTotals();
+    });
   });
   $('#CustomerSOModal').on('shown.bs.modal', function() {
     calculateModalRates();
@@ -965,15 +1023,12 @@
           $('#license_no').val(vehicle.LicenceNo || '');
           $('#lr_no').val(vehicle.VehicleNo || '');
 
-          // ✅ Check if GateINID exists as an option in the gate_no dropdown
           if (vehicle.GateINID) {
             var gateOption = $('#gate_no option[value="' + vehicle.GateINID + '"]');
 
             if (gateOption.length > 0) {
-              // Option exists → just select it and refresh
               $('#gate_no').val(vehicle.GateINID).selectpicker('refresh');
             } else {
-              // Option does NOT exist → dynamically add it, then select
               $('#gate_no').append(
                 $('<option>', {
                   value: vehicle.GateINID,
@@ -993,11 +1048,14 @@
     });
   }
 
+  $('#ListModal').on('shown.bs.modal', function() {
+    $('#searchBtn').trigger('click');
+  });
+
   $('#searchBtn').on('click', function() {
 
     var fromDate = $('#from_date').val();
     var toDate = $('#to_date').val();
-    var categoryId = $('#filter_category').val(); // FIXED
 
     if (!fromDate || !toDate) {
       alert_float('warning', 'Please select both From Date and To Date');
@@ -1020,9 +1078,8 @@
       var rowCategoryId = $(this).data('category');
 
       var dateMatch = (rowDate >= from && rowDate <= to);
-      var categoryMatch = (!categoryId || categoryId == rowCategoryId);
 
-      if (dateMatch && categoryMatch) {
+      if (dateMatch) {
         $(this).show();
       } else {
         $(this).hide();
@@ -1469,7 +1526,35 @@
         // Show modal only if not edit mode
         if (!callback) {
           $('#modal_customer_name').text(CustomerId);
+
+          var alreadySelectedSoNos = [];
+          $('#items_body tr').each(function() {
+            var soNo = $(this).find('input[name="so_no[]"]').val();
+            if (soNo) alreadySelectedSoNos.push(soNo.trim());
+          });
+
           $('#CustomerSOModal').modal('show');
+
+          $('#CustomerSOModal').one('shown.bs.modal', function() {
+            if (alreadySelectedSoNos.length > 0) {
+              $('#valid_so_body .row_checkbox, #invalid_so_body .row_checkbox').each(function() {
+                var rowSoNo = $(this).closest('tr').find('td').eq(2).text().trim();
+              
+                var checkboxVal = $(this).val().trim();
+                if (alreadySelectedSoNos.indexOf(rowSoNo) !== -1 ||
+                  alreadySelectedSoNos.indexOf(checkboxVal) !== -1) {
+                  $(this).prop('checked', true);
+                } else {
+                  $(this).prop('checked', false);
+                }
+              });
+            } else {
+              $('#valid_so_body .row_checkbox, #invalid_so_body .row_checkbox')
+                .prop('checked', false);
+              $('#select_all_valid, #select_all_invalid').prop('checked', false);
+            }
+            calculateModalRates();
+          });
         }
 
         if (callback) callback();
@@ -1477,6 +1562,11 @@
     });
   }
 
+  $('#CustomerSOModal').on('hidden.bs.modal', function() {
+    $('#valid_so_body .row_checkbox, #invalid_so_body .row_checkbox')
+      .prop('checked', false);
+    $('#select_all_valid, #select_all_invalid').prop('checked', false);
+  });
 
   $(document).on('changed.bs.select', 'select.dynamic_item', function(e, clickedIndex, isSelected, previousValue) {
 
@@ -1529,13 +1619,10 @@
           var data = response.data;
 
           $('#item_id' + id).val(itemId);
-
           $('#item_name' + id).val(data.ItemName || '');
-          // $('#hsn_code' + id).val(data.hsn_code || '');
           $('#uom' + id).val(data.unit || '');
           $('#unit_weight' + id).val(Number(data.UnitWeight) || 0);
           $('#gst' + id).val(Number(data.tax) || 0);
-
           $('#min_qty' + id).focus();
         }
         calculateTotals();
@@ -1666,57 +1753,6 @@
 
           if (d.history && d.history.length > 0) {
 
-            // function processRow(index) {
-            //   if (index >= d.history.length) {
-            //     // All rows done
-            //     calculateTotals();
-            //     return;
-            //   }
-
-            //   var item = d.history[index];
-
-            //   addRow(2);
-            //   var row = parseInt($('#row_id').val());
-            //   $('#item_uid' + row).val(item.id || 0);
-
-            //   $('#sr' + row).val(index + 1);
-            //   $('#so_no' + row).val(item.OrderID || '');
-            //   $('#item_id' + row).val(item.ItemID || '');
-
-            //   $('#unit_rate' + row).val(Number(item.BasicRate || 0).toFixed(2));
-            //   $('#disc_amt' + row).val(Number(item.DiscAmt || 0).toFixed(2));
-
-            //   $('#dispatch_qty' + row).val(Number(item.eOrderQty || 0).toFixed(0));
-            //   $('#balance_qty' + row).val(Number(item.OrderQty || 0).toFixed(0));
-
-            //   var totalOriginalQty = Number(item.OrderQty || 0) + Number(item.eOrderQty || 0);
-            //   $('#min_qty' + row).val(totalOriginalQty.toFixed(0));
-
-            //   $.ajax({
-            //     url: '<?= admin_url('DeliveryOrder/GetItemDetails'); ?>',
-            //     type: 'POST',
-            //     data: {
-            //       item_id: item.ItemID
-            //     },
-            //     dataType: 'json',
-            //     success: function(res) {
-            //       if (res.status === 'success' && res.data) {
-            //         $('#item_name' + row).val(res.data.ItemName || '');
-            //         $('#uom' + row).val(res.data.unit || '');
-            //         $('#unit_weight' + row).val(Number(res.data.UnitWeight || 0).toFixed(2));
-            //         $('#gst' + row).val(Number(res.data.tax || 0));
-            //       }
-            //       // Calculate this row after item details loaded
-            //       calculateAmount(row);
-
-            //       processRow(index + 1);
-            //     },
-            //     error: function() {
-            //       calculateAmount(row);
-            //       processRow(index + 1);
-            //     }
-            //   });
-            // }
             function processRow(index) {
               if (index >= d.history.length) {
                 calculateTotals();
@@ -1724,8 +1760,7 @@
               }
 
               var item = d.history[index];
-              var isLocked = item.is_locked == 1; // ← NEW: read lock flag from response
-
+              var isLocked = item.is_locked == 1;
               addRow(2);
               var row = parseInt($('#row_id').val());
 
@@ -1741,32 +1776,22 @@
               var originalBalance = Number(item.BalanceQty || 0) + Number(item.OrderQty || 0);
               $('#min_qty' + row).val(originalBalance.toFixed(0));
 
-              // ── NEW: Apply lock styling and disable editing if locked ──
               if (isLocked) {
-                // Make dispatch_qty read-only
                 $('#dispatch_qty' + row)
                   .prop('readonly', true)
-                  .prop('disabled', false) // keep enabled so value submits, just no editing
+                  .prop('disabled', false)
                   .css({
                     'background-color': '#f5f5f5',
                     'cursor': 'not-allowed',
                     'border-color': '#ccc'
                   })
-                  .off('keyup'); // remove calculate trigger
+                  .off('keyup');
 
-                // Add a lock icon to the SO No cell for visual indication
-                // $('#sr' + row).after(
-                //     '<span title="Locked: A newer Delivery Order exists for this item" ' +
-                //     'style="color:#e74c3c; margin-left:4px; font-size:12px;">🔒</span>'
-                // );
-
-                // Add a red left border to the entire row for visual cue
                 $('#dispatch_qty' + row).closest('tr').css({
                   'border-left': '3px solid #e74c3c',
                   'background-color': '#fff8f8'
                 });
               }
-              // ── END lock block ──
 
               $.ajax({
                 url: '<?= admin_url('DeliveryOrder/GetItemDetails'); ?>',
@@ -1818,7 +1843,7 @@
     var ascending = !$(this).hasClass("asc");
     $(".sortable").removeClass("asc desc");
     $(".sortable span").remove();
-    // Add sort classes and arrows
+
     $(this).addClass(ascending ? "asc" : "desc");
     $(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
     rows.sort(function(a, b) {
@@ -1935,5 +1960,8 @@
     background-color: #f5f5f5 !important;
     cursor: not-allowed !important;
     color: #999 !important;
+  }
+  #table_ListModal tbody tr:hover {
+    background-color: rgb(171, 174, 176);
   }
 </style>

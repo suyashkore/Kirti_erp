@@ -144,7 +144,7 @@
                       <?php
                       if (!empty($customer_list)) :
                         foreach ($customer_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' (' . $value['AccountID'] . ')</option>';
+                          echo '<option value="' . $value['AccountID'] . '">'. $value['company'] . ' - ' . ($value['billing_state'] ?? ''). ' (' . $value['AccountID'] . ')</option>';
                         endforeach;
                       endif;
                       ?>
@@ -401,11 +401,7 @@
           <div class="filter-group">
             <label>From Date</label>
             <div class="input-group">
-              <input type="text"
-                id="from_date"
-                name="from_date"
-                class="form-control datepicker"
-                value="<?= date("01/m/Y") ?>">
+              <input type="text" id="from_date" name="from_date" class="form-control datepicker" value="<?= date("01/m/Y") ?>">
               <div class="input-group-addon">
                 <i class="fa fa-calendar"></i>
               </div>
@@ -416,11 +412,7 @@
           <div class="filter-group">
             <label>To Date</label>
             <div class="input-group">
-              <input type="text"
-                id="to_date"
-                name="to_date"
-                class="form-control datepicker"
-                value="<?= date("d/m/Y") ?>">
+              <input type="text" id="to_date" name="to_date" class="form-control datepicker" value="<?= date("d/m/Y") ?>">
               <div class="input-group-addon">
                 <i class="fa fa-calendar"></i>
               </div>
@@ -500,8 +492,71 @@
   </div>
 </div>
 
+
+<?php
+    $fy = $this->session->userdata('finacial_year');
+    $fy_new = $fy + 1;
+    $lastdate_date = '20'.$fy_new.'-03-31';
+    $curr_date = date('Y-m-d');
+    $curr_date_new = new DateTime($curr_date);
+    $last_date_yr = new DateTime($lastdate_date);
+    if($last_date_yr < $curr_date_new){
+        $max_date_php = $lastdate_date;
+    } else {
+        $max_date_php = $curr_date;
+    }
+?>
 <?php init_tail(); ?>
 <script>
+
+$(document).ready(function(){
+    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year    = "20" + fin_y;
+    var cur_y   = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+        var fy_new   = parseInt(fin_y) + 1;
+        var fy_new_s = "20" + fy_new;
+        maxEndDate   = new Date(fy_new_s + '/03/31');
+    } else {
+        maxEndDate = new Date();
+    }
+
+    // Order Date — restricted within FY, up to today or March 31
+    $('#quotation_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+    // Delivery From — same FY restriction
+    $('#delivery_from').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+    // Delivery To — min is today, max is March 31 of FY end
+    var fy_end_year = "20" + (parseInt(fin_y) + 1);
+    var fyEndDate   = new Date(fy_end_year + '/03/31');
+
+    $('#delivery_to').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,    // can't go before FY start
+        maxDate: fyEndDate,       // always allows up to March 31 for delivery planning
+        timepicker: false
+    });
+});
+  $('#ListModal').on('shown.bs.modal', function() {
+    $('#searchBtn').trigger('click');
+  });
   $('#searchBtn').on('click', function() {
 
     var fromDate = $('#from_date').val();
@@ -627,6 +682,7 @@
     var unitRate = parseFloat($('#unit_rate' + row).val()) || 0;
     var discAmt = parseFloat($('#disc_amt' + row).val()) || 0;
     var gstPercent = parseFloat($('#gst' + row).val()) || 0;
+    $('#max_qty'+row).val(minQty+2);
 
     var taxableAmt = (unitRate - discAmt) * minQty;
     var gstAmt = taxableAmt * (gstPercent / 100);
@@ -858,7 +914,7 @@
           html = '<option value="" selected disabled>None selected</option>';
           $.each(response.broker_list, function(index, loc) {
             if (loc.AccountID == null || loc.AccountID == '') return;
-            html += `<option value="${loc.AccountID}">${loc.company} (${loc.AccountID})</option>`;
+            html += `<option value="${loc.AccountID}">${loc.company} -${loc.billing_state} (${loc.AccountID})</option>`;
           });
           $('#broker_id').html(html);
 
@@ -976,7 +1032,7 @@
           } else {
             $('#table_ListModal tbody').prepend(html);
           }
-          
+
         } else {
           alert_float('warning', response.message);
         }
@@ -1157,5 +1213,11 @@
 
   .search-btn:hover {
     background: #168ac0;
+  }
+  #table_ListModal tbody tr {
+    cursor: pointer;
+  }
+  #table_ListModal tbody tr:hover {
+    background-color: rgb(171, 174, 176);
   }
 </style>

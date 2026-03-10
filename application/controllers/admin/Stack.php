@@ -16,12 +16,13 @@ class Stack extends AdminController
         if (!has_permission_new('StackMaster', '', 'view')) {
             access_denied('Stack Master');
         }
+        $data['title'] = 'Stack Master';
 
         $data['table_data'] = $this->StackMaster_Model->get_StackMaster_data();
 
         $data['godown'] = $this->StackMaster_Model->get_GodownMaster_data();
 
-        $data['chamber'] = $this->StackMaster_Model->get_ChamberMaster_data();
+        // $data['chamber'] = $this->StackMaster_Model->get_ChamberMaster_data();
 
 
         $this->load->view('admin/Stack/AddEditStack.php', $data);
@@ -55,6 +56,15 @@ class Stack extends AdminController
             echo json_encode(null);
         }
     }
+
+    // Get Chambers by GodownID
+public function GetChambersByGodown()
+{
+    $GodownID = $this->input->post('GodownID');
+    $chambers = $this->StackMaster_Model->get_ChambersByGodown($GodownID);
+    $this->output->set_content_type('application/json');
+    echo json_encode($chambers);
+}
 
 
     /* Save New  Stack / ajax */

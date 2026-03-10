@@ -144,6 +144,59 @@ class Quotation extends AdminController
 			$quotation_no = 'PQ'.$FY.$PlantID.$quote_count;
 		}
 
+		// =============================================
+		// Financial Year Date Validation
+		// =============================================
+		$FY_int      = (int) $FY;
+		$fy_start    = '20' . str_pad($FY_int, 2, '0', STR_PAD_LEFT) . '-04-01';          // e.g. 2024-04-01
+		$fy_end      = '20' . str_pad($FY_int + 1, 2, '0', STR_PAD_LEFT) . '-03-31';      // e.g. 2025-03-31
+
+		$today       = date('Y-m-d');
+		// Max allowed for order/delivery_from: lesser of today or FY end
+		$max_txn_date = ($fy_end < $today) ? $fy_end : $today;
+
+		// --- quotation_date check ---
+		if ($quotation_date < $fy_start || $quotation_date > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Quotation Date (' . date('d/m/Y', strtotime($quotation_date)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+
+		// --- delivery_from check ---
+		if ($delivery_from < $fy_start || $delivery_from > $max_txn_date) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery From Date (' . date('d/m/Y', strtotime($delivery_from)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($max_txn_date)) . ').'
+			]);
+			return;
+		}
+
+		// --- delivery_to check (allows up to FY end for future scheduling) ---
+		if ($delivery_to < $fy_start || $delivery_to > $fy_end) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery To Date (' . date('d/m/Y', strtotime($delivery_to)) . ') is outside the allowed financial year range ('
+					. date('d/m/Y', strtotime($fy_start)) . ' to ' . date('d/m/Y', strtotime($fy_end)) . ').'
+			]);
+			return;
+		}
+
+		// --- delivery_to must not be before delivery_from ---
+		if ($delivery_to < $delivery_from) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Delivery To Date (' . date('d/m/Y', strtotime($delivery_to)) . ') cannot be earlier than Delivery From Date (' . date('d/m/Y', strtotime($delivery_from)) . ').'
+			]);
+			return;
+		}
+		// =============================================
+		// End of Date Validation
+		// =============================================
+
 		$insertData = [
 			'PlantID' => $PlantID,
 			'FY' => $FY,
@@ -198,7 +251,9 @@ class Quotation extends AdminController
 				'uom' => $data['uom'] ?? [],
 				'quantity' => $data['min_qty'] ?? [],
 				'amount' => $data['amount'] ?? [],
-				'gst' => $data['gst'] ?? []
+				'gst' => $data['gst'] ?? [],
+				'TType' => 'P',
+				'TType2' => 'Quotation'
 			];
 			$this->Quotation_model->saveMultiData($multi_insert_data);
 
@@ -251,15 +306,15 @@ class Quotation extends AdminController
       $limit  = $data['limit'] ?? 100;
       $offset = $data['offset'] ?? 0;
       if($data['from_date']){
-        $data['from_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['from_date'])));
+        $data['from_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['from_date']))).' 00:00:00';
       }else{
-        $data['from_date'] = date('Y-m-01');
+        $data['from_date'] = date('Y-m-01 00:00:00');
       }
       
       if($data['to_date']){
-        $data['to_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['to_date'])));
+        $data['to_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['to_date']))).' 23:59:59';
       }else{
-        $data['to_date'] = date('Y-m-d');
+        $data['to_date'] = date('Y-m-d 23:59:59');
       }
       
       $result  = $this->Quotation_model->getListByFilter($data, $limit, $offset);

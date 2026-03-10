@@ -13,6 +13,9 @@ th { background: #50607b; color: #fff !important; }
 .total-label-row .total-display { flex: 1; padding: 0; text-align: right; font-weight: 600; }
 .fixed-td { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .get_Details.processing { pointer-events: none; opacity: 0.9; }
+@media only screen and (max-width: 600px) {
+  #header ul { display: none !important; }
+}
 </style>
 <div id="wrapper">
   <div class="content">
@@ -40,7 +43,7 @@ th { background: #50607b; color: #fff !important; }
                       <?php
                       if (!empty($vendor_list)) :
                         foreach ($vendor_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' ('.$value['AccountID'].')</option>';
+                          echo '<option value="'.$value['AccountID'].'">'.$value['company'].' - '.$value['billing_state'].' ('.$value['AccountID'].')</option>';
                         endforeach;
                       endif;
                       ?>
@@ -85,6 +88,14 @@ th { background: #50607b; color: #fff !important; }
                     </select>
                   </div>
                 </div>
+								<div class="col-md-2 mbot5">
+                  <div class="form-group" app-field-wrapper="godown_id">
+                    <label for="godown_id" class="control-label"><small class="req text-danger">* </small> Godown</label>
+                    <select name="godown_id" id="godown_id" class="form-control selectpicker" data-live-search="true" app-field-label="Godown" required>
+                      <option value="" selected>None selected</option>
+                    </select>
+                  </div>
+                </div>
                 
                 <div class="col-md-12 mbot5">
                   <h4 class="bold p_style">Items / Services:</h4>
@@ -101,7 +112,7 @@ th { background: #50607b; color: #fff !important; }
 												<th>Unit Wt (Kg)</th>
 												<th>Min Qty</th>
 												<th>Max Qty</th>
-												<th>Disc Amt</th>
+												<th>Disc Amt/Unit</th>
 												<th>Unit Rate</th>
 												<th>GST %</th>
 												<th>Amount</th>
@@ -244,6 +255,9 @@ th { background: #50607b; color: #fff !important; }
           <div class="row">
             <div class="col-md-2 mbot5">
               <div class="form-group" app-field-wrapper="from_date">
+                <?= render_date_input('from_date', 'From Date', date('01/m/Y'), []); ?>
+              </div>
+              <!-- <div class="form-group" app-field-wrapper="from_date">
                 <label for="from_date" class="control-label">From Date</label>
                 <div class="input-group date">
                   <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y")?>" app-field-label="From Date" onchange="resetForm();">
@@ -251,10 +265,13 @@ th { background: #50607b; color: #fff !important; }
                     <i class="fa-regular fa-calendar calendar-icon"></i>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
             <div class="col-md-2 mbot5">
               <div class="form-group" app-field-wrapper="to_date">
+                <?= render_date_input('to_date', 'To Date', date('d/m/Y'), []); ?>
+              </div>
+              <!-- <div class="form-group" app-field-wrapper="to_date">
                 <label for="to_date" class="control-label">To Date</label>
                 <div class="input-group date">
                   <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y")?>" app-field-label="To Date" onchange="resetForm();">
@@ -262,7 +279,7 @@ th { background: #50607b; color: #fff !important; }
                     <i class="fa-regular fa-calendar calendar-icon"></i>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
             <div class="col-md-5 mbot5" style="padding-top: 20px;">
               <input type="hidden" name="vendor_id">
@@ -316,8 +333,63 @@ th { background: #50607b; color: #fff !important; }
   </div>
 </div>
 
+<?php
+    $fy = $this->session->userdata('finacial_year');
+    $fy_new = $fy + 1;
+    $lastdate_date = '20'.$fy_new.'-03-31';
+    $curr_date = date('Y-m-d');
+    $curr_date_new = new DateTime($curr_date);
+    $last_date_yr = new DateTime($lastdate_date);
+    if($last_date_yr < $curr_date_new){
+        $max_date_php = $lastdate_date;
+    } else {
+        $max_date_php = $curr_date;
+    }
+?>
 <?php init_tail(); ?>
 <script>
+
+$(document).ready(function(){
+    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year    = "20" + fin_y;
+    var cur_y   = new Date().getFullYear().toString().substr(-2);
+
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+        var fy_new   = parseInt(fin_y) + 1;
+        var fy_new_s = "20" + fy_new;
+        maxEndDate   = new Date(fy_new_s + '/03/31');
+    } else {
+        maxEndDate = new Date();
+    }
+
+    // Order Date — restricted within FY, up to today or March 31
+    $('#inwards_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+    $('#from_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+    $('#to_date').datetimepicker({
+        format: 'd/m/Y',
+        minDate: minStartDate,
+        maxDate: maxEndDate,
+        timepicker: false
+    });
+
+});
+  
   $(document).ready(function() {
     setTimeout(() => {
       $('#filter_list_form').submit();
@@ -437,6 +509,7 @@ th { background: #50607b; color: #fff !important; }
     var unitRate = parseFloat($('#unit_rate'+row).val()) || 0;
     var discAmt = parseFloat($('#disc_amt'+row).val()) || 0;
     var gstPercent = parseFloat($('#gst'+row).val()) || 0;
+    $('#max_qty'+row).val(minQty+2);
 
     var taxableAmt = (unitRate - discAmt) * minQty;
     var gstAmt = taxableAmt * (gstPercent / 100);
@@ -553,6 +626,8 @@ th { background: #50607b; color: #fff !important; }
 	}
 
   function getVendorDetails(vendor_id, callback = null) {
+    $('#items_body').html('');
+    $('#row_id').val(0);
     $.ajax({
       url: '<?= admin_url('purchase/Inwards/getVendorDetails'); ?>',
       type: 'POST',
@@ -643,6 +718,11 @@ th { background: #50607b; color: #fff !important; }
             html += '<option value="' + val.ItemId + '">' + val.ItemName + '</option>';
 						});
           $('#item_id').html(html);
+          var html = '<option value="" selected disabled>Select Item</option>';
+          $.each(response.godown_list, function (index, val) {
+            html += '<option value="' + val.id + '">' + val.GodownName + '</option>';
+						});
+          $('#godown_id').html(html);
           $('.selectpicker').selectpicker('refresh');
 
           if(form_mode == 'add'){
@@ -780,9 +860,10 @@ th { background: #50607b; color: #fff !important; }
               $('#unit_rate'+(i+1)).val(Number(history[i].BasicRate));
               $('#disc_amt'+(i+1)).val(Number(history[i].DiscAmt));
               $('#amount'+(i+1)).val(Number(history[i].NetOrderAmt));
-              $('.selectpicker').selectpicker('refresh');
               calculateAmount(i+1);
             }
+            $('#godown_id').val(d.GodownID);
+            $('.selectpicker').selectpicker('refresh');
           });
           $('#inwards_no').val(d.InwardsID);
           $('#inwards_date').val(moment(d.TransDate).format('DD/MM/YYYY'));

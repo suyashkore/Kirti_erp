@@ -3743,14 +3743,14 @@ class Clients extends AdminController
         // Check if GSTIN already exists in database
         $existing_client = $this->clients_model->check_gstin_exists($gstin, $exclude_userid);
 
-        // if ($existing_client) {
-        //     echo json_encode([
-        //         'status' => 'duplicate',
-        //         'message' => 'GSTIN already exists in the system for: ' . $existing_client['company'],
-        //         'existing_record' => $existing_client
-        //     ]);
-        //     return;
-        // }
+        if ($existing_client) {
+            echo json_encode([
+                'status' => 'duplicate',
+                'message' => 'GSTIN already exists in the system for: ' . $existing_client['company'],
+                'existing_record' => $existing_client
+            ]);
+            return;
+        }
 
         $curl = curl_init();
 

@@ -305,64 +305,6 @@
     $('.selectpicker').selectpicker('refresh');
   }
 
-  $('#filter_list_form').submit(function(e) {
-    e.preventDefault();
-
-    let form = this;
-    let limit = 1;
-    let offset = 0;
-    let totalRecords = 0;
-    let loadedRecords = 0;
-    $('#searchBtn').prop('disabled', true);
-    $('#table-list tbody').html('');
-    $('#recordCount').hide();
-
-    function fetchChunk() {
-      var form_data = new FormData(form);
-      form_data.append('offset', offset);
-      form_data.append(
-        '<?= $this->security->get_csrf_token_name(); ?>',
-        $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
-      );
-
-      $.ajax({
-        url: "<?= admin_url('VehicleInPremises/VehicleInPremisesList') ?>",
-        type: "POST",
-        data: form_data,
-        processData: false,
-        contentType: false,
-        success: function(res) {
-          let json = JSON.parse(res);
-          if (!json.success) {
-            $('#searchBtn').prop('disabled', false);
-            if (offset === 0) {
-              $('#table-list tbody').html(
-                '<tr><td colspan="8" class="text-center">No Data Found</td></tr>'
-              );
-            }
-            return;
-          }
-          if (offset === 0) {
-            totalRecords = parseInt(json.total) || 0;
-          }
-          if (json.rows && json.rows.length > 0) {
-            appendRows(json.rows);
-            loadedRecords += json.rows.length;
-            offset += limit;
-          }
-          updateProgress(loadedRecords, totalRecords);
-          if (loadedRecords >= totalRecords) {
-            $('#searchBtn').prop('disabled', false);
-            $('#fetchProgress').css('width', '0%');
-            return;
-          }
-          fetchChunk();
-        }
-      });
-    }
-    fetchChunk();
-  });
-
   function appendRows(rows) {
     const statusMap = {
       1: 'Gate In Generate',

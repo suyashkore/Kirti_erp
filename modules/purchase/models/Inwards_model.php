@@ -61,7 +61,7 @@ class Inwards_model extends App_Model
 
   public function getVendorDropdownByPO() {
     $this->db->distinct();
-    $this->db->select('c.userid, c.AccountID, c.company');
+    $this->db->select('c.userid, c.AccountID, c.company, c.billing_state');
     $this->db->from(db_prefix().'clients c');
     $this->db->join( db_prefix().'AccountSubGroup2 a', 'a.SubActGroupID = c.ActSubGroupID2', 'inner' );
     $this->db->join( db_prefix().'PurchaseOrderMaster pom', 'pom.AccountID = c.AccountID AND pom.Status != 6', 'inner' );
@@ -123,6 +123,8 @@ class Inwards_model extends App_Model
     }
 
     for($i=0; $i<count($data['item_id']); $i++){
+      $itemData = $this->db->select('*')->from(db_prefix().'items')->where(['ItemID' => $data['item_id'][$i]])->get()->row();
+
       $gst_percent = floatval($data['gst'][$i]) ?? 0;
       $taxable_amt = ((floatval($data['unit_rate'][$i]) ?? 0) - (floatval($data['disc_amt'][$i]) ?? 0) ) * (floatval($data['quantity'][$i]) ?? 0);
       
@@ -136,29 +138,36 @@ class Inwards_model extends App_Model
       }
       
       $item_data = [
-        'OrderID' => $data['inwards_no'],
-        'PlantID' => $data['plant_id'],
-        'FY' => $data['fy'],
-        'TransDate' => $data['inwards_date'] ?? date('Y-m-d'),
-        'AccountID' => $data['vendor_id'] ?? '',
-        'ItemID' => $data['item_id'][$i],
-        'BasicRate' => $data['unit_rate'][$i],
-        'SaleRate' => ($data['unit_rate'][$i] * $gst_percent) / 100,
-        'SuppliedIn' => $data['uom'][$i],
-        'UnitWeight' => $data['unit_weight'][$i],
-        'WeightUnit' => $data['uom'][$i],
-        'OrderQty' => $data['quantity'][$i],
-        'DiscAmt' => $data['disc_amt'][$i],
-        'cgst' => $cgst,
-        'cgstamt' => $cgstamt,
-        'sgst' => $sgst,
-        'sgstamt' => $sgstamt,
-        'igst' => $igst,
-        'igstamt' => $igstamt,
-        'OrderAmt' => $data['quantity'][$i] * $data['unit_rate'][$i],
+        'OrderID'     => $data['inwards_no'],
+        'PlantID'     => $data['plant_id'],
+        'FY'          => $data['fy'],
+        'TransDate'   => $data['inwards_date'] ?? date('Y-m-d'),
+				'TType'       => $data['TType'],
+				'TType2'      => $data['TType2'],
+				'GodownID'    => $data['GodownID'],
+        'AccountID'   => $data['vendor_id'] ?? '',
+        'ItemID'      => $data['item_id'][$i],
+        'BasicRate'   => $data['unit_rate'][$i],
+        'SaleRate'    => ($data['unit_rate'][$i] * ($gst_percent / 100)),
+        'SuppliedIn'  => $data['uom'][$i],
+        'UnitWeight'  => $data['unit_weight'][$i],
+        'WeightUnit'  => $data['uom'][$i],
+        'CaseQty'     => (int)($itemData->MinOrderQty ?? 0),
+        'OrderQty'    => $data['quantity'][$i],
+        'Cases'       => ((int)$data['quantity'][$i] - (int)($itemData->MinOrderQty ?? 0)),
+        'DiscAmt'     => $data['disc_amt'][$i],
+        'DiscPerc'    => (($data['disc_amt'][$i] / $data['unit_rate'][$i]) * 100),
+        'cgst'        => $cgst,
+        'cgstamt'     => $cgstamt,
+        'sgst'        => $sgst,
+        'sgstamt'     => $sgstamt,
+        'igst'        => $igst,
+        'igstamt'     => $igstamt,
+        'OrderAmt'    => $data['quantity'][$i] * $data['unit_rate'][$i],
         'NetOrderAmt' => $data['amount'][$i],
-        'Ordinalno' =>  $i,
+        'Ordinalno'   =>  $i+1,
       ];
+
       if($data['item_uid'][$i] == 0){
         $item_data['UserID'] = $this->session->userdata('username');
         $item_data['TransDate2'] = date('Y-m-d H:i:s');
@@ -210,7 +219,7 @@ class Inwards_model extends App_Model
   }
 
   public function getInwardsDetailsPrint($id){
-    $this->db->select(' pm.*,  pom.TransDate as PODate,  c.company, c.billing_address, c.billing_city, c.billing_state, c.GSTIN, gm.id as gatein_id, gm.GateINID as gatein_no, gm.VehicleNo, pld.LocationName,  sl.state_name,  itm.ItemTypeName,  icm.CategoryName,  cwsd.ShippingCity,  cl.city_name,  ft.FreightTerms ', FALSE);
+    $this->db->select(' pm.*,  pom.TransDate as PODate,  c.company, c.billing_address, c.billing_city, c.billing_state, c.GSTIN, gm.id as gatein_id, gm.GateINID as gatein_no, gm.VehicleNo, pld.LocationName,  sl.state_name,  itm.ItemTypeName,  icm.CategoryName,  cwsd.ShippingCity,  cl.city_name,  ft.FreightTerms, gdm.GodownName ', FALSE);
 
     $this->db->from(db_prefix().'PurchInwardsMaster pm');
     // String joins (disable escaping)
@@ -225,6 +234,7 @@ class Inwards_model extends App_Model
     $this->db->join(db_prefix().'clientwiseshippingdata cwsd', 'cwsd.id = pm.VendorLocation', 'left');
     $this->db->join(db_prefix().'xx_citylist cl', 'cl.id = cwsd.ShippingCity', 'left');
     $this->db->join(db_prefix().'FreightTerms ft', 'ft.Id = pm.FreightTerms', 'left');
+    $this->db->join(db_prefix().'godownmaster gdm', 'gdm.Id = pm.GodownID', 'left');
 
     if (is_numeric($id)) {
       $this->db->where('pm.id', $id);
@@ -238,7 +248,11 @@ class Inwards_model extends App_Model
       return null;
     }
 
-    $history = $this->db->where('OrderID', $master->InwardsID)->get(db_prefix().'history')->result();
+    $this->db->select('h.*, i.ItemName as item_name');
+    $this->db->from(db_prefix().'history h');
+    $this->db->join(db_prefix().'items i', 'i.ItemID = h.ItemID', 'left');
+    $this->db->where('h.OrderID', $master->InwardsID);
+    $history = $this->db->get()->result();
 
     $master->history = $history;
 
@@ -371,14 +385,17 @@ class Inwards_model extends App_Model
     return $this->db->get()->row();
   }
 
-  public function getGateInListByFilter($data, $limit, $offset)
-  {
+  public function getGateInListByFilter($data, $limit, $offset, $list=null){
     $from_date  = $data['from_date'] ?? date('Y-m-01');
     $to_date    = $data['to_date'] ?? date('Y-m-d');
 
     $this->db->from(db_prefix().'GateMaster g');
     $this->db->join(db_prefix().'PlantLocationDetails pld', 'pld.id = g.LocationID', 'left');
-    $this->db->where('g.InwardID !=', null);
+    if($list != null){
+      $this->db->where('g.InwardID', null);
+    }else{
+      $this->db->where('g.InwardID !=', null);
+    }
     
     if($from_date != '')       $this->db->where('g.TransDate >=', $from_date);
     if($to_date != '')         $this->db->where('g.TransDate <=', $to_date);
@@ -447,5 +464,49 @@ class Inwards_model extends App_Model
     }
 
     return $iqpRows;
+  }
+
+  public function getStackQcDetails($GateINID){
+    $this->db->select('st.*, i.UnitWeightIn');
+    $this->db->from(db_prefix().'stockInventory st');
+    $this->db->join(db_prefix().'items i', 'i.ItemID = st.ItemID', 'left');
+    $this->db->where('st.GateINID', $GateINID);
+    $stacks = $this->db->get()->result_array();
+    $result = [];
+    foreach ($stacks as $row) {
+      $stack = [
+        'id'      => $row['id'],
+        'item_id' => $row['ItemID'],
+        'godown'  => $row['WHID'],
+        'chamber' => $row['CHID'],
+        'stack'   => $row['StackID'],
+        'lot'     => $row['LOTID'],
+        'weight'  => $row['Weight'],
+        'bag_qty' => $row['BagQty'],
+        'uom'     => $row['UnitWeightIn'],
+        'qc'      => []
+      ];
+
+      $this->db->where('GateINID', $GateINID);
+      $this->db->where('layer_number', $row['id']);
+
+      $qcRows = $this->db->get(db_prefix().'QCParameterValues')->result_array();
+
+      foreach ($qcRows as $qc) {
+
+        $stack['qc'][] = [
+          'id'           => $qc['id'],
+          'parameter_id' => $qc['ItemParameterID'],
+          'value'        => $qc['ParameterValue'],
+          'evalue'       => $qc['EParameterValue'],
+          'hvalue'       => $qc['HParameterValue'],
+          'deductionamt' => $qc['deductionAmt']
+        ];
+      }
+
+      $result[] = $stack;
+    }
+
+    return $result;
   }
 }

@@ -745,17 +745,27 @@ class Purchase_model extends App_Model
 	}
 
 	public function get_AccountDetails($AccountID)
-	{
-		$this->db->select(
-			db_prefix() . 'clients.*'
-		);
+{
+    $this->db->select(
+        db_prefix() . 'clients.*,' .
+        db_prefix() . 'countries.country_id,' .
+        db_prefix() . 'countries.long_name as country_name,' .
+        db_prefix() . 'countries.iso2 as country_iso2,' .
+        db_prefix() . 'countries.calling_code as country_calling_code'
+    );
 
-		$this->db->from(db_prefix() . 'clients');
+    $this->db->from(db_prefix() . 'clients');
 
-		$this->db->where(db_prefix() . 'clients.AccountID', $AccountID);
+    $this->db->join(
+        db_prefix() . 'countries',
+        db_prefix() . 'countries.country_id = ' . db_prefix() . 'clients.billing_country',
+        'left'
+    );
 
-		return $this->db->get()->result_array();
-	}
+    $this->db->where(db_prefix() . 'clients.AccountID', $AccountID);
+
+    return $this->db->get()->result_array();
+}
 
 
 	public function gettdspercent_new($Tdsselection)
@@ -830,7 +840,7 @@ class Purchase_model extends App_Model
 			'FavouringName' => isset($form_data['favouring_name']) ? $form_data['favouring_name'] : null,
 			'PAN' => isset($form_data['Pan']) ? $form_data['Pan'] : (isset($form_data['Pan']) ? $form_data['Pan'] : null),
 			'GSTIN' => isset($form_data['vat']) ? $form_data['vat'] : null,
-			'billing_country' => (isset($form_data['billing_country']) && is_numeric($form_data['billing_country'])) ? (int) $form_data['billing_country'] : (isset($form_data['country']) && is_numeric($form_data['country']) ? (int) $form_data['country'] : null),
+			'billing_country' => (isset($form_data['billing_country']) && is_numeric($form_data['billing_country'])) ? (int) $form_data['billing_country'] : (isset($form_data['billing_country']) && is_numeric($form_data['billing_country']) ? (int) $form_data['billing_country'] : null),
 			'billing_state' => isset($form_data['state']) ? $form_data['state'] : null,
 			'billing_city' => isset($form_data['city']) ? $form_data['city'] : null,
 			'billing_zip' => isset($form_data['zip']) ? $form_data['zip'] : null,
@@ -873,7 +883,7 @@ class Purchase_model extends App_Model
 
 
 			// Active/Blocked Status
-			'IsActive' => isset($form_data['active']) ? $form_data['active'] : (isset($form_data['Blockyn']) ? $form_data['Blockyn'] : null),
+			'IsActive' => isset($form_data['active']) ? $form_data['active'] : '',
 			'DeActiveReason' => isset($form_data['blocked_reason']) ? $form_data['blocked_reason'] : null,
 
 			'CreatedBy' => is_staff_logged_in() ? get_staff_user_id() : 0,
@@ -1378,6 +1388,9 @@ class Purchase_model extends App_Model
 		// die;
 
 		// Map form fields to database column names - only non-null values
+		// echo"";
+		// print_r($form_data);die;
+
 
 		$data = [
 
@@ -1394,6 +1407,7 @@ class Purchase_model extends App_Model
 			'GSTType' => isset($form_data['gsttype']) ? $form_data['gsttype'] : null,
 
 			'billing_country' => isset($form_data['billing_country']) ? $form_data['billing_country'] : null,
+			// 'billing_country' => (isset($form_data['billing_country']) && is_numeric($form_data['billing_country'])) ? (int) $form_data['billing_country'] : (isset($form_data['billing_country']) && is_numeric($form_data['billing_country']) ? (int) $form_data['billing_country'] : null),
 
 			'billing_state' => isset($form_data['state']) ? $form_data['state'] : null,
 
@@ -1405,7 +1419,7 @@ class Purchase_model extends App_Model
 
 			'MobileNo' => isset($form_data['phonenumber']) ? $form_data['phonenumber'] : null,
 
-			'AltMobileNo' => isset($form_data['altphonenumber']) ? $form_data['altphonenumber'] : null,
+			'AltMobileNo' => isset($form_data['telephone']) ? $form_data['telephone'] : null,
 
 			'Email' => isset($form_data['email']) ? $form_data['email'] : null,
 
@@ -1456,6 +1470,8 @@ class Purchase_model extends App_Model
 			'latitude' => isset($form_data['latitude']) ? $form_data['latitude'] : null,
 
 			'default_language' => isset($form_data['default_language']) ? $form_data['default_language'] : null,
+
+			'IsActive' => isset($form_data['active']) ? $form_data['active'] : '',
 
 			'default_currency' => isset($form_data['default_currency']) ? $form_data['default_currency'] : null,
 
@@ -15469,74 +15485,76 @@ class Purchase_model extends App_Model
 
 	}
 
-	public function table_data($data)
-	{
+	// public function table_data($data)
+	// {
 
-		$SubActGroupID = array('100023');
+	// 	$SubActGroupID = array('100023');
 
-		$this->db->select('GROUP_CONCAT(QUOTE(SubActGroupID)) as SubActGroupIDs');
+	// 	$this->db->select('GROUP_CONCAT(QUOTE(SubActGroupID)) as SubActGroupIDs');
 
-		$this->db->where_in(db_prefix() . 'accountgroupssub.SubActGroupID1', $SubActGroupID);
-
-		$this->db->where(db_prefix() . 'accountgroupssub.IsVendor', 'Y');
-
-		$Data = $this->db->get('tblAccountSubGroup2')->row();
+	// 	// $this->db->where_in(db_prefix() . 'accountgroupssub.SubActGroupID1', $SubActGroupID);
+	// 	$this->db->where_in(db_prefix() . 'AccountSubGroup.SubActGroupID1', $SubActGroupID);
 
 
+	// 	$this->db->where(db_prefix() . 'accountgroupssub.IsVendor', 'Y');
 
-		$commaSeparatedSubActGroupIDs = $Data->SubActGroupIDs;
+	// 	$Data = $this->db->get('tblAccountSubGroup2')->row();
 
 
 
-
-
-		$states = $data['states'];
-
-		$status = $data['status'];
-
-		$selected_company = $this->session->userdata('root_company');
+	// 	$commaSeparatedSubActGroupIDs = $Data->SubActGroupIDs;
 
 
 
-		$SQL = '';
 
-		$SQL .= 'SELECT tblclients.AccountID as AccountID,tblclients.vat,tblAccountSubGroup2.SubActGroupName,
 
-			company,state,address,StationName,city,tblclients.active as actstatus,tblxx_statelist.state_name,tblclients.acc_name AS acc_name,tblclients.zip AS zip,tblclients.phonenumber AS phonenumber,tblclients.altphonenumber AS altphonenumber,tblcontacts.email AS email,tblclients.city AS city, (SELECT GROUP_CONCAT(name SEPARATOR ",") FROM tblcustomers_groups WHERE tblcustomers_groups.id = tblclients.DistributorType) as customerGroups
+	// 	$states = $data['states'];
 
-			FROM tblclients
+	// 	$status = $data['status'];
 
-			LEFT JOIN tblxx_statelist ON tblxx_statelist.short_name = tblclients.state
-
-			INNER JOIN tblcontacts ON tblclients.PlantID =tblcontacts.PlantID AND tblclients.AccountID=tblcontacts.AccountID 
-
-			INNER JOIN tblAccountSubGroup2 ON tblAccountSubGroup2.SubActGroupID =tblclients.SubActGroupID';
-
-		$SQL .= ' WHERE `tblclients`.`PlantID` = ' . $selected_company . '
-
-			AND tblclients.SubActGroupID IN(' . $commaSeparatedSubActGroupIDs . ')';
+	// 	$selected_company = $this->session->userdata('root_company');
 
 
 
-		if ($states != '') {
+	// 	$SQL = '';
 
-			$SQL .= '  AND `tblclients`.`state` = "' . $states . '"';
+	// 	$SQL .= 'SELECT tblclients.AccountID as AccountID,tblclients.vat,tblAccountSubGroup2.SubActGroupName,
 
-		}
+	// 		company,state,address,StationName,city,tblclients.active as actstatus,tblxx_statelist.state_name,tblclients.acc_name AS acc_name,tblclients.zip AS zip,tblclients.phonenumber AS phonenumber,tblclients.altphonenumber AS altphonenumber,tblcontacts.email AS email,tblclients.city AS city, (SELECT GROUP_CONCAT(name SEPARATOR ",") FROM tblcustomers_groups WHERE tblcustomers_groups.id = tblclients.DistributorType) as customerGroups
 
-		if ($status != '') {
+	// 		FROM tblclients
 
-			$SQL .= '  AND `tblclients`.`active` = ' . $status;
+	// 		LEFT JOIN tblxx_statelist ON tblxx_statelist.short_name = tblclients.state
 
-		}
+	// 		INNER JOIN tblcontacts ON tblclients.PlantID =tblcontacts.PlantID AND tblclients.AccountID=tblcontacts.AccountID 
 
-		$SQL .= ' ORDER BY `tblclients`.`AccountID` ASC';
+	// 		INNER JOIN tblAccountSubGroup2 ON tblAccountSubGroup2.SubActGroupID =tblclients.SubActGroupID';
 
-		$query = $this->db->query($SQL);
+	// 	$SQL .= ' WHERE `tblclients`.`PlantID` = ' . $selected_company . '
 
-		return $query->result_array();
+	// 		AND tblclients.SubActGroupID IN(' . $commaSeparatedSubActGroupIDs . ')';
 
-	}
+
+
+	// 	if ($states != '') {
+
+	// 		$SQL .= '  AND `tblclients`.`state` = "' . $states . '"';
+
+	// 	}
+
+	// 	if ($status != '') {
+
+	// 		$SQL .= '  AND `tblclients`.`active` = ' . $status;
+
+	// 	}
+
+	// 	$SQL .= ' ORDER BY `tblclients`.`AccountID` ASC';
+
+	// 	$query = $this->db->query($SQL);
+
+	// 	return $query->result_array();
+
+	// }
 
 
 
@@ -18955,6 +18973,17 @@ class Purchase_model extends App_Model
 			return ($val !== null && $val !== '') ? $val : $default;
 		};
 
+			$vendor_id = $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : '');
+
+			$tds_query = $this->db->select('TDSSection, TDSPer')
+								->where('AccountID', $vendor_id)
+								->get('tblclients')
+								->row();
+
+			$tds_section = $tds_query ? $tds_query->TDSSection : '';
+			$tds_per     = $tds_query ? $tds_query->TDSPer : 0;
+			// echo"";print_r($tds_section);die;
+
 		$update_data = [
 			'PlantID' => $plant,
 			'FY' => $fy,
@@ -18988,6 +19017,8 @@ class Purchase_model extends App_Model
 			'Attachment' => isset($data['attachment']) && !is_array($data['attachment']) ? $data['attachment'] : '',
 			'NetAmt' => $scalarNum(isset($data['net_amt']) ? $data['net_amt'] : 0, 0),
 			'UserID' => $user,
+			'TDSSection'=> $tds_section,
+			'TDSPercentage' => $tds_per,
 			'Lupdate' => date('Y-m-d H:i:s'),
 		];
 
@@ -19105,7 +19136,7 @@ class Purchase_model extends App_Model
 	{
 
 		// $this->db->truncate('tblPurchaseOrderMaster');
-// 		$this->db->truncate('tblhistory');
+        //  $this->db->truncate('tblhistory');
 		// $this->db->truncate('tblcontacts');
 		// $this->db->truncate('tblclientwiseshippingdata');
 		// die;
@@ -19125,6 +19156,16 @@ class Purchase_model extends App_Model
 			return ($val !== null && $val !== '') ? $val : $default;
 		};
 
+		// TDS Details fetch karo vendor_id varun
+			$vendor_id = $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : '');
+
+			$tds_query = $this->db->select('TDSSection, TDSPer')
+								->where('AccountID', $vendor_id)
+								->get('tblclients')
+								->row();
+
+			$tds_section = $tds_query ? $tds_query->TDSSection : '';
+			$tds_per     = $tds_query ? $tds_query->TDSPer : 0;
 
 		$insert_data = [
 			'PlantID' => $plant,
@@ -19160,6 +19201,8 @@ class Purchase_model extends App_Model
 			'Attachment' => isset($data['attachment']) && !is_array($data['attachment']) ? $data['attachment'] : '',
 			'NetAmt' => $scalarNum(isset($data['net_amt']) ? $data['net_amt'] : 0, 0),
 			'UserID' => $user,
+			'TDSSection'=> $tds_section,
+			'TDSPercentage' => $tds_per,
 			'Lupdate' => date('Y-m-d H:i:s'),
 		];
 
@@ -26240,6 +26283,47 @@ public function GetvandocDetails($purchase_order_no)
     $this->db->where('tblPurchaseOrderMaster.PurchID', $purchase_order_no);
 
     return $this->db->get()->result_array();
+}
+
+public function getListByFilter($data, $limit, $offset)
+{
+    $state    = $data['state']    ?? '';
+    $IsActive = $data['IsActive'] ?? 'Y';
+
+    // SELECT must come before count
+    $this->db->select(db_prefix() . 'clients.*, ' . db_prefix() . 'clients.company as customer_name,tblxx_statelist.state_name as state');
+    $this->db->from(db_prefix() . 'clients');
+
+    // JOIN must come before count
+    $this->db->join(
+        db_prefix() . 'AccountSubGroup2',
+        db_prefix() . 'AccountSubGroup2.SubActGroupID = ' . db_prefix() . 'clients.ActSubGroupID2',
+        'LEFT'
+    );
+
+	$this->db->join(
+        db_prefix() . 'xx_statelist',
+        db_prefix() . 'xx_statelist.short_name = ' . db_prefix() . 'clients.billing_state',
+        'LEFT'
+    );
+    // WHERE conditions must come before count
+    $this->db->where(db_prefix() . 'AccountSubGroup2.IsVendor', 'Y');
+
+    if ($state    != '') $this->db->where(db_prefix() . 'xx_statelist.state_name', $state);
+    if ($IsActive != '') $this->db->where(db_prefix() . 'clients.IsActive', $IsActive);
+
+    // Count AFTER all conditions are set, FALSE = don't reset query
+    $total = $this->db->count_all_results('', FALSE);
+
+    // Now apply order + pagination
+    $this->db->limit($limit, $offset);
+
+    $rows = $this->db->get()->result_array();
+
+    return [
+        'total' => $total,
+        'rows'  => $rows
+    ];
 }
 
 }

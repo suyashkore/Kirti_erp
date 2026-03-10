@@ -75,7 +75,7 @@ $html .= '<tr style="background-color:#f2f2f2;">
     <td style="border:1px solid #000;" align="center"><b>UOM</b></td>
     <td style="border:1px solid #000;" align="center"><b>Pack Qty</b></td>
     <td style="border:1px solid #000;" align="center"><b>Pack Wt (kg)</b></td>
-    <td style="border:1px solid #000;" align="center"><b>Purch Unit Qty</b></td>
+    <td style="border:1px solid #000;" align="center"><b>Sales Unit Qty</b></td>
     <td style="border:1px solid #000;" align="center"><b>Basic Rate</b></td>
     <td style="border:1px solid #000;" align="center"><b>Disc Amt</b></td>
     <td style="border:1px solid #000;" align="center"><b>GST %</b></td>

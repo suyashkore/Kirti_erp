@@ -105,6 +105,7 @@ class DO_model extends App_Model
   {
     $this->db->select('distinct(v.VehicleNo) as VehicleNo');
     $this->db->from(db_prefix() . 'vehicle v');
+    $this->db->where('v.IsActive', 'Y');
     $query = $this->db->get();
     return $query->result_array();
   }
@@ -201,9 +202,7 @@ class DO_model extends App_Model
         'SuppliedIn' => $data['uom'][$i],
         'UnitWeight' => $data['unit_weight'][$i],
         'WeightUnit' => $data['uom'][$i],
-
         'OrderQty' => $data['disquantity'][$i],
-
         'DiscAmt' => $data['disc_amt'][$i],
         'cgst' => $cgst,
         'cgstamt' => $cgstamt,
@@ -214,6 +213,8 @@ class DO_model extends App_Model
         'OrderAmt' => $data['quantity'][$i] * $data['unit_rate'][$i],
         'NetOrderAmt' => $data['amount'][$i],
         'Ordinalno' =>  $i + 1,
+        'TType' => 'S',
+        'TType2' => 'Delivery',
       ];
 
       if ($item_uid == 0) {
@@ -369,7 +370,7 @@ class DO_model extends App_Model
     return $master;
   }
 
-public function getDeliveryOrderDetails($id)
+  public function getDeliveryOrderDetails($id)
 {
     // ── Get Master Record ──
     $this->db->select('dom.*, c.company, icm.CategoryName');
@@ -448,16 +449,6 @@ public function getDeliveryOrderDetails($id)
     $this->db->from(db_prefix() . 'PartyBrokerMaster pbm');
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pbm.BrokerID', 'left');
     $this->db->where('pbm.AccountID', $customer_id);
-    return $this->db->get()->result_array();
-  }
-
-
-  public function getCustomerQuotationList($customer_id)
-  {
-    $this->db->select('QuotationID');
-    $this->db->from(db_prefix() . 'SalesQuotationMaster');
-    $this->db->where('AccountID', $customer_id);
-    $this->db->where('Status !=', 6);
     return $this->db->get()->result_array();
   }
 
@@ -612,160 +603,59 @@ public function getDeliveryOrderDetails($id)
     return $this->db->get('tblPlantLocationDetails')->result_array();
   }
 
-  public function getCustomerDetailByAccountID($AccountID)
-  {
-    $this->db->select(
-      'AccountID,
-			company,
-			GSTIN as gst_number,
-			PAN as pan,
-			billing_city as city,
-			billing_zip as postal_code,
-			billing_address as address,
-			tblxx_statelist.state_name as state,
-			tblcountries.long_name as country'
-    );
+  // public function getCustomerDetailByAccountID($AccountID)
+  // {
+  //   $this->db->select(
+  //     'AccountID,
+	// 		company,
+	// 		GSTIN as gst_number,
+	// 		PAN as pan,
+	// 		billing_city as city,
+	// 		billing_zip as postal_code,
+	// 		billing_address as address,
+	// 		tblxx_statelist.state_name as state,
+	// 		tblcountries.long_name as country'
+  //   );
 
-    $this->db->from(db_prefix() . 'clients');
+  //   $this->db->from(db_prefix() . 'clients');
 
-    $this->db->join('tblxx_statelist', 'clients.billing_state = tblxx_statelist.short_name', 'left');
-    $this->db->join('tblcountries', 'clients.billing_country = tblcountries.country_id', 'left');
+  //   $this->db->join('tblxx_statelist', 'clients.billing_state = tblxx_statelist.short_name', 'left');
+  //   $this->db->join('tblcountries', 'clients.billing_country = tblcountries.country_id', 'left');
 
-    $this->db->where(db_prefix() . 'clients.AccountID', $AccountID);
+  //   $this->db->where(db_prefix() . 'clients.AccountID', $AccountID);
 
-    $result = $this->db->get()->result_array();
+  //   $result = $this->db->get()->result_array();
 
-    if (!empty($result)) {
-      return array(
-        'gst_no' => $result[0]['gst_number'] ?? '',
-        'pan' => $result[0]['pan'] ?? '',
-        'country' => $result[0]['country'] ?? '',
-        'state' => $result[0]['state'] ?? '',
-        'city' => $result[0]['city'] ?? '',
-        'postal_code' => $result[0]['postal_code'] ?? '',
-        'address' => $result[0]['address'] ?? '',
-        'company' => $result[0]['company'] ?? '',
+  //   if (!empty($result)) {
+  //     return array(
+  //       'gst_no' => $result[0]['gst_number'] ?? '',
+  //       'pan' => $result[0]['pan'] ?? '',
+  //       'country' => $result[0]['country'] ?? '',
+  //       'state' => $result[0]['state'] ?? '',
+  //       'city' => $result[0]['city'] ?? '',
+  //       'postal_code' => $result[0]['postal_code'] ?? '',
+  //       'address' => $result[0]['address'] ?? '',
+  //       'company' => $result[0]['company'] ?? '',
 
-      );
-    }
+  //     );
+  //   }
 
-    return array();
-  }
+  //   return array();
+  // }
 
-  public function getShippingDatacity($AccountID)
-  {
-    $this->db->select(
-      'tblclientwiseshippingdata.id,
-			tblxx_citylist.city_name'
-    );
+  // public function getShippingDatacity($AccountID)
+  // {
+  //   $this->db->select(
+  //     'tblclientwiseshippingdata.id,
+	// 		tblxx_citylist.city_name'
+  //   );
 
-    $this->db->from('tblclientwiseshippingdata');
-    $this->db->join('tblxx_citylist', 'tblxx_citylist.id = tblclientwiseshippingdata.ShippingCity', 'LEFT');
-    $this->db->where('tblclientwiseshippingdata.AccountID', $AccountID);
+  //   $this->db->from('tblclientwiseshippingdata');
+  //   $this->db->join('tblxx_citylist', 'tblxx_citylist.id = tblclientwiseshippingdata.ShippingCity', 'LEFT');
+  //   $this->db->where('tblclientwiseshippingdata.AccountID', $AccountID);
 
-    return $this->db->get()->result_array();
-  }
+  //   return $this->db->get()->result_array();
+  // }
 
-  /* =========================
-	* Sales Order Print Model
-	* ========================= */
-
-  public function GetSalesOrderDetailsForPdf($OrderID)
-  {
-    $selected_company = $this->session->userdata('root_company');
-
-    $this->db->select(
-      db_prefix() . 'SalesOrderMaster.*, ' .
-        db_prefix() . 'clients.company, ' .
-        db_prefix() . 'clients.billing_address, ' .
-        db_prefix() . 'clients.billing_city, ' .
-        db_prefix() . 'clients.billing_state, ' .
-        db_prefix() . 'clients.GSTIN, ' .
-        db_prefix() . 'xx_statelist.state_name, ' .
-        db_prefix() . 'ItemTypeMaster.ItemTypeName, ' .
-        db_prefix() . 'ItemCategoryMaster.CategoryName, ' .
-        db_prefix() . 'clientwiseshippingdata.ShippingCity, ' .
-        'delivery_city.city_name, ' .
-        db_prefix() . 'FreightTerms.FreightTerms, ' .
-        db_prefix() . 'PlantLocationDetails.LocationName , ' .
-        db_prefix() . 'SalesQuotationMaster.TransDate as QuotationDate, ' .
-        'shipping_citys.city_name as ShippingCityName'
-    );
-
-    $this->db->join(
-      db_prefix() . 'clients',
-      db_prefix() . 'clients.AccountID = ' . db_prefix() . 'SalesOrderMaster.AccountID',
-      'left'
-    );
-
-    $this->db->join(
-      db_prefix() . 'xx_statelist',
-      db_prefix() . 'xx_statelist.short_name = ' . db_prefix() . 'clients.billing_state',
-      'left'
-    );
-
-    $this->db->join(
-      db_prefix() . 'ItemTypeMaster',
-      db_prefix() . 'ItemTypeMaster.Id = ' . db_prefix() . 'SalesOrderMaster.ItemType',
-      'left'
-    );
-
-    $this->db->join(
-      db_prefix() . 'ItemCategoryMaster',
-      db_prefix() . 'ItemCategoryMaster.Id = ' . db_prefix() . 'SalesOrderMaster.ItemCategory',
-      'left'
-    );
-
-    $this->db->join(
-      db_prefix() . 'clientwiseshippingdata',
-      db_prefix() . 'clientwiseshippingdata.id = ' . db_prefix() . 'SalesOrderMaster.DeliveryLocation',
-      'left'
-    );
-
-    // Aliased to avoid conflict with the second xx_citylist join
-    $this->db->join(
-      db_prefix() . 'PlantLocationDetails',
-      db_prefix() . 'PlantLocationDetails.id = ' . db_prefix() . 'SalesOrderMaster.SalesLocation',
-      'left'
-    )->join(db_prefix() . 'xx_citylist as delivery_city', 'delivery_city.id = delivery_city.Id', 'left');
-
-    $this->db->join(
-      db_prefix() . 'FreightTerms',
-      db_prefix() . 'SalesOrderMaster.FreightTerms = ' . db_prefix() . 'FreightTerms.Id',
-      'left'
-    );
-
-    // $this->db->join(db_prefix() . 'SalesQuotationMaster',
-    //     db_prefix() . 'SalesQuotationMaster.QuotationID = ' . db_prefix() . 'SalesOrderMaster.QuotationID', 'left');
-
-    $this->db->join(
-      db_prefix() . 'SalesQuotationMaster',
-      db_prefix() . 'SalesQuotationMaster.QuotationID COLLATE utf8mb4_general_ci = '
-        . db_prefix() . 'SalesOrderMaster.QuotationID COLLATE utf8mb4_general_ci',
-      'left',
-      false
-    );
-
-
-    // Aliased for ShippingCity
-    $this->db->join(
-      db_prefix() . 'xx_citylist as shipping_citys',
-      'shipping_citys.id = ' . db_prefix() . 'clientwiseshippingdata.ShippingCity',
-      'left'
-    );
-
-    $this->db->where(db_prefix() . 'SalesOrderMaster.OrderID', $OrderID);
-
-    return $this->db->get(db_prefix() . 'SalesOrderMaster')->row();
-  }
-
-  public function get_order_data($OrderID)
-  {
-    $selected_company = $this->session->userdata('root_company');
-
-    $this->db->select([db_prefix() . 'history.*', 'tblitems.ItemName']);
-    $this->db->join('tblitems', 'tblitems.ItemID = ' . db_prefix() . 'history.ItemID', 'left');
-    $this->db->where(db_prefix() . 'history.OrderID', $OrderID);
-    return $this->db->get('tblhistory')->result_array();
-  }
+  
 }

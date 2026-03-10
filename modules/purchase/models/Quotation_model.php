@@ -60,7 +60,7 @@ class Quotation_model extends App_Model
   }
 
   public function getVendorDropdown(){
-    $this->db->select('c.userid, c.AccountID, c.company');
+    $this->db->select('c.userid, c.AccountID, c.company, c.billing_state');
     $this->db->from(db_prefix().'clients c');
     $this->db->join(
         db_prefix().'AccountSubGroup2 a',
@@ -68,6 +68,7 @@ class Quotation_model extends App_Model
         'inner'
     );
     $this->db->where('a.IsVendor', 'Y');
+    $this->db->where('c.IsActive', 'Y');
 
     $query = $this->db->get();
     return $query->result_array();
@@ -96,6 +97,8 @@ class Quotation_model extends App_Model
     }
 
     for($i=0; $i<count($data['item_id']); $i++){
+      $itemData = $this->db->select('*')->from(db_prefix().'items')->where(['ItemID' => $data['item_id'][$i]])->get()->row();
+
       $gst_percent = floatval($data['gst'][$i]) ?? 0;
       $taxable_amt = ((floatval($data['unit_rate'][$i]) ?? 0) - (floatval($data['disc_amt'][$i]) ?? 0) ) * (floatval($data['quantity'][$i]) ?? 0);
       
@@ -109,29 +112,35 @@ class Quotation_model extends App_Model
       }
       
       $item_data = [
-        'OrderID' => $data['quotation_no'],
-        'PlantID' => $data['plant_id'],
-        'FY' => $data['fy'],
-        'TransDate' => $data['quotation_date'] ?? date('Y-m-d'),
-        'AccountID' => $data['vendor_id'] ?? '',
-        'ItemID' => $data['item_id'][$i],
-        'BasicRate' => $data['unit_rate'][$i],
-        'SaleRate' => ($data['unit_rate'][$i] * $gst_percent) / 100,
-        'SuppliedIn' => $data['uom'][$i],
-        'UnitWeight' => $data['unit_weight'][$i],
-        'WeightUnit' => $data['uom'][$i],
-        'OrderQty' => $data['quantity'][$i],
-        'DiscAmt' => $data['disc_amt'][$i],
-        'cgst' => $cgst,
-        'cgstamt' => $cgstamt,
-        'sgst' => $sgst,
-        'sgstamt' => $sgstamt,
-        'igst' => $igst,
-        'igstamt' => $igstamt,
-        'OrderAmt' => $data['quantity'][$i] * $data['unit_rate'][$i],
+        'OrderID'     => $data['quotation_no'],
+        'PlantID'     => $data['plant_id'],
+        'FY'          => $data['fy'],
+        'TransDate'   => $data['quotation_date'] ?? date('Y-m-d'),
+				'TType'       => $data['TType'],
+				'TType2'      => $data['TType2'],
+        'AccountID'   => $data['vendor_id'] ?? '',
+        'ItemID'      => $data['item_id'][$i],
+        'BasicRate'   => $data['unit_rate'][$i],
+        'SaleRate'    => ($data['unit_rate'][$i] * ($gst_percent / 100)),
+        'SuppliedIn'  => $data['uom'][$i],
+        'UnitWeight'  => $data['unit_weight'][$i],
+        'WeightUnit'  => $data['uom'][$i],
+        'CaseQty'     => (int)($itemData->MinOrderQty ?? 0),
+        'OrderQty'    => $data['quantity'][$i],
+        'Cases'       => ((int)$data['quantity'][$i] - (int)($itemData->MinOrderQty ?? 0)),
+        'DiscAmt'     => $data['disc_amt'][$i],
+        'DiscPerc'    => (($data['disc_amt'][$i] / $data['unit_rate'][$i]) * 100),
+        'cgst'        => $cgst,
+        'cgstamt'     => $cgstamt,
+        'sgst'        => $sgst,
+        'sgstamt'     => $sgstamt,
+        'igst'        => $igst,
+        'igstamt'     => $igstamt,
+        'OrderAmt'    => $data['quantity'][$i] * $data['unit_rate'][$i],
         'NetOrderAmt' => $data['amount'][$i],
-        'Ordinalno' =>  $i,
+        'Ordinalno'   => $i+1,
       ];
+
       if($data['item_uid'][$i] == 0){
         $item_data['UserID'] = $this->session->userdata('username');
         $item_data['TransDate2'] = date('Y-m-d H:i:s');
@@ -181,10 +190,11 @@ class Quotation_model extends App_Model
   }
 
   public function getVendorBrokerList($vendor_id){
-    $this->db->select('c.AccountID, c.company');
+    $this->db->select('c.AccountID, c.company, c.billing_state');
     $this->db->from(db_prefix().'PartyBrokerMaster pbm');
     $this->db->join(db_prefix().'clients c', 'c.AccountID = pbm.BrokerID', 'left');
     $this->db->where('pbm.AccountID', $vendor_id);
+    $this->db->where('c.IsActive', 'Y');
     return $this->db->get()->result_array();
   }
 
@@ -198,6 +208,8 @@ class Quotation_model extends App_Model
       'clients.billing_city',
       'clients.billing_zip',
       'clients.billing_address',
+      'clients.TDSSection',
+      'clients.TDSPer',
       'state.state_name',
       'country.long_name as country_name',
     ]);
@@ -211,6 +223,20 @@ class Quotation_model extends App_Model
 
 		$result = $this->db->get()->result_array();
 		return $result ? $result[0] : null;
+	}
+
+  public function getItemDetailsById($item_id)
+	{
+		// Select item fields and join taxes to get tax rate
+		$this->db->select("i.ItemID, i.ItemName, i.hsn_code, um.ShortCode as unit, i.UnitWeight, t.taxrate as tax, idm.name as DivisionName");
+		$this->db->from(db_prefix().'items i');
+		$this->db->join(db_prefix().'taxes t', 't.id = i.tax', 'left');
+		$this->db->join(db_prefix().'UnitMaster um', 'um.id = i.unit', 'left');
+		$this->db->join(db_prefix().'ItemsDivisionMaster idm', 'idm.id = i.DivisionID', 'left');
+		$this->db->where('i.ItemID', $item_id);
+
+		$result = $this->db->get()->row_array();
+		return $result;
 	}
 
   public function get_company_detail(){

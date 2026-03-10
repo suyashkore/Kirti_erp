@@ -19,15 +19,25 @@
 		return $this->db->get()->result_array();
 	}
 
-		// ChamberMaster Table Data
-	public function get_ChamberMaster_data()
-	{
+	// Get Chambers filtered by GodownID
+public function get_ChambersByGodown($GodownID)
+{
+    $this->db->select('id, ChamberName');
+    $this->db->from(db_prefix() . 'ChamberMaster');
+    $this->db->where('GodownID', $GodownID);
+    $this->db->order_by('id', 'ASC');
+    return $this->db->get()->result_array();
+}
 
-		$this->db->select(db_prefix() . 'ChamberMaster.*');
-		$this->db->from(db_prefix() . 'ChamberMaster');
-		$this->db->order_by('id', 'ASC');
-		return $this->db->get()->result_array();
-	}
+	// 	ChamberMaster Table Data
+	// public function get_ChamberMaster_data()
+	// {
+
+	// 	$this->db->select(db_prefix() . 'ChamberMaster.*');
+	// 	$this->db->from(db_prefix() . 'ChamberMaster');
+	// 	$this->db->order_by('id', 'ASC');
+	// 	return $this->db->get()->result_array();
+	// }
 
 
 
