@@ -652,6 +652,8 @@ class Purchase_model extends App_Model
 			GSTIN as gst_number,
 			PAN as pan,
 			TDSSection as TDS,
+			IsTDS as is_tds_applicable,
+			TDSPer as tds_percent,
 			tblxx_citylist.city_name as city,
 			billing_zip as postal_code,
 			billing_address as address,
@@ -664,6 +666,7 @@ class Purchase_model extends App_Model
 		$this->db->join('tblxx_statelist', 'clients.billing_state = tblxx_statelist.short_name', 'left');
 		$this->db->join('tblcountries', 'clients.billing_country = tblcountries.country_id', 'left');
 		$this->db->join('tblxx_citylist', 'clients.billing_city = tblxx_citylist.id', 'left');
+		// $this->db->join('tbltdsdetails', 'clients.TDSSection = tbltdsdetails.TDSCode', 'left');
 
 		$this->db->where(db_prefix() . 'clients.AccountID', $AccountID);
 
@@ -680,6 +683,8 @@ class Purchase_model extends App_Model
 				'address' => $result[0]['address'] ?? '',
 				'company' => $result[0]['company'] ?? '',
 				'TDS' => $result[0]['TDS'] ?? '',
+				'is_tds_applicable' => $result[0]['is_tds_applicable'] ?? '',
+				'tds_percent' => $result[0]['tds_percent'] ?? '',
 
 			);
 		}
