@@ -428,6 +428,21 @@
                                                 <!-- <div role="tabpanel" class="tab-pane active" id="credit_payment">
         <br>
         <div class="row"> -->
+                                        <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Default Currency</label>
+                                                        <select name="default_currency" id="default_currency" class="selectpicker form-control"
+                                                            required data-live-search="true" data-none-selected-text="None selected">
+                                                            <option value=""></option>
+                                                            <?php foreach ($currencies as $key => $value) { ?>
+                                                            <option value="<?php echo $value['id']; ?>"
+                                                                <?php echo ($value['isdefault'] == 1) ? 'selected' : ''; ?>>
+                                                                <?php echo $value['name']; ?>
+                                                            </option>
+                                                            <?php } ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                                 <div class="col-md-2">
                                                     <div class="form-group">
                                                         <label class="control-label">Payment Terms</label>
@@ -1273,7 +1288,7 @@ $(document).ready(function() {
                 
                 // Populate select fields
                 var selectFields = ['Tds', 'gst_type', 'organisation_type', 'pay_term', 'payment_cycle_type',
-                                   'payment_cycle', 'freight_terms', 'priority', 'territory', 'blocked'];
+                                   'payment_cycle', 'freight_terms','default_currency', 'priority', 'territory', 'blocked'];
 
                 $.each(selectFields, function(index, field) {
                     if (typeof data[field] !== 'undefined' && data[field] !== null && data[field] !== '') {
@@ -1296,6 +1311,7 @@ $(document).ready(function() {
                 $('#payment_cycle_type').val(data.PaymentCycleType || data.payment_cycle_type || '').selectpicker('refresh');
                 $('#payment_cycle').val(data.PaymentCycle || data.payment_cycle || '').selectpicker('refresh');
                 $('#freight_terms').val(data.FreightTerms || data.freight_terms || '').selectpicker('refresh');
+                $('#default_currency').val(data.DefaultCurrency || data.default_currency || '').selectpicker('refresh');
                 $('#credit_days').val(data.GraceDay || data.credit_days || '0');
                 $('#website').val(data.website || '');
                 $('#additional_info').val(data.AdditionalInfo || data.additional_info || '');
@@ -1574,6 +1590,7 @@ $(document).ready(function() {
         // $('#credit_days').val('');
         $('#website').val('');
         $('#freight_terms').val('');
+        $('#default_currency').val('');
         $('#food_lic_n').val('');
         $('#priority').val('');
         $('#territory').val('');
@@ -1740,6 +1757,7 @@ $(document).ready(function() {
         var food_lic_n = $('#food_lic_n').val();
         var website = $('#website').val();
         var freight_terms = $('#freight_terms').val();
+        var default_currency = $('#default_currency').val();
         var priority = $('#priority').val();
         var territory = $('#territory').val();
         var additional_info = $('#additional_info').val();
@@ -1785,6 +1803,7 @@ $(document).ready(function() {
         formData.append('FLNO1', food_lic_n);
         formData.append('website', website);
         formData.append('freight_terms', freight_terms);
+        formData.append('default_currency', default_currency);
         formData.append('priority', priority);
         formData.append('territory', territory);
         formData.append('additional_info', additional_info);
@@ -1909,6 +1928,7 @@ $(document).ready(function() {
         var food_lic_n = $('#food_lic_n').val();
         var website = $('#website').val();
         var freight_terms = $('#freight_terms').val();
+        var default_currency = $('#default_currency').val();
         var priority = $('#priority').val();
         var territory = $('#territory').val();
         var additional_info = $('#additional_info').val();
@@ -1954,6 +1974,7 @@ $(document).ready(function() {
         formData.append('FLNO1', food_lic_n);
         formData.append('website', website);
         formData.append('freight_terms', freight_terms);
+        formData.append('default_currency', default_currency);
         formData.append('priority', priority);
         formData.append('territory', territory);
         formData.append('additional_info', additional_info);

@@ -334,6 +334,7 @@
                                                 <?php if (isset($locations) && is_array($locations) && count($locations) > 0) { ?>
                                                 <?php foreach ($locations as $loc) { ?>
                                                 <tr>
+                                                        <input type="hidden" name="loc_id[]" value="<?php echo htmlspecialchars($loc['id'] ?? ''); ?>">
                                                     <td>
                                                         <select name="loc_state[]"
                                                             class="selectpicker form-control loc_state"
@@ -406,6 +407,8 @@
                                                 <?php } ?>
                                                 <?php } else { ?>
                                                 <tr>
+                                                        <input type="hidden" name="loc_id[]" value="">
+
                                                     <td>
                                                         <select name="loc_state[]"
                                                             class="selectpicker form-control loc_state"
@@ -595,6 +598,8 @@ function addLocationRow() {
 	var today = new Date().toISOString().split('T')[0];
     var newRow = `
 	<tr>
+            <input type="hidden" name="loc_id[]" value="">
+
 		<td>
 			<select name="loc_state[]" class="selectpicker form-control loc_state" data-width="100%" data-none-selected-text="None selected" data-live-search="true" data-container="body" required>
 				<option value="">None selected</option>
@@ -631,6 +636,8 @@ function addInitialLocationRow() {
 	var today = new Date().toISOString().split('T')[0];
     var initRow = `
 	<tr>
+            <input type="hidden" name="loc_id[]" value="">
+
 		<td>
 			<select name="loc_state[]" class="selectpicker form-control loc_state" data-width="100%" data-none-selected-text="None selected" data-live-search="true" data-container="body" required>
 				<option value="">None selected</option>
@@ -753,6 +760,8 @@ function populateCompanyForm(resp) {
         var L = locs[j];
 
         var newRow = '<tr>';
+        newRow += '<input type="hidden" name="loc_id[]" value="' + (L.id || '') + '">'; // ✅ Location ID
+
         newRow +=
             '<td><select name="loc_state[]" class="selectpicker form-control loc_state" data-width="100%" data-none-selected-text="None selected" data-live-search="true" data-container="body">';
         newRow += '<option value="">None selected</option>';

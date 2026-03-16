@@ -420,7 +420,7 @@ function timesheets_permissions()
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
 	];
-	register_staff_capabilities('attendance_management', $capabilities, _l('attendance_sheet'),'HR');
+	// register_staff_capabilities('attendance_management', $capabilities, _l('attendance_sheet'),'HR');
 
 	// Leave
 	$capabilities['capabilities'] = [
@@ -431,7 +431,7 @@ function timesheets_permissions()
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
 	];
-	register_staff_capabilities('leave_management', $capabilities, _l('leave_management'),'HR');
+	// register_staff_capabilities('leave_management', $capabilities, _l('leave_management'),'HR');
    
    // Work Shift Table
 	$capabilities['capabilities'] = [
@@ -442,7 +442,7 @@ function timesheets_permissions()
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
 	];
-	register_staff_capabilities('timesheets_table_shiftwork', $capabilities, _l('shiftwork'),'HR');
+	// register_staff_capabilities('timesheets_table_shiftwork', $capabilities, _l('shiftwork'),'HR');
 	
 	// Work Shift Managment
 	$capabilities['capabilities'] = [
@@ -453,7 +453,7 @@ function timesheets_permissions()
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
 	];
-	register_staff_capabilities('table_shiftwork_management', $capabilities, _l('shift_management'),'HR');
+	// register_staff_capabilities('table_shiftwork_management', $capabilities, _l('shift_management'),'HR');
 	
 	// Manage shift Type
 	$capabilities['capabilities'] = [
@@ -464,7 +464,7 @@ function timesheets_permissions()
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
 	];
-	register_staff_capabilities('timesheets_shift_type', $capabilities, _l('shift_type'),'HR');
+	// register_staff_capabilities('timesheets_shift_type', $capabilities, _l('shift_type'),'HR');
 	
    
 	$capabilities['capabilities'] = [
@@ -498,7 +498,7 @@ function timesheets_permissions()
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
 	];
-	register_staff_capabilities('report_management', $capabilities, "Timesheet Reports",'HR');
+	// register_staff_capabilities('report_management', $capabilities, "Timesheet Reports",'HR');
 	// Workplace
 	$capabilities['capabilities'] = [
 		'view' => _l('permission_view') . '(' . _l('permission_global') . ')',

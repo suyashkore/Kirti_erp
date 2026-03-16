@@ -16,6 +16,9 @@ class DeliveryOrder extends AdminController
 	* ========================= */
 	public function index()
 	{
+		if (!has_permission_new('deliveryOrder', '', 'view')) {
+			access_denied('Access Denied');
+		}
 		$data['title'] = 'Delivery Order';
 		$selected_company = $this->session->userdata('root_company');
 		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
@@ -133,30 +136,11 @@ class DeliveryOrder extends AdminController
 
 	public function SaveDeliveryOrder()
 	{
-		// $this->db->truncate('tblDeliveryOrderMaster');
-		// exit;
-
-		// $transIds = [
-		// 	'DO25100006',
-		// 	'DO25100005',
-		//     'DO25100004',
-		//     'DO25100003',
-		//     'DO25100002',
-		//     'DO25100001'
-		// ];
-
-		// $this->db->where_in('TransID', $transIds);
-		// return $this->db->delete(db_prefix() . 'history');
-		// exit;
-
 
 		if (empty($this->input->post())) {
 			echo json_encode(['success' => false, 'message' => 'No data received']);
 			return;
 		}
-
-		// echo json_encode(print_r($this->input->post()));
-		// exit;
 
 		$PlantID = $this->session->userdata('root_company');
 		$UserID = $this->session->userdata('username');
@@ -237,7 +221,7 @@ class DeliveryOrder extends AdminController
 				die;
 			}
 		}
-		
+
 		// =============================================
 		// Financial Year Date Validation
 		// =============================================
@@ -314,10 +298,16 @@ class DeliveryOrder extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('deliveryOrder', '', 'create')) {
+				access_denied('Access Denied');
+			}
 			$insertData['TransDate'] = date('Y-m-d H:i:s');
 			$result = $this->DO_model->saveData('DeliveryOrderMaster', $insertData);
 			$details = $this->DO_model->getDeliveryOrderDetails($result);
 		} else {
+			if (!has_permission_new('deliveryOrder', '', 'edit')) {
+				access_denied('Access Denied');
+			}
 			$insertData['Lupdate'] = date('Y-m-d H:i:s');
 			$result = $this->DO_model->updateData('DeliveryOrderMaster', $insertData, ['id' => $update_id]);
 			$details = $this->DO_model->getDeliveryOrderDetails($update_id);
@@ -397,24 +387,6 @@ class DeliveryOrder extends AdminController
 			]);
 		}
 	}
-
-	// 	public function getQuotationDetails()
-	// {
-	//     $quotation_id = $this->input->post('quotation_id');
-
-	//     $this->load->model('SalesOrder_model');
-
-	//     $data = $this->SalesOrder_model->getQuotationFullDetails($quotation_id);
-
-	//     echo json_encode([
-	//         'success'        => true,
-	//         // 'item_type'      => $data['master']->ItemType,
-	//         // 'item_category'  => $data['master']->CategoryID,
-	//         'items'          => $data['master']
-	//     ]);
-	// }
-
-
 
 	public function GetQuotationDetails()
 	{
@@ -555,30 +527,13 @@ class DeliveryOrder extends AdminController
 	* ========================= */
 	public function List()
 	{
-		$data['title'] = 'Sales Order List';
-		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
+		$data['title'] = 'Delivery Order List';
 
 		$selected_company = $this->session->userdata('root_company');
-		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
+		$data['company_detail'] = $this->DO_model->get_company_detail($selected_company);
 
-		$this->load->view('admin/SalesOrder/SalesOrderList', $data);
+		$this->load->view('admin/DO/DOList', $data);
 	}
-	public function OrderList()
-	{
-		if (!$this->input->is_ajax_request()) {
-			show_404();
-		}
-
-		$this->load->model('SalesOrder_model');
-
-		$order_list = $this->SalesOrder_model->getOrderList();
-
-		echo json_encode([
-			'success' => true,
-			'data'    => $order_list
-		]);
-	}
-
 
 	public function ListFilter()
 	{
@@ -588,7 +543,7 @@ class DeliveryOrder extends AdminController
 			$limit  = $data['limit'] ?? 100;
 			$offset = $data['offset'] ?? 0;
 
-			$result  = $this->SalesOrder_model->getListByFilter($data, $limit, $offset);
+			$result  = $this->DO_model->getListByFilter($data, $limit, $offset);
 			if (!empty($result['rows'])) {
 				echo json_encode([
 					'success' => true,

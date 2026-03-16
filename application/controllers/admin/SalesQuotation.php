@@ -14,6 +14,9 @@ class SalesQuotation extends AdminController
 		* ========================= */
 	public function index()
 	{
+		if (!has_permission_new('salesQuotation', '', 'view')) {
+			access_denied('Access Denied');
+		}
 		$data['title'] = 'Quotation Master';
 		$data['item_type'] = $this->SalesQuotation_model->getDropdown('ItemTypeMaster', 'id, ItemTypeName', ['isActive' => 'Y'], 'id', 'ASC');
 		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
@@ -224,10 +227,16 @@ class SalesQuotation extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('salesQuotation', '', 'create')) {
+				access_denied('Access Denied');
+			}
 			$insertData['TransDate2'] = date('Y-m-d H:i:s');
 			$result = $this->SalesQuotation_model->saveData('SalesQuotationMaster', $insertData);
 			$details = $this->SalesQuotation_model->getQuoteDetails($result);
 		} else {
+			if (!has_permission_new('salesQuotation', '', 'edit')) {
+				access_denied('Access Denied');
+			}
 			$result = $this->SalesQuotation_model->updateData('SalesQuotationMaster', $insertData, ['id' => $update_id]);
 			$details = $this->SalesQuotation_model->getQuoteDetails($update_id);
 		}

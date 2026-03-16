@@ -57,6 +57,26 @@
       <div class="col-md-12">
         <div class="panel_s">
           <div class="panel-body">
+
+            <!-- Flash Messages -->
+            <?php if ($this->session->flashdata('success')) : ?>
+              <div class="alert alert-success alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <i class="fa fa-check-circle"></i> <?= $this->session->flashdata('success'); ?>
+              </div>
+            <?php endif; ?>
+
+            <?php if ($this->session->flashdata('error')) : ?>
+              <div class="alert alert-danger alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <i class="fa fa-times-circle"></i> <?= $this->session->flashdata('error'); ?>
+              </div>
+            <?php endif; ?>
+
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb custombreadcrumb" style="background-color:#fff !important; margin-Bottom:0px !important;">
                 <li class="breadcrumb-item"><a href="<?= admin_url(); ?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
@@ -71,29 +91,11 @@
                   <div class="form-group" app-field-wrapper="from_date">
                     <?= render_date_input('from_date', 'From Date', date('01/m/Y'), []); ?>
                   </div>
-                  <!-- <div class="form-group" app-field-wrapper="from_date">
-                    <label for="from_date" class="control-label">From Date</label>
-                    <div class="input-group date">
-                      <input type="text" id="from_date" name="from_date" class="form-control datepicker filterInput" value="<?= date("01/m/Y") ?>" app-field-label="From Date" onchange="resetForm();">
-                      <div class="input-group-addon">
-                        <i class="fa-regular fa-calendar calendar-icon"></i>
-                      </div>
-                    </div>
-                  </div> -->
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="to_date">
                     <?= render_date_input('to_date', 'To Date', date('d/m/Y'), []); ?>
                   </div>
-                  <!-- <div class="form-group" app-field-wrapper="to_date">
-                    <label for="to_date" class="control-label">To Date</label>
-                    <div class="input-group date">
-                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y") ?>" app-field-label="To Date" onchange="resetForm();">
-                      <div class="input-group-addon">
-                        <i class="fa-regular fa-calendar calendar-icon"></i>
-                      </div>
-                    </div>
-                  </div> -->
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="vendor_id">
@@ -136,8 +138,18 @@
                 </div>
                 <div class="col-md-9 mbot5" style="padding-top: 20px;">
                   <button type="submit" class="btn btn-success" id="searchBtn"><i class="fa fa-list"></i> Show</button>
-                  <button type="button" class="btn btn-info exportBtn" onclick="exportTableToExcel()" style="display: none;"><i class="fa fa-file-excel"></i> Excel</button>
-                  <button type="button" class="btn btn-info exportBtn" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>
+                  <?php
+                  if (has_permission_new('PurchaseQuotationList', '', 'export')) {
+                    echo '<button type="button" class="btn btn-info exportBtn" onclick="exportTableToExcel()" style="display: none;"><i class="fa fa-file-excel"></i> Excel</button> ';
+                  }
+                  if (has_permission_new('PurchaseQuotationList', '', 'print')) {
+                    echo '<button type="button" class="btn btn-info exportBtn" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>';
+                  }
+                  ?>
+                  <!-- Create PO Button - will be enabled only when a checkbox is selected -->
+                  <button type="button" class="btn btn-warning" id="createPoBtn" onclick="createPO()" style="display: none;" disabled>
+                    <i class="fa fa-plus-circle"></i> Create PO
+                  </button>
                 </div>
                 <div class="col-md-3 mbot5" style="padding-top: 20px;">
                   <input type="search" class="form-control" id="myInput1" onkeyup="myFunction2()" placeholder="Search..." title="Type in a table">
@@ -154,7 +166,7 @@
                   <table class="table table-striped table-bordered table-list" id="table-list" width="100%">
                     <thead>
                       <tr class="mainHead" style="display: none;">
-                        <td colspan="8">
+                        <td colspan="18">
                           <h5 style="text-align:center;">
                             <span style="font-size:15px; font-weight:700;"><?= $company_detail->company_name ?? ''; ?></span><br>
                             <span style="font-size:10px; font-weight:600;"><?= $company_detail->address ?? ''; ?></span>
@@ -162,11 +174,14 @@
                         </td>
                       </tr>
                       <tr class="mainHead" style="display: none;">
-                        <td colspan="8">
+                        <td colspan="18">
                           <span class="report_for" style="font-size:10px;"></span>
                         </td>
                       </tr>
                       <tr>
+                        <th style="text-align:center;">
+                          <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" title="Select All Pending">
+                        </th>
                         <th class="sortable">Quotation No</th>
                         <th class="sortable">Quotation Date</th>
                         <th class="sortable">Category</th>
@@ -191,6 +206,7 @@
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -213,15 +229,18 @@ if ($last_date_yr < $curr_date_new) {
 
 <?php init_tail(); ?>
 <script>
+  // Auto-dismiss flash alerts after 4 seconds
+  setTimeout(function() {
+    $('.alert').fadeOut('slow');
+  }, 4000);
+
   $(document).ready(function() {
     var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
     var year = "20" + fin_y;
     var cur_y = new Date().getFullYear().toString().substr(-2);
 
-    // Min date: April 1st of FY start year
-    var minStartDate = new Date(year, 3, 1); // month index 3 = April
+    var minStartDate = new Date(year, 3, 1);
 
-    // Max date: March 31 of FY end year, OR today if still within FY
     var maxEndDate;
     if (parseInt(cur_y) > parseInt(fin_y)) {
       var fy_new = parseInt(fin_y) + 1;
@@ -245,15 +264,16 @@ if ($last_date_yr < $curr_date_new) {
     });
   });
 
-  
   $(document).ready(function() {
     resetForm();
     $('#filter_list_form').submit();
-  })
+  });
 
   function resetForm() {
     $('.exportBtn').hide();
+    $('#createPoBtn').hide().prop('disabled', true);
     $('#table-list tbody').html('');
+    $('#selectAll').prop('checked', false);
 
     let filterHtml = '';
     $('.filterInput').each(function() {
@@ -294,7 +314,6 @@ if ($last_date_yr < $curr_date_new) {
             html += `<option value="${loc.AccountID}">${loc.company} (${loc.AccountID})</option>`;
           });
           $('#broker_id').html(html);
-
           $('.selectpicker').selectpicker('refresh');
         }
       }
@@ -311,6 +330,7 @@ if ($last_date_yr < $curr_date_new) {
     let loadedRecords = 0;
     $('#searchBtn').prop('disabled', true);
     $('#table-list tbody').html('');
+    $('#selectAll').prop('checked', false);
 
     function fetchChunk() {
       var form_data = new FormData(form);
@@ -332,7 +352,7 @@ if ($last_date_yr < $curr_date_new) {
             $('#searchBtn').prop('disabled', false);
             if (offset === 0) {
               $('#table-list tbody').html(
-                '<tr><td colspan="17" class="text-center">No Data Found</td></tr>'
+                '<tr><td colspan="18" class="text-center">No Data Found</td></tr>'
               );
             }
             return;
@@ -348,12 +368,14 @@ if ($last_date_yr < $curr_date_new) {
           updateProgress(loadedRecords, totalRecords);
           if (loadedRecords >= totalRecords) {
             $('#searchBtn').prop('disabled', false);
-            $('#fetchProgress').css('width', '0%')
+            $('#fetchProgress').css('width', '0%');
             $('.exportBtn').show();
+            if ($('.row-select').length > 0) {
+              $('#createPoBtn').show();
+            }
             return;
           }
           fetchChunk();
-
         }
       });
     }
@@ -371,8 +393,20 @@ if ($last_date_yr < $curr_date_new) {
       6: 'Complete',
       7: 'Partially Complete'
     };
+
     rows.forEach(function(row) {
+      let checkboxTd = '';
+      if (row.Status == 1) {
+        let rowData = encodeURIComponent(JSON.stringify(row));
+        checkboxTd = `<td class="text-center">
+          <input type="checkbox" class="row-select" value="${row.QuotatioonID}" data-row="${rowData}">
+        </td>`;
+      } else {
+        checkboxTd = `<td></td>`;
+      }
+
       html += `<tr>
+        ${checkboxTd}
         <td class="text-center">${row.QuotatioonID}</td>
         <td>${moment(row.TransDate).format('DD/MM/YYYY')}</td>
         <td>${row.category_name}</td>
@@ -395,13 +429,59 @@ if ($last_date_yr < $curr_date_new) {
     $('#table-list tbody').append(html);
   }
 
+  function toggleSelectAll(source) {
+    $('.row-select:visible').prop('checked', source.checked).trigger('change');
+  }
+
+  $(document).on('change', '.row-select', function() {
+    let checkedCount = $('.row-select:checked').length;
+    $('#createPoBtn').prop('disabled', checkedCount === 0);
+  });
+
+  function createPO() {
+    let selectedRows = [];
+    $('.row-select:checked').each(function() {
+      let rowData = JSON.parse(decodeURIComponent($(this).attr('data-row')));
+      selectedRows.push(rowData);
+    });
+
+    if (selectedRows.length === 0) {
+      alert('Please select at least one Quotation.');
+      return;
+    }
+
+    let csrfName = '<?= $this->security->get_csrf_token_name(); ?>';
+    let csrfToken = $('input[name="' + csrfName + '"]').val();
+
+    let form = $('<form>', {
+      method: 'POST',
+      action: '<?= admin_url('purchase/Quotation/create_po') ?>'
+    });
+
+    form.append($('<input>', {
+      type: 'hidden',
+      name: csrfName,
+      value: csrfToken
+    }));
+
+    selectedRows.forEach(function(row) {
+      form.append($('<input>', {
+        type: 'hidden',
+        name: 'quotation_ids[]',
+        value: row.QuotatioonID
+      }));
+    });
+
+    $('body').append(form);
+    form.submit();
+  }
+
   function updateProgress(loaded, total) {
     let percent = Math.floor((loaded / total) * 100);
-    $('#fetchProgress').css('width', percent + '%')
+    $('#fetchProgress').css('width', percent + '%');
   }
 
   function exportTableToExcel() {
-
     let formData = new FormData(document.getElementById('filter_list_form'));
     formData.append(
       '<?= $this->security->get_csrf_token_name(); ?>',
@@ -419,11 +499,9 @@ if ($last_date_yr < $curr_date_new) {
       contentType: false,
       cache: false,
       success: function(res) {
-
         $('.exportBtn').prop('disabled', false);
-
         if (res.success) {
-          window.location.href = res.file_url; // download file
+          window.location.href = res.file_url;
         } else {
           console.log(res);
         }
@@ -433,8 +511,7 @@ if ($last_date_yr < $curr_date_new) {
       }
     });
   }
-</script>
-<script>
+
   $(document).on("click", ".sortable", function() {
     var table = $("#table-list tbody");
     var rows = table.find("tr").toArray();
@@ -442,7 +519,6 @@ if ($last_date_yr < $curr_date_new) {
     var ascending = !$(this).hasClass("asc");
     $(".sortable").removeClass("asc desc");
     $(".sortable span").remove();
-    // Add sort classes and arrows
     $(this).addClass(ascending ? "asc" : "desc");
     $(this).append(ascending ? '<span> &#8593;</span>' : '<span> &#8595;</span>');
     rows.sort(function(a, b) {
@@ -470,7 +546,6 @@ if ($last_date_yr < $curr_date_new) {
   function myFunction2() {
     var input = document.getElementById("myInput1");
     var filter = input.value.toUpperCase();
-
     var table = document.getElementById("table-list");
     var tbody = table.getElementsByTagName("tbody")[0];
     var tr = tbody.getElementsByTagName("tr");
@@ -478,7 +553,6 @@ if ($last_date_yr < $curr_date_new) {
     for (var i = 0; i < tr.length; i++) {
       var tds = tr[i].getElementsByTagName("td");
       var rowMatch = false;
-
       for (var j = 0; j < tds.length; j++) {
         var txtValue = tds[j].textContent || tds[j].innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {

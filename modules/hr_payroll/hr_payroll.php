@@ -355,14 +355,14 @@ function hr_payroll_permissions()
 
     //register_staff_capabilities('hrp_employee', $capabilities_3, _l('hr_payroll_employee'),'HR');
     //register_staff_capabilities('hrp_attendance', $capabilities_3, _l('hr_payroll_attendance'),'HR');
-    register_staff_capabilities('hrp_commission', $capabilities_3, _l('hr_payroll_commission'),'HR');
-    register_staff_capabilities('hrp_deduction', $capabilities_3, _l('hr_payroll_deduction'),'HR');
-    register_staff_capabilities('hrp_bonus_kpi', $capabilities_3, _l('hr_payroll_bonus_kpi'),'HR');
-    register_staff_capabilities('hrp_insurrance', $capabilities_3, _l('hr_payroll_insurrance'),'HR');
+    // register_staff_capabilities('hrp_commission', $capabilities_3, _l('hr_payroll_commission'),'HR');
+    // register_staff_capabilities('hrp_deduction', $capabilities_3, _l('hr_payroll_deduction'),'HR');
+    // register_staff_capabilities('hrp_bonus_kpi', $capabilities_3, _l('hr_payroll_bonus_kpi'),'HR');
+    // register_staff_capabilities('hrp_insurrance', $capabilities_3, _l('hr_payroll_insurrance'),'HR');
     //register_staff_capabilities('hrp_payslip', $capabilities_3, _l('hr_payroll_payslip'),'HR');
    // register_staff_capabilities('hrp_payslip_template', $capabilities_3, _l('hr_payroll_payslip_template'),'HR');
-    register_staff_capabilities('hrp_income_tax', $capabilities_4, _l('hr_payroll_income_tax'),'HR');
-    register_staff_capabilities('tour', $capabilities_4, 'Tour Plan','HR');
+    // register_staff_capabilities('hrp_income_tax', $capabilities_4, _l('hr_payroll_income_tax'),'HR');
+    // register_staff_capabilities('tour', $capabilities_4, 'Tour Plan','HR');
     //register_staff_capabilities('hrp_report', $dashboard, _l('hr_payroll_report'),'HR');
     //register_staff_capabilities('hrp_setting', $capabilities, _l('hr_payroll_setting'),'HR');
 

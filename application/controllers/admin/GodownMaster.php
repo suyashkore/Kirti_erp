@@ -118,7 +118,7 @@ class GodownMaster extends AdminController
         $data = array(
             'PlantID' => $this->session->userdata('root_company'),
             'GodownCode' => strtoupper($this->input->post('GodownCode')),
-            'GodownName' => $this->input->post('GodownName'),
+            'GodownName' => strtoupper($this->input->post('GodownName')),
             'LocationID' => $this->input->post('Location'),
             'Pincode' => $this->input->post('Pincode'),
             'Statecode' => $this->input->post('State'),
@@ -138,7 +138,7 @@ class GodownMaster extends AdminController
     {
         $GodownCode = $this->input->post('GodownCode');
         $data = array(
-            'GodownName' => $this->input->post('GodownName'),
+            'GodownName' => strtoupper($this->input->post('GodownName')),
             'LocationID' => $this->input->post('Location'),
 
             'Pincode' => $this->input->post('Pincode'),

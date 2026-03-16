@@ -451,13 +451,13 @@ function hr_profile_load_js(){
                 'export' => ['not_applicable' => false, 'name' => 'Export'],
 		];
 		$createview['capabilities'] = [
-        'view'     => $viewGlobalName,
-        'create' => _l('permission_create'),
-        'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-        'print' => ['not_applicable' => false, 'name' => 'Print'],
-        'export' => ['not_applicable' => false, 'name' => 'Export'],
-    ];
+			'view'     => $viewGlobalName,
+			'create' => _l('permission_create'),
+			'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
+			'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+			'print' => ['not_applicable' => false, 'name' => 'Print'],
+			'export' => ['not_applicable' => false, 'name' => 'Export'],
+		];
 
 		$dashboard['capabilities'] = [
 				'view'   => _l('permission_view') . '(' . _l('permission_global') . ')',
@@ -477,39 +477,32 @@ function hr_profile_load_js(){
                 'export' => ['not_applicable' => false, 'name' => 'Export'],
 		];
 
-		//Dashboard
-		//register_staff_capabilities('hrm_dashboard', $dashboard, _l('HR_dashboard'),'HR');
-		//Orgranization
-		//register_staff_capabilities('staffmanage_orgchart', $capabilities_2, _l('HR_organizational_chart'),'HR');
-		//Onboarding Process
-		//register_staff_capabilities('hrm_reception_staff', $capabilities, _l('HR_reception_staff'),'HR');
-		//Hr Profile
-		register_staff_capabilities('hrm_hr_records', $capabilities, _l('Staff members'),'HR');
-		register_staff_capabilities('hrm_hr_recordslist', $onlyview, 'Staff List','HR');
-		register_staff_capabilities('DailyAttendanceRegister', $capabilities, 'Daily Attendance Register','HR');
-		register_staff_capabilities('AttendanceSheet', $createview, 'Attendance Sheet','HR');
-		//HR Expenses
-		register_staff_capabilities('cliam_expenses', $claim, 'Claim Expenses','HR');
-		//Job Description
-		register_staff_capabilities('Departments', $capabilities_2, "Job Departments",'HR');
-		register_staff_capabilities('staffmanage_job_position', $capabilities_2, "Job Designation",'HR');
-		//Training
-		//register_staff_capabilities('staffmanage_training', $capabilities, _l('HR_training'),'HR');
-		//Q&A
-		//register_staff_capabilities('hr_manage_q_a', $capabilities, _l('HR_q&a'),'HR');
-		//Contracts
-		//register_staff_capabilities('hrm_contract', $capabilities, _l('HR_contract'),'HR');
-		//Dependent Persons
-		register_staff_capabilities('hrm_dependent_person', $capabilities, _l('hr_dependent_persons'),'HR');
 		
-		register_staff_capabilities('salarymaster', $capabilities, 'Salary Master','HR');
-		register_staff_capabilities('salaryComponents', $capabilities, 'Salary Components','HR');
-		//Resignation procedures
-		//register_staff_capabilities('hrm_procedures_for_quitting_work', $capabilities, _l('HR_resignation_procedures'),'HR');
-		//Reports
-		//register_staff_capabilities('hrm_report', $dashboard, _l('HR_report'),'HR');
-		//Settings
-		//register_staff_capabilities('hrm_setting', $capabilities, _l('HR_setting'),'HR');
+		// register_staff_capabilities('hrmDashboard', $dashboard, _l('HR_dashboard'),'HR');
+		// register_staff_capabilities('hrmStaffMembers', $capabilities, _l('Staff members'),'HR');
+		// register_staff_capabilities('hrmStaffList', $onlyview, 'Staff List','HR');
+		// register_staff_capabilities('hrmAttendanceSheet', $createview, 'Attendance Sheet','HR');
+		// register_staff_capabilities('hrm_ClaimExpenses', $claim, 'Claim Expenses','HR');
+		// register_staff_capabilities('hrmJobDepartments', $capabilities_2, "Job Departments",'HR');
+		// register_staff_capabilities('hrmJobDesignation', $capabilities_2, "Job Designation",'HR');
+		// register_staff_capabilities('hrmShiftCategories', $capabilities_2, "Shift Categories",'HR');
+		// register_staff_capabilities('hrmShift', $capabilities_2, "Shift",'HR');
+		// register_staff_capabilities('hrmWorkShift', $capabilities_2, "Work Shift Table",'HR');
+		// register_staff_capabilities('hrmAnnualLeave', $capabilities_2, "Annual Leave & Holiday",'HR');
+		// register_staff_capabilities('hrmLeave', $capabilities_2, "Leave",'HR');
+
+		// register_staff_capabilities('DailyAttendanceRegister', $capabilities, 'Daily Attendance Register','HR');
+		// register_staff_capabilities('staffmanage_orgchart', $capabilities_2, _l('HR_organizational_chart'),'HR');
+		// register_staff_capabilities('hrm_reception_staff', $capabilities, _l('HR_reception_staff'),'HR');
+		// register_staff_capabilities('staffmanage_training', $capabilities, _l('HR_training'),'HR');
+		// register_staff_capabilities('hr_manage_q_a', $capabilities, _l('HR_q&a'),'HR');
+		// register_staff_capabilities('hrm_contract', $capabilities, _l('HR_contract'),'HR');
+		// register_staff_capabilities('hrm_dependent_person', $capabilities, _l('hr_dependent_persons'),'HR');
+		// register_staff_capabilities('salarymaster', $capabilities, 'Salary Master','HR');
+		// register_staff_capabilities('salaryComponents', $capabilities, 'Salary Components','HR');
+		// register_staff_capabilities('hrm_procedures_for_quitting_work', $capabilities, _l('HR_resignation_procedures'),'HR');
+		// register_staff_capabilities('hrm_report', $dashboard, _l('HR_report'),'HR');
+		// register_staff_capabilities('hrm_setting', $capabilities, _l('HR_setting'),'HR');
 
 	}
 

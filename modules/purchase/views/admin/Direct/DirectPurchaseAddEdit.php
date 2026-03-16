@@ -208,35 +208,18 @@
                     <input type="text" name="vendor_state" id="vendor_state" class="form-control" app-field-label="Vendor State" readonly placeholder="">
                   </div>
                 </div>
-                <div class="col-md-2 mbot5">
+                <!-- <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="closing_balance">
                     <label for="closing_balance" class="control-label">Closing Balance</label>
                     <input type="text" name="closing_balance" id="closing_balance" class="form-control" app-field-label="Closing Balance" readonly placeholder="">
                   </div>
-                </div>
+                </div> -->
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="broker_id">
                     <label for="broker_id" class="control-label">Broker Name</label>
                     <select name="broker_id" id="broker_id" class="form-control selectpicker" data-live-search="true" app-field-label="Broker Name">
                       <option value="" selected disabled>None selected</option>
                     </select>
-                  </div>
-                </div>
-                <div class="col-md-2 mbot5">
-                  <div class="form-group" app-field-wrapper="vendor_doc_no">
-                    <label for="vendor_doc_no" class="control-label">Vendor Doc No</label>
-                    <input type="text" name="vendor_doc_no" id="vendor_doc_no" class="form-control" app-field-label="Vendor Doc No" placeholder="">
-                  </div>
-                </div>
-                <div class="col-md-2 mbot5">
-                  <div class="form-group" app-field-wrapper="vendor_doc_date">
-                    <?= render_date_input('vendor_doc_date', 'Vendor Doc Date', date('d/m/Y'), []); ?>
-                  </div>
-                </div>
-                <div class="col-md-2 mbot5">
-                  <div class="form-group" app-field-wrapper="vendor_doc_amt">
-                    <label for="vendor_doc_amt" class="control-label">Vendor Doc Amount</label>
-                    <input type="text" name="vendor_doc_amt" id="vendor_doc_amt" class="form-control" app-field-label="Vendor Doc Amount" placeholder="">
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">
@@ -263,6 +246,29 @@
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">
+                  <div class="form-group" app-field-wrapper="vehicle_no">
+                    <label for="vehicle_no" class="control-label"><small class="req text-danger">* </small> Vehicle No</label>
+                    <input type="text" name="vehicle_no" id="vehicle_no" class="form-control" app-field-label="Vehicle No" placeholder="*MH01AB1234" required title="Examples: 25 BH 1234 AH or MH 01 AB 1234" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');" onchange="vehicleNoValidation('vehicle_no');">
+                  </div>
+                </div>
+                <div class="col-md-2 mbot5">
+                  <div class="form-group" app-field-wrapper="vendor_doc_no">
+                    <label for="vendor_doc_no" class="control-label">Vendor Doc No</label>
+                    <input type="text" name="vendor_doc_no" id="vendor_doc_no" class="form-control" app-field-label="Vendor Doc No" placeholder="">
+                  </div>
+                </div>
+                <div class="col-md-2 mbot5">
+                  <div class="form-group" app-field-wrapper="vendor_doc_date">
+                    <?= render_date_input('vendor_doc_date', 'Vendor Doc Date', date('d/m/Y'), []); ?>
+                  </div>
+                </div>
+                <div class="col-md-2 mbot5">
+                  <div class="form-group" app-field-wrapper="vendor_doc_amt">
+                    <label for="vendor_doc_amt" class="control-label">Vendor Doc Amount</label>
+                    <input type="text" name="vendor_doc_amt" id="vendor_doc_amt" class="form-control" app-field-label="Vendor Doc Amount" placeholder="">
+                  </div>
+                </div>
+                <!-- <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="ledger_group_id">
                     <label for="ledger_group_id" class="control-label"><small class="req text-danger">* </small> Ledger Group</label>
                     <select name="ledger_group_id" id="ledger_group_id" class="form-control selectpicker" data-live-search="true" app-field-label="Ledger Group" required>
@@ -279,7 +285,7 @@
                       <option value="PURCH">Purchase Account</option>
                     </select>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="col-md-12 mbot5">
                   <h4 class="bold p_style">Items:</h4>
@@ -317,7 +323,7 @@
                         <td><input type="tel" id="unit_weight" class="form-control num2-form-control fixed_row" min="0" step="0.01" readonly tabindex="-1"></td>
                         <td style="min-width: 80px;"><input type="tel" id="min_qty" class="form-control num2-form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td style="min-width: 80px;"><input type="tel" id="unit_rate" class="form-control num2-form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
-                        <td style="min-width: 80px;"><input type="tel" id="disc_amt" class="form-control num2-form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
+                        <td style="min-width: 80px;"><input type="tel" id="disc_amt" class="form-control num2-form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');" value="0"></td>
                         <td><input type="tel" id="gst" class="form-control num2-form-control fixed_row" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
                         <td><input type="tel" id="cgstamt" class="form-control num2-form-control fixed_row" readonly tabindex="-1"></td>
                         <td><input type="tel" id="sgstamt" class="form-control num2-form-control fixed_row" readonly tabindex="-1"></td>
@@ -404,8 +410,8 @@
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <a href="#" class="btn btn-primary updateBtn" id="print_pdf" style="display: none;" target="_blank"><i class="fa fa-print"></i> Print PDF</a>
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('DirectPurchase', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('DirectPurchase', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn btn-danger" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
                   <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
                 </div>
@@ -593,6 +599,20 @@ if ($last_date_yr < $curr_date_new) {
       .replace(/(\..*?)\..*/g, '$1'); // allow only one dot
   });
 
+  function vehicleNoValidation(vehicleNoId) {
+    let vehicleNo = $('#' + vehicleNoId).val().toUpperCase().trim();
+    vehicleNo = vehicleNo.replace(/\s+/g, ' ');
+
+    var bhRegex = /^[0-9]{2}\s?BH\s?[0-9]{4}\s?[A-Z]{1,2}$/;
+    var rtoRegex = /^[A-Z]{2}\s?[0-9]{2}\s?[A-Z]{1,2}\s?[0-9]{4}$/;
+
+    if (!bhRegex.test(vehicleNo) && !rtoRegex.test(vehicleNo)) {
+      alert_float('warning', 'Please enter a valid Vehicle No. Examples: 25 BH 1234 AH or MH 01 AB 1234');
+      $('#' + vehicleNoId).focus();
+      return false;
+    }
+  }
+
   function validate_fields(fields) {
     let data = {};
     for (let i = 0; i < fields.length; i++) {
@@ -640,7 +660,7 @@ if ($last_date_yr < $curr_date_new) {
         <td><input type="tel" name="unit_weight[]" id="unit_weight${next_id}" class="form-control num2-form-control unit-weight dynamic_row${next_id}" min="0" step="0.01" readonly tabindex="-1"></td>
         <td><input type="tel" name="min_qty[]" id="min_qty${next_id}" class="form-control num2-form-control min-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="unit_rate[]" id="unit_rate${next_id}" class="form-control num2-form-control unit-rate dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="disc_amt[]" id="disc_amt${next_id}" class="form-control num2-form-control disc-amt dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
+        <td><input type="tel" name="disc_amt[]" id="disc_amt${next_id}" class="form-control num2-form-control disc-amt dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})" value="0"></td>
         <td><input type="tel" name="gst[]" id="gst${next_id}" class="form-control num2-form-control gst-percent dynamic_row${next_id}" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
         <td><input type="tel" name="cgst[]" id="cgst${next_id}" class="form-control num2-form-control cgst-amt dynamic_row${next_id}" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
         <td><input type="tel" name="sgst[]" id="sgst${next_id}" class="form-control num2-form-control sgst-amt dynamic_row${next_id}" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -664,6 +684,7 @@ if ($last_date_yr < $curr_date_new) {
       $('#igst' + next_id).val($('#igst').val());
       $('#amount' + next_id).val($('#amount').val());
       $('.fixed_row').val('');
+      $('#disc_amt').val(0);
       calculateAmount(next_id);
     }
     $('#row_id').val(next_id);
@@ -694,7 +715,7 @@ if ($last_date_yr < $curr_date_new) {
     }
 
     calculateTotals();
-    if ((row == '' || row == null) && minQty > 0 && unitRate > 0 && discAmt != '') {
+    if ((row == '' || row == null) && minQty > 0 && unitRate > 0) {
       addRow();
     }
   }
@@ -730,7 +751,7 @@ if ($last_date_yr < $curr_date_new) {
 
     var roundoff = Math.round(amt);
     var roundOffAmt = roundoff - amt;
-    $('#roundoff_amount').val(roundOffAmt);
+    $('#roundoff_amount').val(roundOffAmt.toFixed(2));
 
     var tds_amount = parseFloat($('#tds_amount').val()) || 0;
 
@@ -925,6 +946,11 @@ if ($last_date_yr < $curr_date_new) {
       return;
     }
 
+    let vehicleNo = vehicleNoValidation('vehicle_no');
+    if (vehicleNo === false) {
+      return;
+    }
+
     var form_data = new FormData(this);
     form_data.append(
       '<?= $this->security->get_csrf_token_name(); ?>',
@@ -1025,6 +1051,7 @@ if ($last_date_yr < $curr_date_new) {
             }
           });
           $('#payment_terms').val(d.PaymentTerms);
+          $('#vehicle_no').val(d.VehicleNo);
           $('#vendor_doc_no').val(d.VendorDocNo);
           $('#vendor_doc_date').val(moment(d.VendorDocDate).format('DD/MM/YYYY'));
           $('#vendor_doc_amt').val(d.VendorDocAmt);

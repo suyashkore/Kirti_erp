@@ -245,7 +245,7 @@
 									</div>
 								</div>
 
-								<div class="col-md-2 mbot5">
+								<!-- <div class="col-md-2 mbot5">
 									<div class="form-group">
 										<label><small class="req text-danger">*</small>Currency</label>
 										<select name="currency" id="currency" class="form-control selectpicker"
@@ -255,6 +255,14 @@
 												<option value="<?= $value['id']; ?>" <?= ($value['isdefault'] == 1) ? 'selected' : ''; ?>><?= $value['name']; ?></option>
 											<?php } ?>
 										</select>
+									</div>
+								</div> -->
+
+								<div class="col-md-2 mbot5">
+									<div class="form-group">
+										<label>currency</label>
+										<input type="text" name="currency" id="currency" class="form-control"
+											app-field-label="currency" readonly placeholder="currency">
 									</div>
 								</div>
 
@@ -568,7 +576,7 @@
 								<div class="col-md-12"
 									style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
 									<button type="submit"
-										class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>">
+										class="btn btn-success saveBtn <?= (has_permission_new('PurchaseOrder', '', 'create')) ? '' : 'disabled'; ?>">
 										<i class="fa fa-save"></i> Save
 									</button>
 									<button type="button" class="btn btn-primary printPdfBtn updateBtn"
@@ -576,7 +584,7 @@
 										<i class="fa fa-print"></i> Print PDF
 									</button>
 									<button type="submit"
-										class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>"
+										class="btn btn-success updateBtn <?= (has_permission_new('PurchaseOrder', '', 'edit')) ? '' : 'disabled'; ?>"
 										style="display: none;">
 										<i class="fa fa-save"></i> Update
 									</button>
@@ -1084,6 +1092,27 @@ if ($last_date_yr < $curr_date_new) {
 				loadShippingLocations(callback);
 			}
 		});
+
+
+			$.ajax({
+    url: '<?= admin_url('purchase/getCurrency'); ?>',
+    type: 'POST',
+    data: {
+        AccountID: vendorId
+    },
+    dataType: 'json',
+    success: function(response) {
+
+        if (response.status === 'success') {
+
+            $('#currency').val(response.data.currency_name);
+
+        }
+
+    }
+});
+
+		
 	}
 
 	// =============================================

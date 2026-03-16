@@ -15,6 +15,7 @@ class Vehiclein extends AdminController
 		* ADD / EDIT PAGE GATE IN
 		* ========================= */
 	public function index(){
+		if (!has_permission_new('generateGateIn', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Gate In';
 		$data['purchaselocation'] = $this->purchase_model->get_purchase_location();
 
@@ -87,6 +88,9 @@ class Vehiclein extends AdminController
 			$gatein_no = $this->Inwards_model->GetGateInNo($location_id);
 		}
 
+		$gatein_date = !empty($data['gatein_date'])
+			? date('Y-m-d', strtotime(str_replace('/', '-', $data['gatein_date'])))
+			: date('Y-m-d');
 		// =============================================
 		// Financial Year Date Validation
 		// =============================================
@@ -161,9 +165,11 @@ class Vehiclein extends AdminController
 		}
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('generateGateIn', '', 'create')) { access_denied('Access Denied'); }
 			$result = $this->Inwards_model->saveData('GateMaster', $insertData);
 			$details = $this->Inwards_model->getGateinDetails($result);
 		} else {
+			if (!has_permission_new('generateGateIn', '', 'edit')) { access_denied('Access Denied'); }
 			unset($insertData['GateINID']);
 			unset($insertData['LocationID']);
 			$result = $this->Inwards_model->updateData('GateMaster', $insertData, ['id' => $update_id]);
@@ -238,6 +244,7 @@ class Vehiclein extends AdminController
 	}
 
 	public function GateControl(){
+		if (!has_permission_new('gateControl', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Gate Control';
 		$data['purchaselocation'] = $this->purchase_model->get_purchase_location();
 
@@ -259,6 +266,7 @@ class Vehiclein extends AdminController
 	 * Calls Inwards_model->getGateInListByFilter and returns JSON
 	 */
 	public function GateInListExportExcel() {
+		if (!has_permission_new('gateControl', '', 'export')) { access_denied('Access Denied'); }
 		$this->output->enable_profiler(FALSE);
 		ob_end_clean();
 
@@ -390,9 +398,7 @@ class Vehiclein extends AdminController
 			redirect(admin_url('purchase/AddPurchaseOrder'));
 		}
 		
-		if (!has_permission_new('CashPurchaseList', '', 'view')) {
-			access_denied('Invoices');
-		}
+		if (!has_permission_new('gateControl', '', 'view')) { access_denied('Access Denied'); }
 		$invoice = [];
 		$data['gatein'] = $this->Inwards_model->getGateinDetails($gatein_no);
 		if(!$data['gatein']){

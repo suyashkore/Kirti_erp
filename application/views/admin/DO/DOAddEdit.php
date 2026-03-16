@@ -461,9 +461,17 @@
                 </div>
                 <!-- </div> -->
 
+                <!-- Invoice Lock Warning -->
+<div class="col-md-12" style="margin-top: 8px;">
+    <span id="invoice_lock_warning"
+        style="display:none; color:#c0392b; font-size:13px; font-weight:600;">
+        ⚠ This record is locked and cannot be updated because an Invoice has been created.
+    </span>
+</div>
+
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('deliveryOrder', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('deliveryOrder', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn btn-warning" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
                   <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
                 </div>
@@ -1103,6 +1111,11 @@ $(document).ready(function(){
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
+
+    $('#invoice_lock_warning').hide();
+    $('#main_save_form input:not([type="hidden"])').prop('readonly', false);
+    $('#main_save_form select').prop('disabled', false).selectpicker('refresh');
+    $('#main_save_form textarea').prop('readonly', false);
   }
   $(document).on('input', 'input[type="tel"]', function() {
     this.value = this.value
@@ -1818,6 +1831,29 @@ $(document).ready(function(){
             }
             processRow(0);
           }
+
+          // ── Invoice Lock: disable entire form if invoice exists ──
+if (d.is_invoice_locked == 1) {
+
+    // Show warning message
+    $('#invoice_lock_warning').show();
+
+    // Lock all form inputs
+    $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
+    $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
+    $('#main_save_form textarea').prop('readonly', true);
+
+    // Lock all dispatch qty fields in items table
+    $('#items_body input').prop('readonly', true);
+
+    // Hide Save/Update buttons
+    $('.saveBtn').hide();
+    $('.updateBtn').hide();
+
+} else {
+    $('#invoice_lock_warning').hide();
+    $('.updateBtn').show();
+}
 
           $('.selectpicker').selectpicker('refresh');
           $('#form_mode').val('edit');

@@ -121,7 +121,7 @@ function hrm_permissions()
             'delete' => _l('permission_delete'),
     ];
 
-    register_staff_capabilities('hrm', $capabilities, _l('hrm'));
+    // register_staff_capabilities('hrm', $capabilities, _l('hrm'));
 }
 
 

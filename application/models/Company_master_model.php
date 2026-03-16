@@ -84,6 +84,7 @@ class Company_master_model extends App_Model
 
     public function update($data, $id)
     {
+
         if (isset($data['id'])) unset($data['id']);
 
         $root_status = $this->map_root_status($data['status'] ?? '1');
@@ -106,8 +107,8 @@ class Company_master_model extends App_Model
         $success = $this->db->update('tblrootcompany', $db_data);
 
         if ($success) {
-            $this->db->where('PlantID', (int)$id)->delete('tblPlantLocationDetails');
-            $this->save_locations((int)$id, $data);
+            // $this->db->where('PlantID', (int)$id)->delete('tblPlantLocationDetails');
+            $this->update_locations((int)$id, $data);
         }
 
         return $success;
@@ -172,7 +173,81 @@ class Company_master_model extends App_Model
             $this->db->insert('tblPlantLocationDetails', $location_data);
         }
     }
+    
+    private function update_locations($plant_id, $data)
+{
+    $loc_ids     = $data['loc_id'] ?? [];
+    $loc_states  = $data['loc_state'] ?? [];
+    $loc_cities  = $data['loc_city'] ?? [];
+    $loc_names   = $data['loc_location'] ?? [];
+    $loc_addr    = $data['loc_address'] ?? [];
+    $loc_pin     = $data['loc_pincode'] ?? [];
+    $loc_mob     = $data['loc_mobile'] ?? [];
+    $loc_status  = $data['loc_status'] ?? [];
+    $loc_fssai   = $data['loc_fssai'] ?? [];
+    $loc_expiry  = $data['loc_expiry_date'] ?? [];
 
+    $has_rows = is_array($loc_states) && count($loc_states) > 0;
+
+    if (!$has_rows) {
+        $loc_ids    = [ '' ];
+        $loc_states = [ $data['state'] ?? '' ];
+        $loc_cities = [ $data['city'] ?? 0 ];
+        $loc_names  = [ '' ];
+        $loc_addr   = [ $data['address'] ?? '' ];
+        $loc_pin    = [ $data['pincode'] ?? '' ];
+        $loc_mob    = [ $data['mobile'] ?? '' ];
+        $loc_status = [ ($data['status'] ?? 'active') ];
+        $loc_fssai  = [ '' ];
+        $loc_expiry = [ '' ];
+    }
+
+    $staff_id = function_exists('get_staff_user_id') ? (string)get_staff_user_id() : '0';
+
+    $rows = count($loc_states);
+    for ($i = 0; $i < $rows; $i++) {
+        $stateCode = $loc_states[$i] ?? '';
+        $cityId    = $loc_cities[$i] ?? 0;
+        $addr      = $loc_addr[$i] ?? '';
+
+        if ($stateCode === '' && (int)$cityId === 0 && trim($addr) === '') {
+            continue;
+        }
+
+        $location_data = [
+            'PlantID'         => (int)$plant_id,
+            'comp_short'      => $data['comp_short'] ?? '',
+            'StateCode'       => $stateCode,
+            'CityID'          => !empty($cityId) ? (int)$cityId : 0,
+            'LocationName'    => $loc_names[$i] ?? '',
+            'Address'         => $addr,
+            'PinCode'         => !empty($loc_pin[$i]) ? (int)$loc_pin[$i] : 0,
+            'MobileNo'        => $loc_mob[$i] ?? '',
+            'fssai_no'        => $loc_fssai[$i] ?? null,
+            'fssai_no_expiry' => !empty($loc_expiry[$i]) ? $loc_expiry[$i] : null,
+            'IsActive'        => $this->map_loc_active($loc_status[$i] ?? 'active'),
+            'UserID2'         => $staff_id,
+            'LupDate'         => date('Y-m-d H:i:s'),
+        ];
+
+        $existing_id = !empty($loc_ids[$i]) ? (int)$loc_ids[$i] : 0;
+
+        if ($existing_id > 0) {
+            // UPDATE existing record
+            $this->db->where('id', $existing_id);
+            $this->db->where('PlantID', (int)$plant_id);
+            $this->db->update('tblPlantLocationDetails', $location_data);
+        } else {
+            // INSERT new record
+            $location_data['UserID']    = $staff_id;
+            $location_data['TransDate'] = date('Y-m-d H:i:s');
+            $location_data['UserID2']   = null;
+            $location_data['LupDate']   = null;
+
+            $this->db->insert('tblPlantLocationDetails', $location_data);
+        }
+    }
+}
     public function delete($id)
     {
         $id = (int)$id;

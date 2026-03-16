@@ -14,6 +14,7 @@ class Invoice extends AdminController
 
 	public function AddEditPurchInvoice($id = '')
 	{
+		if (!has_permission_new('PurchaseInvoice', '', 'view')) { access_denied('Access Denied'); }
 		/*if($this->input->post()){
 	        $form_data = $this->input->post();
 	        $result = $this->invoice_model->AddNewPurchInvoice($form_data);
@@ -34,6 +35,7 @@ class Invoice extends AdminController
 	}
 	public function AddNewPurchInvoice()
 	{
+		if (!has_permission_new('PurchaseInvoice', '', 'create')) { access_denied('Access Denied'); }
 		$data = array(
 			"VendorID" => $this->input->post('VendorID'),
 			"InwardID" => $this->input->post('InwardID'),
@@ -170,6 +172,7 @@ class Invoice extends AdminController
 	}
 	public function index()
 	{
+		if (!has_permission_new('PurchaseInvoice', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Invoice Master';
 
 		$data['vendor_list'] = $this->invoice_model->GetPendingInvoiceVendorList();
@@ -185,6 +188,7 @@ class Invoice extends AdminController
 
 	public function UpdateInvoice()
 	{
+		if (!has_permission_new('PurchaseInvoice', '', 'edit')) { access_denied('Access Denied'); }
 		if (empty($this->input->post())) {
 			echo json_encode(['success' => false, 'message' => 'No data received']);
 			return;
@@ -336,6 +340,7 @@ class Invoice extends AdminController
 		* ========================= */
 	public function List()
 	{
+		if (!has_permission_new('PurchaseInvoiceList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Invoice List';
 
 		$this->load->view('admin/Invoice/InvoiceList', $data);

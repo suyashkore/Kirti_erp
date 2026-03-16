@@ -86,9 +86,9 @@ th { background: #50607b; color: #fff !important; }
                   </div>
                 </div>
                 <div class="col-md-9 mbot5" style="padding-top: 20px;">
-                  <button type="submit" class="btn btn-success" id="searchBtn" onclick="applyClientFilter()"><i class="fa fa-list"></i> Show</button>
-                  <button type="button" class="btn btn-info exportBtn" onclick="exportTableToExcel()" style="display: none;"><i class="fa fa-file-excel"></i> Excel</button>
-                  <button type="button" class="btn btn-info exportBtn" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>
+                  <button type="submit" class="btn btn-success <?= (has_permission_new('salesQuotationList', '', 'view')) ? '' : 'disabled'; ?>" id="searchBtn" onclick="applyClientFilter()"><i class="fa fa-list"></i> Show</button>
+                  <button type="button" class="btn btn-info exportBtn <?= (has_permission_new('salesQuotationList', '', 'export')) ? '' : 'disabled'; ?>" onclick="exportTableToExcel()" style="display: none;"><i class="fa fa-file-excel"></i> Excel</button>
+                  <button type="button" class="btn btn-info exportBtn <?= (has_permission_new('salesQuotationList', '', 'print')) ? '' : 'disabled'; ?>" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>
                 </div>
                 <div class="col-md-3 mbot5" style="padding-top: 20px;">
                   <input type="search" class="form-control" id="myInput1" onkeyup="myFunction2()" placeholder="Search..." title="Type in a table">
@@ -105,7 +105,7 @@ th { background: #50607b; color: #fff !important; }
                   <table class="table table-striped table-bordered table-list" id="table-list" width="100%">
                     <thead>
                       <tr class="mainHead" style="display: none;">
-                        <td colspan="8">
+                        <td colspan="16">
                           <h5 style="text-align:center;">
                             <span style="font-size:15px; font-weight:700;"><?= $company_detail->company_name ?? ''; ?></span><br>
                             <span style="font-size:10px; font-weight:600;"><?= $company_detail->address ?? ''; ?></span>
@@ -113,7 +113,7 @@ th { background: #50607b; color: #fff !important; }
                         </td>
                       </tr>
                       <tr class="mainHead" style="display: none;">
-                        <td colspan="8">
+                        <td colspan="16">
                           <span class="report_for" style="font-size:10px;"></span>
                         </td>
                       </tr>

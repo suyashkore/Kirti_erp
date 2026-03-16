@@ -1390,7 +1390,9 @@ class Purchase_model extends App_Model
 		// Map form fields to database column names - only non-null values
 		// echo"";
 		// print_r($form_data);die;
-
+// echo"<pre>";
+// print_r($form_data);
+// die();
 
 		$data = [
 
@@ -26258,6 +26260,16 @@ class Purchase_model extends App_Model
 
 		return $this->db->get()->result_array();
 	}
+public function getCurrency($AccountID)
+{
+    $this->db->select('tblcurrencies.name as currency_name');
+
+    $this->db->from('tblclients');
+    $this->db->join('tblcurrencies', 'tblclients.default_currency = tblcurrencies.id', 'left');
+    $this->db->where('tblclients.AccountID', $AccountID);
+
+    return $this->db->get()->row_array();
+}
 
 
 public function GetvandocDetails($purchase_order_no)

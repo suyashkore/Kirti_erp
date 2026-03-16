@@ -78,13 +78,6 @@ th { background: #50607b; color: #fff !important; }
                     <label for="gatein_no" class="control-label">Gate In</label>
                     <select name="gatein_no" id="gatein_no" class="form-control selectpicker" data-live-search="true" app-field-label="Gate In">
                       <option value="" selected>None selected</option>
-                      <?php
-                      if (!empty($gatein_list)) :
-                        foreach ($gatein_list as $value) :
-                          echo '<option value="' . $value['GateINID'] . '">' . $value['VehicleNo'] . ' ('.$value['GateINID'].')</option>';
-                        endforeach;
-                      endif;
-                      ?>
                     </select>
                   </div>
                 </div>
@@ -229,8 +222,8 @@ th { background: #50607b; color: #fff !important; }
                 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <a href="#" class="btn btn-primary updateBtn" id="print_pdf" style="display: none;" target="_blank"><i class="fa fa-print"></i> Print PDF</a>
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-									<button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('PurchaseInward', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+									<button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('PurchaseInward', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
 									<button type="button" class="btn btn-danger" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
 									<button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
                 </div>
@@ -716,12 +709,17 @@ $(document).ready(function(){
           var html = '<option value="" selected disabled>Select Item</option>';
           $.each(response.item_list, function (index, val) {
             html += '<option value="' + val.ItemId + '">' + val.ItemName + '</option>';
-						});
+					});
           $('#item_id').html(html);
+          var html = '<option value="" selected disabled>Select Item</option>';
+          $.each(response.gatein_list, function (index, val) {
+            html += `<option value="${val.GateINID}">${val.VehicleNo} (${val.GateINID})</option>`;
+					});
+          $('#gatein_no').html(html);
           var html = '<option value="" selected disabled>Select Item</option>';
           $.each(response.godown_list, function (index, val) {
             html += '<option value="' + val.id + '">' + val.GodownName + '</option>';
-						});
+					});
           $('#godown_id').html(html);
           $('.selectpicker').selectpicker('refresh');
 

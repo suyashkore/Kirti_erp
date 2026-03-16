@@ -14,6 +14,7 @@ class Quotation extends AdminController
 		* ADD / EDIT PAGE
 		* ========================= */
 	public function index(){
+		if (!has_permission_new('PurchaseQuotation', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Quotation Master';
 		$data['item_type'] = $this->Quotation_model->getDropdown('ItemTypeMaster', 'id, ItemTypeName', ['isActive' => 'Y'], 'id', 'ASC');
 		$data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
@@ -226,10 +227,12 @@ class Quotation extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('PurchaseQuotation', '', 'create')) { access_denied('Access Denied'); }
 			$insertData['TransDate2'] = date('Y-m-d H:i:s');
 			$result = $this->Quotation_model->saveData('PurchQuotationMaster', $insertData);
 			$details = $this->Quotation_model->getQuoteDetails($result);
 		} else {
+			if (!has_permission_new('PurchaseQuotation', '', 'edit')) { access_denied('Access Denied'); }
 			$result = $this->Quotation_model->updateData('PurchQuotationMaster', $insertData, ['id' => $update_id]);
 			$details = $this->Quotation_model->getQuoteDetails($update_id);
 		}
@@ -242,6 +245,7 @@ class Quotation extends AdminController
 				'quotation_date' => $quotation_date,
 				'vendor_id' => $vendor_id,
 				'vendor_state' => $vendor_state,
+				'godown_id' => null,
 				'item_uid' => $data['item_uid'] ?? [],
 				'item_id' => $data['item_id'] ?? [],
 				'hsn_code' => $data['hsn_code'] ?? [],
@@ -290,6 +294,7 @@ class Quotation extends AdminController
 		* LIST PAGE
 		* ========================= */
 	public function List(){
+		if (!has_permission_new('PurchaseQuotationList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Quotation List';
     $data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
 
@@ -344,6 +349,7 @@ class Quotation extends AdminController
   }
 
   public function ListExportExcel(){
+		if (!has_permission_new('PurchaseQuotationList', '', 'export')) { access_denied('Access Denied'); }
     $this->output->enable_profiler(FALSE);
     ob_end_clean();
 
@@ -493,4 +499,55 @@ class Quotation extends AdminController
         'file_url' => base_url('uploads/exports/'.$filename)
     ]);
   }
+
+ 	// Controller - create_po()
+	public function create_po(){
+    if (empty($this->input->post())) {
+        show_error('Invalid Request', 400);
+        return;
+    }
+
+    $quotation_ids = $this->input->post('quotation_ids');
+
+    if (empty($quotation_ids) || !is_array($quotation_ids)) {
+        show_error('No Quotation IDs received', 400);
+        return;
+    }
+
+    $PlantID = $this->session->userdata('root_company');
+    $UserID  = $this->session->userdata('username');
+    $FY      = $this->session->userdata('finacial_year');
+
+    $all_quotation_data = [];
+
+    foreach ($quotation_ids as $qid) {
+        $details = $this->Quotation_model->getQuoteDetails($qid);
+        if (!empty($details)) {
+            $all_quotation_data[] = $details;
+        }
+    }
+
+    if (empty($all_quotation_data)) {
+        $this->session->set_flashdata('error', 'No valid Quotation data found.');
+        redirect(admin_url('purchase/Quotation/List'));
+        return;
+    }
+
+    $po_result = $this->Quotation_model->createPOFromQuotations([
+        'plant_id'      => $PlantID,
+        'user_id'       => $UserID,
+        'fy'            => $FY,
+        'quotations'    => $all_quotation_data,
+        'quotation_ids' => $quotation_ids,
+    ]);
+
+    if ($po_result['success']) {
+        $this->session->set_flashdata('success', 'PO Generated Successfully!');
+        redirect(admin_url('purchase/Quotation/List'));
+    } else {
+        $this->session->set_flashdata('error', $po_result['message'] ?? 'Error creating PO.');
+        redirect(admin_url('purchase/Quotation/List'));
+    }
+	}
+
 }

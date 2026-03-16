@@ -75,14 +75,14 @@
                   <div class="form-group" app-field-wrapper="to_date">
                     <label for="to_date" class="control-label">To Date</label>
                     <div class="input-group date">
-                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y") ?>" app-field-label="To Date" >
+                      <input type="text" id="to_date" name="to_date" class="form-control datepicker filterInput" value="<?= date("d/m/Y") ?>" app-field-label="To Date">
                       <div class="input-group-addon">
                         <i class="fa-regular fa-calendar calendar-icon"></i>
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="col-md-9 mbot5" style="padding-top: 20px;">
                   <button type="submit" class="btn btn-success" id="searchBtn"><i class="fa fa-list"></i> Show</button>
                   <button type="button" class="btn btn-info exportBtn" onclick="exportTableToExcel()" style="display: none;"><i class="fa fa-file-excel"></i> Excel</button>
@@ -103,7 +103,7 @@
                   <table class="table table-striped table-bordered table-list" id="table-list" width="100%">
                     <thead>
                       <tr class="mainHead" style="display: none;">
-                        <td colspan="8">
+                        <td colspan="13">
                           <h5 style="text-align:center;">
                             <span style="font-size:15px; font-weight:700;"><?= $company_detail->company_name ?? ''; ?></span><br>
                             <span style="font-size:10px; font-weight:600;"><?= $company_detail->address ?? ''; ?></span>
@@ -111,7 +111,7 @@
                         </td>
                       </tr>
                       <tr class="mainHead" style="display: none;">
-                        <td colspan="8">
+                        <td colspan="13">
                           <span class="report_for" style="font-size:10px;"></span>
                         </td>
                       </tr>
@@ -121,7 +121,7 @@
                         <th class="sortable">Customer Name</th>
                         <th class="sortablePop">Total Weight</th>
 
-                        <th class="sortablePop">Total Qty</th>
+                        <th class="sortablePop">Dispatched Qty</th>
                         <th class="sortablePop">Item Total</th>
                         <th class="sortablePop">Total Disc</th>
                         <th class="sortablePop">Taxable Amt</th>
@@ -178,30 +178,6 @@
     $('.selectpicker').selectpicker('refresh');
   }
 
-  function getCustomerDetailsLocation() {
-    var customerId = $('#customer_id').val();
-    $.ajax({
-      url: '<?= admin_url('SalesQuotation/getCustomerDetailsLocation'); ?>',
-      type: 'POST',
-      data: {
-        customer_id: customerId
-      },
-      dataType: 'json',
-      success: function(response) {
-        if (response.success == true) {
-          html = '<option value="" selected>None selected</option>';
-          $.each(response.broker_list, function(index, loc) {
-            if (loc.AccountID == null || loc.AccountID == '') return;
-            html += `<option value="${loc.AccountID}">${loc.company} (${loc.AccountID})</option>`;
-          });
-          $('#broker_id').html(html);
-
-          $('.selectpicker').selectpicker('refresh');
-        }
-      }
-    });
-  }
-
   $('#filter_list_form').submit(function(e) {
     e.preventDefault();
 
@@ -223,7 +199,7 @@
       );
 
       $.ajax({
-        url: "<?= admin_url('SalesOrder/ListFilter') ?>",
+        url: "<?= admin_url('SalesInvoice/ListFilter') ?>",
         type: "POST",
         data: form_data,
         processData: false,
@@ -234,7 +210,7 @@
             $('#searchBtn').prop('disabled', false);
             if (offset === 0) {
               $('#table-list tbody').html(
-                '<tr><td colspan="14" class="text-center">No Data Found</td></tr>'
+                '<tr><td colspan="13" class="text-center">No Data Found</td></tr>'
               );
             }
             return;
@@ -266,19 +242,18 @@
     let html = '';
     rows.forEach(function(row) {
       html += `<tr>
-        <td class="text-center">${row.OrderID}</td>
-        <td>${moment(row.TransDate).format('DD/MM/YYYY')}</td>
+        <td class="text-center">${row.InvoiceID}</td>
+        <td>${moment(row.InvoiceDate).format('DD/MM/YYYY')}</td>
         <td>${row.customer_name} (${row.AccountID})</td>
-        <td>${row.broker_name || ''} (${row.BrokerID || ''})</td>
-        <td>${row.TotalWeight || ''}</td>
-        <td>${row.TotalQuantity || ''}</td>
-        <td>${row.DiscAmt || ''}</td>
-        <td>${row.ItemAmt || ''}</td>
-        <td>${row.TaxableAmt || ''}</td>
+        <td>${row.TotalWt || ''}</td>
+        <td>${row.TotalQty || ''}</td>
+        <td>${row.ItemTotal || ''}</td>
+        <td>${row.TotalDisc || ''}</td>
+        <td>${row.TaxAmt || ''}</td>
         <td>${row.CGSTAmt || ''}</td>
         <td>${row.SGSTAmt || ''}</td>
         <td>${row.IGSTAmt || ''}</td>
-        <td>${row.RoundOffAmt || ''}</td>
+        <td>${row.RoundOff || ''}</td>
         <td>${row.NetAmt || ''}</td>
       </tr>`;
     });
@@ -301,7 +276,7 @@
     $('.exportBtn').prop('disabled', true);
 
     $.ajax({
-      url: "<?= admin_url('SalesQuotation/ListExportExcel') ?>",
+      url: "<?= admin_url('SalesInvoice/ListExportExcel') ?>",
       type: 'POST',
       data: formData,
       dataType: 'json',

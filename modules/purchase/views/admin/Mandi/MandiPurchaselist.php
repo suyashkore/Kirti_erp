@@ -136,13 +136,14 @@ th { background: #50607b; color: #fff !important; position: sticky; top: 0; z-in
               <!-- Print/Excel + Search -->
               <div class="row" style="margin-bottom:5px;">
                 <div class="col-md-3 mbot5" style="padding-top:5px;">
-                  <button type="button" class="btn btn-info btn-sm" onclick="printTable();" title="Print Table">
-                    <i class="fa fa-print"></i> Print
-                  </button>
-                  &nbsp;
-                  <button type="button" class="btn btn-success btn-sm" onclick="exportToExcel();" title="Export to Excel">
-                    <i class="fa fa-file-excel-o"></i> Excel
-                  </button>
+                  <?php
+                  if (has_permission_new('MandiPurchaseList', '', 'export')) {
+                    echo '<button type="button" class="btn btn-success btn-sm" onclick="exportToExcel();" title="Export to Excel"> <i class="fa fa-file-excel-o"></i> Excel </button> ';
+                  }
+                  if (has_permission_new('MandiPurchaseList', '', 'print')) {
+                    echo '<button type="button" class="btn btn-info btn-sm" onclick="printTable();" title="Print Table"> <i class="fa fa-print"></i> Print </button>>';
+                  }
+                  ?>
                 </div>
                 <div class="col-md-3 col-md-offset-6 mbot5" style="padding-top:5px;">
                   <input type="search" class="form-control" id="myInput1" onkeyup="myFunction2()" placeholder="Search in table..." title="Type in a table">

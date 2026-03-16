@@ -16,6 +16,7 @@ class Direct extends AdminController
 		* ADD / EDIT PAGE
 		* ========================= */
 	public function index(){
+		if (!has_permission_new('DirectPurchase', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Direct Purchase';
 		$data['FY'] = $this->session->userdata('finacial_year');
     $data['po_no'] = $this->DirectPurchase_model->getNextDPONo();
@@ -82,7 +83,7 @@ class Direct extends AdminController
 		foreach ($field_names as $key => $value) {
 			if(!is_array($data[$value])) $data[$value] = trim($data[$value]);
 		}
-		$required_fields = ['center_location', 'warehouse_id', 'purchase_type', 'vendor_id', 'vendor_state', 'payment_terms'];
+		$required_fields = ['center_location', 'warehouse_id', 'purchase_type', 'vendor_id', 'vendor_state', 'payment_terms', 'vehicle_no'];
 
     if($data['form_mode'] == 'edit'){
       $required_fields[] = 'update_id';
@@ -115,6 +116,7 @@ class Direct extends AdminController
     $vendor_state = $data['vendor_state'] ?? '';
     $closing_balance = $data['closing_balance'] ?? '';
     $broker_id = $data['broker_id'] ?? '';
+		$vehicle_no = strtoupper($data['vehicle_no'] ?? 'NONE');
     $vendor_doc_no = $data['vendor_doc_no'] ?? '';
     if($data['vendor_doc_date']){
 			$vendor_doc_date = date('Y-m-d', strtotime(str_replace('/', '-', $data['vendor_doc_date'])));
@@ -181,6 +183,7 @@ class Direct extends AdminController
       'GSTIN' => $vendor_gst,
       'state' => $vendor_state,
       'ClosingBalance' => $closing_balance,
+			'VehicleNo' => $vehicle_no,
       'VendorDocNo' => $vendor_doc_no,
       'VendorDocDate' => $vendor_doc_date,
       'VendorDocAmt' => $vendor_doc_amt,
@@ -201,9 +204,11 @@ class Direct extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('DirectPurchase', '', 'create')) { access_denied('Access Denied'); }
 			$result = $this->DirectPurchase_model->saveData('DirectPurchaseMaster', $insertData);
 			$details = $this->DirectPurchase_model->getDPODetails($result);
 		} else {
+			if (!has_permission_new('DirectPurchase', '', 'edit')) { access_denied('Access Denied'); }
 			$result = $this->DirectPurchase_model->updateData('DirectPurchaseMaster', $insertData, ['id' => $update_id]);
 			$details = $this->DirectPurchase_model->getDPODetails($update_id);
 		}
@@ -217,6 +222,7 @@ class Direct extends AdminController
 				'order_date' => $order_date,
 				'vendor_id' => $vendor_id,
 				'vendor_state' => $vendor_state,
+				'godown_id' => $warehouse_id,
 				'item_uid' => $data['item_uid'] ?? [],
 				'item_id' => $data['item_id'] ?? [],
 				'item_group' => $data['item_group'] ?? [],
@@ -343,6 +349,7 @@ class Direct extends AdminController
 	}
 	
 	public function List(){
+		if (!has_permission_new('DirectPurchaseList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Direct Purchase Order List';
 		$data['FY'] = $this->session->userdata('finacial_year');
     $data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
@@ -354,6 +361,7 @@ class Direct extends AdminController
 	}
 
 	public function ListExportExcel(){
+		if (!has_permission_new('DirectPurchaseList', '', 'export')) { access_denied('Access Denied'); }
     $this->output->enable_profiler(FALSE);
     ob_end_clean();
 

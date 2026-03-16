@@ -43,15 +43,15 @@ function einvoice_module_init(): void
         ]);
     }
 
-    register_staff_capabilities(
-        'einvoice_module',
-        [
-            'capabilities' => [
-                'bulk_export' => _l('einvoice_module_permission_bulk'),
-            ]
-        ],
-        _l('einvoice')
-    );
+    // register_staff_capabilities(
+    //     'einvoice_module',
+    //     [
+    //         'capabilities' => [
+    //             'bulk_export' => _l('einvoice_module_permission_bulk'),
+    //         ]
+    //     ],
+    //     _l('einvoice')
+    // );
 }
 
 hooks()->add_action('activate_einvoice_module', 'einvoice_module_activation_hook');

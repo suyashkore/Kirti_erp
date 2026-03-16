@@ -144,7 +144,7 @@
                       <?php
                       if (!empty($customer_list)) :
                         foreach ($customer_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">'. $value['company'] . ' - ' . ($value['billing_state'] ?? ''). ' (' . $value['AccountID'] . ')</option>';
+                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' - ' . ($value['billing_state'] ?? '') . ' (' . $value['AccountID'] . ')</option>';
                         endforeach;
                       endif;
                       ?>
@@ -217,7 +217,7 @@
                         <td><input type="text" id="uom" class="form-control fixed_row" readonly tabindex="-1"></td>
                         <td><input type="tel" id="unit_weight" class="form-control fixed_row" min="0" step="0.01" readonly tabindex="-1"></td>
                         <td><input type="tel" id="min_qty" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
-                        <td><input type="tel" id="max_qty" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
+                        <td><input type="tel" id="max_qty" class="form-control fixed_row" min="0" step="0.01" readonly></td>
                         <td><input type="tel" id="disc_amt" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="unit_rate" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="gst" class="form-control fixed_row" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -307,7 +307,7 @@
                     <!-- LEFT COLUMN -->
                     <div class="col-md-6 col-sm-6 col-xs-6">
                       <div class="total-label-row">
-                        <label>Total Weight:</label>
+                        <label>Total Wt (Kg):</label>
                         <div class="total-display" id="total_weight_display">0.00</div>
                       </div>
 
@@ -369,8 +369,8 @@
                 <!-- </div> -->
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('salesQuotation', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('salesQuotation', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn btn-warning" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
                   <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
                 </div>
@@ -494,25 +494,24 @@
 
 
 <?php
-    $fy = $this->session->userdata('finacial_year');
-    $fy_new = $fy + 1;
-    $lastdate_date = '20'.$fy_new.'-03-31';
-    $curr_date = date('Y-m-d');
-    $curr_date_new = new DateTime($curr_date);
-    $last_date_yr = new DateTime($lastdate_date);
-    if($last_date_yr < $curr_date_new){
-        $max_date_php = $lastdate_date;
-    } else {
-        $max_date_php = $curr_date;
-    }
+$fy = $this->session->userdata('finacial_year');
+$fy_new = $fy + 1;
+$lastdate_date = '20' . $fy_new . '-03-31';
+$curr_date = date('Y-m-d');
+$curr_date_new = new DateTime($curr_date);
+$last_date_yr = new DateTime($lastdate_date);
+if ($last_date_yr < $curr_date_new) {
+  $max_date_php = $lastdate_date;
+} else {
+  $max_date_php = $curr_date;
+}
 ?>
 <?php init_tail(); ?>
 <script>
-
-$(document).ready(function(){
-    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
-    var year    = "20" + fin_y;
-    var cur_y   = new Date().getFullYear().toString().substr(-2);
+  $(document).ready(function() {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
 
     // Min date: April 1st of FY start year
     var minStartDate = new Date(year, 3, 1); // month index 3 = April
@@ -520,40 +519,40 @@ $(document).ready(function(){
     // Max date: March 31 of FY end year, OR today if still within FY
     var maxEndDate;
     if (parseInt(cur_y) > parseInt(fin_y)) {
-        var fy_new   = parseInt(fin_y) + 1;
-        var fy_new_s = "20" + fy_new;
-        maxEndDate   = new Date(fy_new_s + '/03/31');
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
     } else {
-        maxEndDate = new Date();
+      maxEndDate = new Date();
     }
 
     // Order Date — restricted within FY, up to today or March 31
     $('#quotation_date').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,
-        maxDate: maxEndDate,
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
 
     // Delivery From — same FY restriction
     $('#delivery_from').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,
-        maxDate: maxEndDate,
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
 
     // Delivery To — min is today, max is March 31 of FY end
     var fy_end_year = "20" + (parseInt(fin_y) + 1);
-    var fyEndDate   = new Date(fy_end_year + '/03/31');
+    var fyEndDate = new Date(fy_end_year + '/03/31');
 
     $('#delivery_to').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,    // can't go before FY start
-        maxDate: fyEndDate,       // always allows up to March 31 for delivery planning
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate, // can't go before FY start
+      maxDate: fyEndDate, // always allows up to March 31 for delivery planning
+      timepicker: false
     });
-});
+  });
   $('#ListModal').on('shown.bs.modal', function() {
     $('#searchBtn').trigger('click');
   });
@@ -651,7 +650,7 @@ $(document).ready(function(){
         <td><input type="text" name="uom[]" id="uom${next_id}" class="form-control dynamic_row${next_id}" readonly tabindex="-1"></td>
         <td><input type="tel" name="unit_weight[]" id="unit_weight${next_id}" class="form-control unit-weight dynamic_row${next_id}" min="0" step="0.01" readonly tabindex="-1"></td>
         <td><input type="tel" name="min_qty[]" id="min_qty${next_id}" class="form-control min-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="max_qty[]" id="max_qty${next_id}" class="form-control max-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
+        <td><input type="tel" name="max_qty[]" id="max_qty${next_id}" class="form-control max-qty dynamic_row${next_id}" min="0" step="0.01" readonly></td>
         <td><input type="tel" name="disc_amt[]" id="disc_amt${next_id}" class="form-control disc-amt dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="unit_rate[]" id="unit_rate${next_id}" class="form-control unit-rate dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="gst[]" id="gst${next_id}" class="form-control gst-percent dynamic_row${next_id}" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -676,13 +675,14 @@ $(document).ready(function(){
     $('#row_id').val(next_id);
     $('.selectpicker').selectpicker('refresh');
   }
+  
 
   function calculateAmount(row) {
     var minQty = parseFloat($('#min_qty' + row).val()) || 0;
     var unitRate = parseFloat($('#unit_rate' + row).val()) || 0;
     var discAmt = parseFloat($('#disc_amt' + row).val()) || 0;
     var gstPercent = parseFloat($('#gst' + row).val()) || 0;
-    $('#max_qty'+row).val(minQty+2);
+    $('#max_qty' + row).val(minQty + 2);
 
     var taxableAmt = (unitRate - discAmt) * minQty;
     var gstAmt = taxableAmt * (gstPercent / 100);
@@ -1214,9 +1214,11 @@ $(document).ready(function(){
   .search-btn:hover {
     background: #168ac0;
   }
+
   #table_ListModal tbody tr {
     cursor: pointer;
   }
+
   #table_ListModal tbody tr:hover {
     background-color: rgb(171, 174, 176);
   }

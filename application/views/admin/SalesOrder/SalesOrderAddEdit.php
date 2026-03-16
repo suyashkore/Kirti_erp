@@ -316,7 +316,7 @@
                     <!-- LEFT COLUMN -->
                     <div class="col-md-6 col-sm-6 col-xs-6">
                       <div class="total-label-row">
-                        <label>Total Weight:</label>
+                        <label>Total Wt (Kg):</label>
                         <div class="total-display" id="total_weight_display">0.00</div>
                       </div>
 
@@ -377,8 +377,8 @@
                 </div>
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('items', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="button" class="btn btn-primary printBtn" style="display: none;" onclick="printPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</button>
+                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('salesOrder', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="button" class="btn btn-primary printBtn <?= (has_permission_new('salesOrder', '', 'print')) ? '' : 'disabled'; ?>" style="display: none;" onclick="printPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</button>
                   <script>
                     // Print PDF function
                     function printPurchaseOrderPdf() {
@@ -391,7 +391,7 @@
                       window.open(url, '_blank');
                     }
                   </script>
-                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('items', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('salesOrder', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn btn-warning" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
                   <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
                 </div>
@@ -1003,6 +1003,11 @@ $(document).ready(function(){
             });
           });
         });
+                  $('#delivery_to').val(moment(d.DeliveryTo).format('DD/MM/YYYY'));
+          $('#delivery_from').val(moment(d.DeliveryFrom).format('DD/MM/YYYY'));
+          $('#payment_terms').val(d.PaymentTerms);
+          $('#freight_terms').val(d.FreightTerms);
+
       }
     });
   }

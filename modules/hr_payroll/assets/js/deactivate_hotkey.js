@@ -1,6 +1,6 @@
-$(function () {
-  "use strict";
-
-  $.Shortcuts.stop();
-  
+$(function () {
+  "use strict";
+
+  $.Shortcuts.stop();
+  
 });

@@ -198,7 +198,7 @@ function account_permissions()
             'delete' => _l('permission_delete'),
     ];
 
-    register_staff_capabilities('account', $capabilities, _l('hrm'));
+    // register_staff_capabilities('account', $capabilities, _l('hrm'));
 }
 
 

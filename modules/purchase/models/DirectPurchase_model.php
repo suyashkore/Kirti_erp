@@ -91,6 +91,7 @@ class DirectPurchase_model extends App_Model
 				'TType2'      => $data['TType2'],
         'AccountID'   => $data['vendor_id'] ?? '',
         'ItemID'      => $data['item_id'][$i],
+        'GodownID'    => $data['godown_id'],
         'BasicRate'   => $data['unit_rate'][$i],
         'SaleRate'    => ($data['unit_rate'][$i] * ($gst_percent / 100)),
         'SuppliedIn'  => $data['uom'][$i],

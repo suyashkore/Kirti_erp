@@ -17,6 +17,7 @@ class Mandi extends AdminController
 	 */
 	public function index()
 	{
+		if (!has_permission_new('MandiPurchase', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Mandi Purchase';
 		$data['PurchID'] = $this->Mandi_model->get_po_no();
 		$data['Items'] = $this->Mandi_model->get_Items_list();
@@ -80,6 +81,7 @@ class Mandi extends AdminController
 	 */
 	public function SaveMandiPurchase()
 	{
+		if (!has_permission_new('MandiPurchase', '', 'create')) { access_denied('Access Denied'); }
 		// Check request method
 		if (!$this->input->is_ajax_request() && $_SERVER['REQUEST_METHOD'] != 'POST') {
 			echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -275,6 +277,7 @@ class Mandi extends AdminController
 
 	public function MandiPurchaselist()
 	{
+		if (!has_permission_new('MandiPurchaseList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Mandi Purchase';
 		$data['PurchID'] = $this->Mandi_model->get_po_no();
 		$data['Items'] = $this->Mandi_model->get_Items_list();

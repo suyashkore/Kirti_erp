@@ -1,5 +1,5 @@
-<?php
-
-return [
-    'ideal/webhook',
-];
+<?php
+
+return [
+    'ideal/webhook',
+];

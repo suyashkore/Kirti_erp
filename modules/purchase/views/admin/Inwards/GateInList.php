@@ -92,8 +92,14 @@
                   <button type="submit" class="btn btn-success" id="searchBtn"><i class="fa fa-list"></i> Show</button>
                 </div>
                 <div class="col-md-9 mbot5" style="padding-top: 20px;">
-                  <button type="button" class="btn btn-info exportBtn" id="exportExcelBtn"><i class="fa fa-file-excel"></i> Excel</button>
-                  <button type="button" class="btn btn-info exportBtn" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>
+                  <?php
+                  if (has_permission_new('gateControl', '', 'export')) {
+                    echo '<button type="button" class="btn btn-info exportBtn" id="exportExcelBtn"><i class="fa fa-file-excel"></i> Excel</button> ';
+                  }
+                  if (has_permission_new('gateControl', '', 'print')) {
+                    echo '<button type="button" class="btn btn-info exportBtn" onclick="printPage();" style="display: none;"><i class="fa fa-print"></i> Print</button>';
+                  }
+                  ?>
                 </div>
                 <div class="col-md-3 mbot5" style="padding-top: 20px;">
                   <input type="search" class="form-control" id="myInput1" onkeyup="myFunction2()" placeholder="Search..." title="Type in a table">

@@ -16,8 +16,12 @@ class SalesOrder extends AdminController
 	* ========================= */
 
     public function SalesOrderPrint($OrderID)
-    {
-        if (!$OrderID) {
+	{
+		if (!has_permission_new('salesOrder', '', 'print')) {
+			access_denied('Access Denied');
+		}
+
+		if (!$OrderID) {
             redirect($this->load->view('admin/SalesOrder/SalesOrderAddEdit'));
         }
         
@@ -61,6 +65,9 @@ class SalesOrder extends AdminController
 	* ADD / EDIT PAGE
 	* ========================= */
 	public function index(){
+		if (!has_permission_new('salesOrder', '', 'view')) {
+			access_denied('Access Denied');
+		}
 		$data['title'] = 'Sales Order';
 		$data['item_type'] = $this->SalesQuotation_model->getDropdown('ItemTypeMaster', 'id, ItemTypeName', ['isActive' => 'Y'], 'id', 'ASC');
 		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
@@ -143,12 +150,6 @@ class SalesOrder extends AdminController
 			echo json_encode(['success' => false, 'message' => 'No data received']);
 			return;
 		}
-
-
-		
-
-		// echo json_encode(print_r($this->input->post()));
-		// exit;
 
 		$PlantID = $this->session->userdata('root_company');
 		$FY = $this->session->userdata('finacial_year');
@@ -292,7 +293,6 @@ class SalesOrder extends AdminController
 			'BrokerID' => $broker_id,
 			'QuotationID' => $quotation_id,
 			'DeliveryLocation' => $customer_location,
-			
 			'PaymentTerms' => $payment_terms,
 			'FreightTerms' => $freight_terms,
 			'GSTIN' => $GSTIN,
@@ -309,10 +309,16 @@ class SalesOrder extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('salesOrder', '', 'create')) {
+				access_denied('Access Denied');
+			}
 			$insertData['TransDate2'] = date('Y-m-d H:i:s');
 			$result = $this->SalesOrder_model->saveData('SalesOrderMaster', $insertData);
 			$details = $this->SalesOrder_model->getOrderDetails($result);
 		} else {
+			if (!has_permission_new('salesOrder', '', 'edit')) {
+				access_denied('Access Denied');
+			}
 			$result = $this->SalesOrder_model->updateData('SalesOrderMaster', $insertData, ['id' => $update_id]);
 			$details = $this->SalesOrder_model->getOrderDetails($update_id);
 		}

@@ -210,7 +210,7 @@ function vehicle_permissions()
             'delete' => _l('permission_delete'),
     ];
 
-    register_staff_capabilities('vehicle', $capabilities, _l('hrm'));
+    // register_staff_capabilities('vehicle', $capabilities, _l('hrm'));
 }
 
 

@@ -120,6 +120,7 @@ class Quotation_model extends App_Model
 				'TType2'      => $data['TType2'],
         'AccountID'   => $data['vendor_id'] ?? '',
         'ItemID'      => $data['item_id'][$i],
+        'GodownID'    => $data['godown_id'],
         'BasicRate'   => $data['unit_rate'][$i],
         'SaleRate'    => ($data['unit_rate'][$i] * ($gst_percent / 100)),
         'SuppliedIn'  => $data['uom'][$i],
@@ -165,7 +166,7 @@ class Quotation_model extends App_Model
 
   public function getQuoteDetails($id)
   {
-    $this->db->select('pm.*, c.company, icm.CategoryName as category_name');
+    $this->db->select('pm.*, c.company, icm.CategoryName as category_name,icm.prefix as category_prefix');
     $this->db->from(db_prefix().'PurchQuotationMaster pm');
     $this->db->join(db_prefix().'clients c', 'c.AccountID = pm.AccountID', 'left');
     $this->db->join( db_prefix().'ItemCategoryMaster icm', 'icm.id = pm.ItemCategory', 'left' );
@@ -312,4 +313,149 @@ class Quotation_model extends App_Model
     if($where != null) $this->db->where($where);
     return $this->db->get()->row_array();
   }
+
+
+  // Model - createPOFromQuotations()
+public function createPOFromQuotations($data)
+{
+    $plant_id      = $data['plant_id'];
+    $user_id       = $data['user_id'];
+    $fy            = $data['fy'];
+    $quotations    = $data['quotations'];
+    $quotation_ids = $data['quotation_ids'];
+
+    $this->db->trans_start();
+
+    foreach ($quotations as $quot) {
+
+        $category_prefix = $quot['category_prefix'] ?? '';
+        $po_prefix       = 'PO' . $fy . $plant_id . $category_prefix;
+
+        $last_po = $this->db->select('PurchID')
+                            ->where('PlantID', $plant_id)
+                            ->where('FY', $fy)
+                            ->where('ItemCategory', $quot['ItemCategory'])
+                            ->like('PurchID', $po_prefix, 'after')  
+                            ->order_by('id', 'DESC')
+                            ->limit(1)
+                            ->get('tblPurchaseOrderMaster')
+                            ->row_array();
+
+        if (!empty($last_po['PurchID'])) {
+            $last_num = (int) substr($last_po['PurchID'], strlen($po_prefix));
+            $next_no  = str_pad($last_num + 1, 5, '0', STR_PAD_LEFT);
+        } else {
+            $next_no = str_pad(1, 5, '0', STR_PAD_LEFT);
+        }
+
+        $po_no = $po_prefix . $next_no;
+
+        // echo"";
+        // print_r("Generated PO Number: " . $po_no);die;
+        // ── tblPurchaseOrderMaster Insert ──
+        $master = [
+            'PlantID'          => $quot['PlantID'],
+            'FY'               => $quot['FY'],
+            'PurchaseLocation' => $quot['PurchaseLocation'],
+            'PurchID'          => $po_no,
+            'TransDate'        => date('Y-m-d', strtotime($quot['TransDate'])),
+            'TransDate2'       => date('Y-m-d H:i:s'),
+            'ItemType'         => $quot['ItemType'],
+            'ItemCategory'     => $quot['ItemCategory'],
+            'QuatationID'      => $quot['QuotatioonID'],
+            'AccountID'        => $quot['AccountID'],
+            'BrokerID'         => $quot['BrokerID'],
+            'DeliveryLocation' => $quot['DeliveryLocation'],
+            'DeliveryFrom'     => date('Y-m-d', strtotime($quot['DeliveryFrom'])),
+            'DeliveryTo'       => date('Y-m-d', strtotime($quot['DeliveryTo'])),
+            'PaymentTerms'     => $quot['PaymentTerms'],
+            'FreightTerms'     => $quot['FreightTerms'],
+            'GSTIN'            => $quot['GSTIN'],
+            'TotalWeight'      => $quot['TotalWeight'],
+            'TotalQuantity'    => $quot['TotalQuantity'],
+            'ItemAmt'          => $quot['ItemAmt'],
+            'DiscAmt'          => $quot['DiscAmt'],
+            'TaxableAmt'       => $quot['TaxableAmt'],
+            'CGSTAmt'          => $quot['CGSTAmt'],
+            'SGSTAmt'          => $quot['SGSTAmt'],
+            'IGSTAmt'          => $quot['IGSTAmt'],
+            'TDSSection'       => $quot['TDSSection']    ?? null,
+            'TDSPercentage'    => $quot['TDSPercentage'] ?? null,
+            'TDSAmt'           => $quot['TDSAmt']        ?? null,
+            'RoundOffAmt'      => $quot['RoundOffAmt'],
+            'NetAmt'           => $quot['NetAmt'],
+            'UserID'           => $user_id,
+            'Status'           => 6,
+        ];
+
+        $this->db->insert('tblPurchaseOrderMaster', $master);
+
+        // ── tblhistory Insert ──
+        if (!empty($quot['history'])) {
+            foreach ($quot['history'] as $item) {
+                $history_row = [
+                    'PlantID'       => $item['PlantID'],
+                    'FY'            => $item['FY'],
+                    'OrderID'       => $po_no,
+                    'BillID'        => null,
+                    'TransID'       => null,
+                    'TransDate'     => date('Y-m-d', strtotime($item['TransDate'])),
+                    'TransDate2'    => date('Y-m-d H:i:s'),
+                    'TType'         => 'P',
+                    'TType2'        => 'Order',
+                    'AccountID'     => $item['AccountID'],
+                    'ItemID'        => $item['ItemID'],
+                    'GodownID'      => $item['GodownID']  ?? null,
+                    'Mrp'           => $item['Mrp']       ?? null,
+                    'BasicRate'     => $item['BasicRate'],
+                    'SaleRate'      => $item['SaleRate'],
+                    'SuppliedIn'    => $item['SuppliedIn'],
+                    'UnitWeight'    => $item['UnitWeight'],
+                    'WeightUnit'    => $item['WeightUnit'],
+                    'CaseQty'       => $item['CaseQty'],
+                    'OrderQty'      => $item['OrderQty'],
+                    'eOrderQty'     => $item['eOrderQty'] ?? null,
+                    'ereason'       => $item['ereason']   ?? null,
+                    'BilledQty'     => null,
+                    'Cases'         => $item['Cases'],
+                    'DiscPerc'      => $item['DiscPerc'],
+                    'DiscAmt'       => $item['DiscAmt'],
+                    'cgst'          => $item['cgst'],
+                    'cgstamt'       => $item['cgstamt'],
+                    'sgst'          => $item['sgst'],
+                    'sgstamt'       => $item['sgstamt'],
+                    'igst'          => $item['igst'],
+                    'igstamt'       => $item['igstamt'],
+                    'OrderAmt'      => $item['OrderAmt'],
+                    'ChallanAmt'    => null,
+                    'NetOrderAmt'   => $item['NetOrderAmt'],
+                    'NetChallanAmt' => null,
+                    'Ordinalno'     => $item['Ordinalno'],
+                    'UserID'        => $user_id,
+                    'batch_no'      => $item['batch_no']    ?? null,
+                    'expiry_date'   => $item['expiry_date'] ?? null,
+                ];
+
+                $this->db->insert('tblhistory', $history_row);
+            }
+        }
+
+        // ── Quotation Status → Approved (6) ──
+        $this->db->where('QuotatioonID', value: $quot['QuotatioonID'])
+                 ->update('PurchQuotationMaster', [
+                     'Status'  => 6,
+                     'UserID2' => $user_id,
+                     'Lupdate' => date('Y-m-d H:i:s'),
+                 ]);
+    }
+
+    $this->db->trans_complete();
+
+    
+    if ($this->db->trans_status() === FALSE) {
+        return ['success' => false, 'message' => 'Transaction failed while creating PO'];
+    }
+
+    return ['success' => true];
+}
 }

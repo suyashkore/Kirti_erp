@@ -15,10 +15,11 @@ class Inwards extends AdminController
 		* ADD / EDIT PAGE
 		* ========================= */
 	public function index(){
+		if (!has_permission_new('PurchaseInward', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Inwards Master';
 		$data['vendor_list'] = $this->Inwards_model->getVendorDropdownByPO();
 		$data['inwards_list'] = $this->Inwards_model->getInwardsList();
-		$data['gatein_list'] = $this->Inwards_model->getDropdown('GateMaster', 'id, GateINID, VehicleNo', ['InwardID' => null, 'Type' => 'P'], 'id', 'DESC');
+		// $data['gatein_list'] = $this->Inwards_model->getDropdown('GateMaster', 'id, GateINID, VehicleNo', ['InwardID' => null, 'Type' => 'P'], 'id', 'DESC');
 
 		$selected_company = $this->session->userdata('root_company');
 		$data['company_detail'] = $this->Quotation_model->get_company_detail($selected_company);
@@ -46,10 +47,11 @@ class Inwards extends AdminController
 		}
 		$order_details = $this->Inwards_model->getPurchaseOrderDetails($order_id);
 		$item_list = $this->Quotation_model->getDropdown('items', 'ItemId, ItemName', ['ItemCategoryCode' => $order_details['ItemCategory'], 'IsActive' => 'Y'], 'ItemName', 'ASC') ?? [];
+		$gatein_list = $this->Quotation_model->getDropdown('GateMaster', 'id, GateINID, VehicleNo', ['InwardID' => null, 'Type' => 'P', 'LocationID' => $order_details['PurchaseLocation']], 'id', 'DESC') ?? [];
 		$godown_list = $this->Quotation_model->getDropdown('godownmaster', 'id, GodownCode, GodownName', ['LocationID' => $order_details['PurchaseLocation'], 'IsActive' => 'Y'], 'GodownName', 'ASC') ?? [];
 		$inwards_no = $this->Inwards_model->getNextInwardsNoByCategory($order_details['ItemCategory']);
 
-		echo json_encode(['success' => true, 'data' => $order_details, 'item_list' => $item_list, 'godown_list' => $godown_list, 'inwards_no' => $inwards_no]);
+		echo json_encode(['success' => true, 'data' => $order_details, 'item_list' => $item_list, 'gatein_list' => $gatein_list, 'godown_list' => $godown_list, 'inwards_no' => $inwards_no]);
 	}
 
 	public function SaveInwards(){
@@ -152,11 +154,13 @@ class Inwards extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('PurchaseInward', '', 'create')) { access_denied('Access Denied'); }
 			$insertData['TransDate2'] = date('Y-m-d H:i:s');
 			$result = $this->Inwards_model->saveData('PurchInwardsMaster', $insertData);
 			$details = $this->Inwards_model->getInwardsDetails($result);
 			$this->Inwards_model->updateData('PurchaseOrderMaster', ['Status' => 6], ['PurchID' => $purchase_order]);
 		} else {
+			if (!has_permission_new('PurchaseInward', '', 'edit')) { access_denied('Access Denied'); }
 			$result = $this->Inwards_model->updateData('PurchInwardsMaster', $insertData, ['id' => $update_id]);
 			$details = $this->Inwards_model->getInwardsDetails($update_id);
 		}
@@ -218,6 +222,7 @@ class Inwards extends AdminController
 	}
 
 	public function PrintPDF($InwardID){
+		if (!has_permission_new('PurchaseInward', '', 'view')) { access_denied('Access Denied'); }
 		$data = $this->Inwards_model->getInwardsDetailsPrint($InwardID);
 		if(!$data){
 			redirect(admin_url('purchase/Inwards'));
@@ -1074,6 +1079,7 @@ class Inwards extends AdminController
 		* REPORTS PAGE
 		* ========================= */
 	public function Reports(){
+		if (!has_permission_new('PurchaseInwardList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Inwards Reports';
 		$data['vendor_list'] = $this->Inwards_model->getVendorDropdownByInwards();
 
@@ -1128,6 +1134,7 @@ class Inwards extends AdminController
   }
 
   public function ListExportExcel(){
+		if (!has_permission_new('PurchaseInwardList', '', 'export')) { access_denied('Access Denied'); }
     $this->output->enable_profiler(FALSE);
     ob_end_clean();
 

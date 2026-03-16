@@ -119,137 +119,137 @@ function purchase_module_init_menu_items()
                 'position' => 2,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseQuotation', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseQuotation',
                 'name' => 'Purchase Quotation',
                 'href' => admin_url('purchase/Quotation'),
                 'position' => 3,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseQuotationList', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseQuotationList',
                 'name' => 'Quotation List',
                 'href' => admin_url('purchase/Quotation/List'),
                 'position' => 4,
             ]);
         }
-        if (has_permission_new('purchase-order-po', '', 'view')) {
+        if (has_permission_new('PurchaseOrder', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-order-po',
+                'slug' => 'PurchaseOrder',
                 'name' => "Purchase Order",
                 'icon' => 'fa fa-cart-plus',
                 'href' => admin_url('purchase/AddPurchaseOrder'),
                 'position' => 5,
             ]);
         }
-        if (has_permission_new('purchase-order-po-list', '', 'view')) {
+        if (has_permission_new('PurchaseOrderList', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-order-po-list',
+                'slug' => 'PurchaseOrderList',
                 'name' => "Order List",
                 'icon' => 'fa fa-cart-plus',
                 'href' => admin_url('purchase/Orders/List'),
                 'position' => 6,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('generateASN', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'generateASN',
                 'name' => 'Generate ASN',
                 'href' => admin_url('purchase/Inwards/ASN'),
                 'position' => 7,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('generateGateIn', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'generateGateIn',
                 'name' => 'Ganerate Gate In',
                 'href' => admin_url('purchase/Vehiclein'),
                 'position' => 8,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseInward', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseInward',
                 'name' => 'Purchase Inward',
                 'href' => admin_url('purchase/Inwards'),
                 'position' => 9,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('gateControl', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'gateControl',
                 'name' => 'Gate Control',
                 'href' => admin_url('purchase/Vehiclein/GateControl'),
                 'position' => 10,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseInwardList', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseInwardList',
                 'name' => 'Inward List',
                 'href' => admin_url('purchase/Inwards/Reports'),
                 'position' => 11,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseInvoice', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseInvoice',
                 'name' => "Purchase Invoice",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Invoice'),
                 'position' => 12,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseGRN', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseGRN',
                 'name' => "Goods Receive Note (GRN)",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Grn'),
                 'position' => 13,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('DirectPurchase', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'DirectPurchase',
                 'name' => "Direct Purchase",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Direct'),
                 'position' => 14,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('DirectPurchaseList', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'DirectPurchaseList',
                 'name' => "Direct Purchase List",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Direct/List'),
                 'position' => 15,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('MandiPurchase', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'MandiPurchase',
                 'name' => "Mandi Purchase",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Mandi'),
                 'position' => 16,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('MandiPurchaseList', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'MandiPurchaseList',
                 'name' => "Mandi Purchase List",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('purchase/Mandi/MandiPurchaselist'),
                 'position' => 17,
             ]);
         }
-        if (has_permission_new('purchase-invoice', '', 'view')) {
+        if (has_permission_new('PurchaseTradeSettlement', '', 'view')) {
             $CI->app_menu->add_sidebar_children_item('purchase', [
-                'slug' => 'purchase-invoice',
+                'slug' => 'PurchaseTradeSettlement',
                 'name' => "Trade Settlement",
                 'icon' => 'fa fa-file-invoice',
                 'href' => admin_url('TradeSettlement/Purchase'),
@@ -383,59 +383,101 @@ function purchase_module_init_menu_items()
  */
 function purchase_permissions()
 {
-    $capabilities = [];
-    $capabilities['capabilities'] = [
-        'view' => _l('permission_view') . '(' . _l('permission_global') . ')',
+    $viewGlobalName = _l('permission_view') . '(' . _l('permission_global') . ')';
+    $v = $v_c = $v_c_e = $v_c_e_d = $v_e = $v_e_d = $v_c_e_p_ex = $v_p_ex = $all = [];
+    $v['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+        'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
+        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+        'print' => ['not_applicable' => true, 'name' => 'Print'],
+        'export' => ['not_applicable' => true, 'name' => 'Export'],
+    ];
+    $v_c['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create' => _l('permission_create'),
+        'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
+        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+        'print' => ['not_applicable' => true, 'name' => 'Print'],
+        'export' => ['not_applicable' => true, 'name' => 'Export'],
+    ];
+    $v_c_e['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create'   => _l('permission_create'),
+        'edit'     => _l('permission_edit'),
+        'delete'   => ['not_applicable' => true, 'name' => _l('permission_delete')],
+        'print' => ['not_applicable' => true, 'name' => 'Print'],
+        'export' => ['not_applicable' => true, 'name' => 'Export'],
+    ];
+    $v_c_e_d['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create'   => _l('permission_create'),
+        'edit'     => _l('permission_edit'),
+        'delete'   => _l('permission_delete'),
+        'print' => ['not_applicable' => true, 'name' => 'Print'],
+        'export' => ['not_applicable' => true, 'name' => 'Export'],
+    ];
+    $v_e['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+        'edit' => _l('permission_edit'),
+        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+        'print' => ['not_applicable' => true, 'name' => 'Print'],
+        'export' => ['not_applicable' => true, 'name' => 'Export'],
+    ];
+    $v_e_d['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+        'edit' => _l('permission_edit'),
+        'delete' => _l('permission_delete'),
+        'print' => ['not_applicable' => true, 'name' => 'Print'],
+        'export' => ['not_applicable' => true, 'name' => 'Export'],
+    ];
+    $v_c_e_p_ex['capabilities'] = [
+        'view'     =>  $viewGlobalName,
+        'create' => _l('permission_create'),
+        'edit' => _l('permission_edit'),
+        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+        'print' => ['not_applicable' => false, 'name' => 'Print'],
+        'export' => ['not_applicable' => false, 'name' => 'Export'],
+    ];
+    $v_p_ex['capabilities'] = [
+        'view'     => $viewGlobalName,
+        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+        'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
+        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+        'print' => ['not_applicable' => false, 'name' => 'Print'],
+        'export' => ['not_applicable' => false, 'name' => 'Export'],
+    ];
+    $all['capabilities'] = [
+        'view'     => $viewGlobalName,
         'create' => _l('permission_create'),
         'edit' => _l('permission_edit'),
         'delete' => _l('permission_delete'),
         'print' => ['not_applicable' => false, 'name' => 'Print'],
         'export' => ['not_applicable' => false, 'name' => 'Export'],
     ];
-    $capabilities2 = [];
-    $capabilities2['capabilities'] = [
-        'view' => _l('permission_view') . '(' . _l('permission_global') . ')',
-        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-        'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-        'print' => ['not_applicable' => false, 'name' => 'Print'],
-        'export' => ['not_applicable' => false, 'name' => 'Export'],
-    ];
-    $capabilities3 = [];
-    $capabilities3['capabilities'] = [
-        'view' => ['not_applicable' => true, 'name' => _l('permission_global')],
-        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-        'edit' => _l('permission_edit'),
-        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-        'print' => ['not_applicable' => false, 'name' => 'Print'],
-        'export' => ['not_applicable' => false, 'name' => 'Export'],
-    ];
-    $capabilities_view = [];
-    $capabilities_view['capabilities'] = [
-        'view' => _l('permission_view') . '(' . _l('permission_global') . ')',
-        'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-        'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-        'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-        'print' => ['not_applicable' => false, 'name' => 'Print'],
-        'export' => ['not_applicable' => false, 'name' => 'Export'],
-    ];
+    
     //register_staff_capabilities('purchase-items', $capabilities, _l('items'),'Purchase');
-    register_staff_capabilities('PurchaseDashboard', $capabilities_view, _l('Dashboard'), 'Purchase');
-    register_staff_capabilities('vendors', $capabilities, _l('vendor'), 'Purchase');
-    register_staff_capabilities('VendorList', $capabilities2, 'VendorList', 'Purchase');
-    // register_staff_capabilities('vendors-items', $capabilities, _l('vendor_item'),'Purchase');
-    register_staff_capabilities('purchase-order-po', $capabilities, 'Purchase Order', 'Purchase');
-    register_staff_capabilities('purchase-order-po-list', $capabilities_view, 'Purchase Order List', 'Purchase');
-    register_staff_capabilities('purchase-pending-order-po-list', $capabilities_view, 'Pending Purchase Order List', 'Purchase');
-    register_staff_capabilities('purchase-order-po-approve', $capabilities3, 'Purchase Order Approval', 'Purchase');
-    register_staff_capabilities('purchase-order', $capabilities, 'Purchase Entry', 'Purchase');
-    register_staff_capabilities('purchase-order-list', $capabilities_view, 'Purchase Entry List', 'Purchase');
-    register_staff_capabilities('purchase-order-approve', $capabilities3, 'Purchase Entry Approval', 'Purchase');
-    register_staff_capabilities('purchase-return', $capabilities, _l('purchase_return'), 'Purchase');
-    register_staff_capabilities('TradePayableReport', $capabilities_view, 'Trade Payable Report', 'Purchase');
-    register_staff_capabilities('Stock_alert', $capabilities_view, 'Stock Alert', 'Purchase');
-    register_staff_capabilities('purchase_register', $capabilities_view, 'Purchase Register', 'Purchase');
-    //register_staff_capabilities('purchase-invoices', $capabilities, _l('invoices'),'Purchase');
+    // register_staff_capabilities('PurchaseDashboard', $capabilities_view, _l('Dashboard'), 'Purchase');
+    register_staff_capabilities('vendors', $v_c_e, _l('vendor'), 'Purchase');
+    register_staff_capabilities('VendorList', $v_p_ex, 'VendorList', 'Purchase');
+    register_staff_capabilities('PurchaseQuotation', $v_c_e, 'Purchase Quotation', 'Purchase');
+    register_staff_capabilities('PurchaseQuotationList', $v_p_ex, 'Quotation List', 'Purchase');
+    register_staff_capabilities('PurchaseOrder', $v_c_e, 'Purchase Order', 'Purchase');
+    register_staff_capabilities('PurchaseOrderList', $v_p_ex, 'Order List', 'Purchase');
+    register_staff_capabilities('generateASN', $v_c_e, 'Generate ASN', 'Purchase');
+    register_staff_capabilities('generateGateIn', $v_c_e, 'Generate Gate In', 'Purchase');
+    register_staff_capabilities('PurchaseInward', $v_c_e, 'Purchase Inward', 'Purchase');
+    register_staff_capabilities('gateControl', $v_p_ex, 'Gate Control', 'Purchase');
+    register_staff_capabilities('PurchaseInwardList', $v_p_ex, 'Inward List', 'Purchase');
+    register_staff_capabilities('PurchaseInvoice', $v_c_e, 'Purchase Invoice', 'Purchase');
+    register_staff_capabilities('PurchaseGRN', $v_c_e, 'Good Receive Note (GRN)', 'Purchase');
+    register_staff_capabilities('DirectPurchase', $v_c_e, 'Direct Purchase', 'Purchase');
+    register_staff_capabilities('DirectPurchaseList', $v_p_ex, 'Direct Purchase List', 'Purchase');
+    register_staff_capabilities('MandiPurchase', $v_c_e, 'Mandi  Purchase', 'Purchase');
+    register_staff_capabilities('MandiPurchaseList', $v_p_ex, 'Mandi  Purchase List', 'Purchase');
+    register_staff_capabilities('PurchaseTradeSettlement', $v_c_e, 'Trade Settlement', 'Purchase');
 }
 /**
  * purchase add footer components

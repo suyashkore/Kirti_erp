@@ -16,52 +16,58 @@ class SalesInvoice extends AdminController
 	* Sales Invoice Print
 	* ========================= */
 
-    public function SalesInvoicePrint($OrderID)
-    {
-        if (!$OrderID) {
-            redirect($this->load->view('admin/SalesInvoice/SalesOrderAddEdit'));
-        }
-        
-        if (!has_permission_new('CashOrderList', '', 'view')) {
-            access_denied('Invoices');
-        }
-        $invoice = [];
-        $invoice1  = $this->SalesInvoice_model->GetSalesInvoiceDetailsForPdf($OrderID);
-      	$history  = $this->SalesInvoice_model->get_order_data($OrderID);
-    
-    	$invoice = [
-        	'invoice' => $invoice1,
-        	'history' => $history
-    	];
-        try {
-            $pdf = SalesInvoice_pdf($invoice);
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            echo $message;
-            if (strpos($message, 'Unable to get the size of the image') !== false) {
-                show_pdf_unable_to_get_image_size_error();
-            }
-            die;
-        }
-        
-        $type = 'I';
-        
-        if ($this->input->get('output_type')) {
-            $type = $this->input->get('output_type');
-        }
-        
-        if ($this->input->get('print')) {
-            $type = 'I';
-        }
-		
-        $pdf->Output(mb_strtoupper(slug_it($OrderID)) . '-Invoice.pdf', $type);
-    }
+	public function SalesInvoicePrint($OrderID)
+	{
+		if (!has_permission_new('salesInvoice', '', 'print')) {
+			access_denied('Access Denied');
+		}
+		if (!$OrderID) {
+			redirect($this->load->view('admin/SalesInvoice/SalesOrderAddEdit'));
+		}
+
+		if (!has_permission_new('CashOrderList', '', 'view')) {
+			access_denied('Invoices');
+		}
+		$invoice = [];
+		$invoice1  = $this->SalesInvoice_model->GetSalesInvoiceDetailsForPdf($OrderID);
+		$history  = $this->SalesInvoice_model->get_order_data($OrderID);
+
+		$invoice = [
+			'invoice' => $invoice1,
+			'history' => $history
+		];
+		try {
+			$pdf = SalesInvoice_pdf($invoice);
+		} catch (Exception $e) {
+			$message = $e->getMessage();
+			echo $message;
+			if (strpos($message, 'Unable to get the size of the image') !== false) {
+				show_pdf_unable_to_get_image_size_error();
+			}
+			die;
+		}
+
+		$type = 'I';
+
+		if ($this->input->get('output_type')) {
+			$type = $this->input->get('output_type');
+		}
+
+		if ($this->input->get('print')) {
+			$type = 'I';
+		}
+
+		$pdf->Output(mb_strtoupper(slug_it($OrderID)) . '-Invoice.pdf', $type);
+	}
 
 	/* =========================
 	* ADD / EDIT PAGE
 	* ========================= */
 	public function index()
 	{
+		if (!has_permission_new('salesInvoice', '', 'view')) {
+			access_denied('Access Denied');
+		}
 		$data['title'] = 'Sales Invoice';
 		$selected_company = $this->session->userdata('root_company');
 		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
@@ -126,44 +132,44 @@ class SalesInvoice extends AdminController
 	}
 
 	public function getLedgerByVoucher()
-{
-    $VoucherID = $this->input->post('VoucherID');
+	{
+		$VoucherID = $this->input->post('VoucherID');
 
-    $ledger = $this->db
-        ->where('VoucherID', $VoucherID)
-        ->get('tblaccountledger')
-        ->result_array();
+		$ledger = $this->db
+			->where('VoucherID', $VoucherID)
+			->get('tblaccountledger')
+			->result_array();
 
-    if(empty($ledger)){
-        echo "No ledger entries found.";
-        return;
-    }
+		if (empty($ledger)) {
+			echo "No ledger entries found.";
+			return;
+		}
 
-    $html = '<table class="table table-bordered table-striped">';
-    $html .= '<thead><tr>';
+		$html = '<table class="table table-bordered table-striped">';
+		$html .= '<thead><tr>';
 
-    // Create table headers dynamically
-    foreach(array_keys($ledger[0]) as $column){
-        $html .= '<th>'.htmlspecialchars($column).'</th>';
-    }
+		// Create table headers dynamically
+		foreach (array_keys($ledger[0]) as $column) {
+			$html .= '<th>' . htmlspecialchars($column) . '</th>';
+		}
 
-    $html .= '</tr></thead><tbody>';
+		$html .= '</tr></thead><tbody>';
 
-    // Create rows dynamically
-    foreach($ledger as $row){
-        $html .= '<tr>';
+		// Create rows dynamically
+		foreach ($ledger as $row) {
+			$html .= '<tr>';
 
-        foreach($row as $value){
-            $html .= '<td>'.htmlspecialchars($value).'</td>';
-        }
+			foreach ($row as $value) {
+				$html .= '<td>' . htmlspecialchars($value) . '</td>';
+			}
 
-        $html .= '</tr>';
-    }
+			$html .= '</tr>';
+		}
 
-    $html .= '</tbody></table>';
+		$html .= '</tbody></table>';
 
-    echo $html;
-}
+		echo $html;
+	}
 
 	public function SaveSalesInvoice()
 	{
@@ -329,6 +335,9 @@ class SalesInvoice extends AdminController
 		];
 
 		if ($form_mode == 'add') {
+			if (!has_permission_new('salesInvoice', '', 'create')) {
+				access_denied('Access Denied');
+			}
 			$insertData['TransDate'] = date('Y-m-d H:i:s');
 			$result = $this->SalesInvoice_model->saveData('SalesInvoiceMaster', $insertData);
 			// SAVE LEDGER
@@ -347,6 +356,9 @@ class SalesInvoice extends AdminController
 			);
 			$details = $this->SalesInvoice_model->getSalesInvoiceDetails($result);
 		} else {
+			if (!has_permission_new('salesInvoice', '', 'edit')) {
+				access_denied('Access Denied');
+			}
 			$insertData['Lupdate'] = date('Y-m-d H:i:s');
 			$result = $this->SalesInvoice_model->updateData('SalesInvoiceMaster', $insertData, ['id' => $update_id]);
 			// UPDATE LEDGER
@@ -430,7 +442,7 @@ class SalesInvoice extends AdminController
 		}
 	}
 
-	
+
 
 	/* =========================
 	* LIST PAGE
@@ -497,18 +509,15 @@ class SalesInvoice extends AdminController
 
 		$post = $this->input->post(NULL, TRUE);
 
-		$sheetName = 'Quotation List';
+		$sheetName = 'Sales Invoice List';
 		$writer = new XLSXWriter();
 
 		$header = [
-			'Quotation Code'  => 'string',
-			'Quotation Date'  => 'string',
+			'Inovice No'  => 'string',
+			'Invoice Date'  => 'string',
 			'Customer Name'     => 'string',
-			'Broker Name'     => 'string',
-			'Quotation Weight' => 'string',
-			'Quotation Amount' => 'string',
-			'Inward Weight'   => 'string',
-			'Status'          => 'string'
+			'Total Weight' => 'string',
+			'Total Amount' => 'string',
 		];
 
 		$writer->writeSheetHeader($sheetName, $header, ['suppress_row' => true]);
@@ -588,7 +597,7 @@ class SalesInvoice extends AdminController
 		}
 
 		// ===== SAVE FILE =====
-		$filename = 'QuotationList_' . date('YmdHis') . '.xlsx';
+		$filename = 'SalesInvoiceList_' . date('YmdHis') . '.xlsx';
 		$filepath = FCPATH . 'uploads/exports/' . $filename;
 
 		if (!is_dir(FCPATH . 'uploads/exports')) {

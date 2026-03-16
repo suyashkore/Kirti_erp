@@ -274,21 +274,10 @@
 	*/
 	function accounting_module_init_menu_items() {
 		$CI = &get_instance();
-		if (has_permission_new('accounting_ledger_entry', '', 'view') || 
-		has_permission_new('accounting_ledger_entry_SC', '', 'view') || 
-		has_permission_new('accounting_ledger_entry_SD', '', 'view') || 
-		has_permission_new('accounting_contra_entry', '', 'view') || 
-		has_permission_new('accounting_journal_entry', '', 'view') || 
-		has_permission_new('accounting_journal_entry_multiple', '', 'view') || 
-		has_permission_new('accounting_receipt_entry', '', 'view') || 
-		has_permission_new('accounting_payment_entry', '', 'view') || 
-		has_permission_new('accounting_voucher_register_entry', '', 'view') || 
-		has_permission_new('accounting_tcs_report', '', 'view') ||
-		has_permission_new('accounting_tds_report', '', 'view') ||
-		has_permission_new('accounting_cd_report', '', 'view') || 
-		has_permission_new('accounting_report', '', 'view') || 
-		has_permission_new('accounting_voucher_entry_approve', '', 'view') ||
-		has_permission_new('accounting_trial_balance', '', 'view')) {
+		if (has_permission_new('accMainGroup', '', 'view') || 
+		has_permission_new('accSubGroup1', '', 'view') || 
+		has_permission_new('accSubGroup2', '', 'view') || 
+		has_permission_new('accCreateLedger', '', 'view')) {
 			$CI->app_menu->add_sidebar_menu_item('accounting', [
 			'name' => 'Accounts',
 			'icon' => 'fa fa-usd',
@@ -302,33 +291,33 @@
 			// 	'position' => 1,
 			// 	]);
 			// }
-			if (has_permission_new('account_main_groups', '', 'view')) {
+			if (has_permission_new('accMainGroup', '', 'view')) {
 				$CI->app_menu->add_sidebar_children_item('accounting', [
-				'slug'     => 'ActMainGroup',
+				'slug'     => 'accMainGroup',
 				'name'     => 'Account Main Groups',
 				'href'     => admin_url('accounts_master/ActMainGroup'),
 				'position' => 1,
 				]);
 			}
-			if (has_permission_new('account_subgroups1', '', 'view')) {
+			if (has_permission_new('accSubGroup1', '', 'view')) {
 				$CI->app_menu->add_sidebar_children_item('accounting', [
-				'slug'     => 'account_subgroups1',
+				'slug'     => 'accSubGroup1',
 				'name'     => 'Account Sub-Groups 1',
 				'href'     => admin_url('accounts_master/SubGroup1'),
 				'position' => 2,
 				]);
 			}
-			if (has_permission_new('account_subgroups2', '', 'view')) {
+			if (has_permission_new('accSubGroup2', '', 'view')) {
 				$CI->app_menu->add_sidebar_children_item('accounting', [
-				'slug'     => 'account_subgroups2',
+				'slug'     => 'accSubGroup2',
 				'name'     => 'Account Sub-Groups 2',
 				'href'     => admin_url('accounts_master/SubGroup2'),
 				'position' => 3,
 				]);
 			}
-			if (has_permission_new('account_head', '', 'view')) {
+			if (has_permission_new('accCreateLedger', '', 'view')) {
 				$CI->app_menu->add_sidebar_children_item('accounting', [
-    				'slug'     => 'accounts_master',
+    				'slug'     => 'accCreateLedger',
     				'name'     => 'Create Ledger',
     				'href'     => admin_url('Accounts/Ledger'),
     				'position' => 4,
@@ -629,195 +618,55 @@
 		* Init accounting module permissions in setup in admin_init hook
 	*/
 	function accounting_permissions() {
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-	    'view_own' => ['not_applicable' => true, 'name' => _l('permission_view_own')],
-		'view' => _l('permission_view'),
-		];
-		//register_staff_capabilities('accounting_dashboard', $capabilities, _l('accounting_dashboard'));
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-	    'view_own' => ['not_applicable' => true, 'name' => _l('permission_view_own')],
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		];
-		//register_staff_capabilities('accounting_transaction', $capabilities, _l('accounting_transaction'));
-		$OnlyView['capabilities'] = [
-		    'view' => _l('permission_view'),
-    		'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-    		'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-    		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-    		'print' => ['not_applicable' => true, 'name' => "Print"],
-    		'export' => ['not_applicable' => true, 'name' => "Export"],
+		$allPermissionsArray['capabilities'] = [
+			'view'     => _l('permission_view') . '(' . _l('permission_global') . ')',
+			'create'   => _l('permission_create'),
+			'edit'     => _l('permission_edit'),
+			'delete'   => _l('permission_delete'),
+			'print' => ['not_applicable' => true, 'name' => 'Print'],
+			'export' => ['not_applicable' => true, 'name' => 'Export'],
 		];
 		$capabilities = [];
 		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => ['not_applicable' => false, 'name' => _l('permission_create')],
-		'edit' => ['not_applicable' => false, 'name' => _l('permission_edit')],
-		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
+			'view' => _l('permission_view') . '(' . _l('permission_global') . ')',
+			'create' => _l('permission_create'),
+			'edit' => _l('permission_edit'),
+			'delete' => _l('permission_delete'),
+			'print' => ['not_applicable' => false, 'name' => 'Print'],
+			'export' => ['not_applicable' => false, 'name' => 'Export'],
 		];
-		register_staff_capabilities('AccountDashboard', $OnlyView, 'Dashboard','Accounts');
-		register_staff_capabilities('account_main_groups', $capabilities, 'Account Main Groups','Accounts');
-		register_staff_capabilities('account_subgroups1', $capabilities, 'Account Sub Groups1','Accounts');
-		register_staff_capabilities('account_subgroups2', $capabilities, 'Account Sub Groups2','Accounts');
-		register_staff_capabilities('account_head', $capabilities, 'Add/Edit Ledger','Accounts');
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-		'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-		'print' => ['not_applicable' => false, 'name' => "Print"],
-		'export' => ['not_applicable' => false, 'name' => "Export"],
+		$capabilities2 = [];
+		$capabilities2['capabilities'] = [
+			'view' => _l('permission_view') . '(' . _l('permission_global') . ')',
+			'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+			'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
+			'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+			'print' => ['not_applicable' => false, 'name' => 'Print'],
+			'export' => ['not_applicable' => false, 'name' => 'Export'],
 		];
-		register_staff_capabilities('accounting_ledger_entry', $capabilities, 'Account Ledger All','Accounts');
-		register_staff_capabilities('accounting_ledger_share', $OnlyView, 'Account Ledger Share','Accounts');
-		register_staff_capabilities('accounting_ledger_entry_SC', $capabilities, 'Account Ledger SUNDRY CREDITORS - RM','Accounts');
-		register_staff_capabilities('accounting_ledger_entry_SD', $capabilities, 'Account Ledger SUNDRY DEBITORS','Accounts');
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
+		$capabilities3 = [];
+		$capabilities3['capabilities'] = [
+			'view' => ['not_applicable' => true, 'name' => _l('permission_global')],
+			'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+			'edit' => _l('permission_edit'),
+			'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+			'print' => ['not_applicable' => false, 'name' => 'Print'],
+			'export' => ['not_applicable' => false, 'name' => 'Export'],
 		];
-		register_staff_capabilities('accounting_journal_entry', $capabilities, _l('accounting_journal_entry'),'Accounts');
-		register_staff_capabilities('accounting_journal_entry_multiple', $capabilities, 'Journal Entry Multiple','Accounts');
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
+		$capabilities_view = [];
+		$capabilities_view['capabilities'] = [
+			'view' => _l('permission_view') . '(' . _l('permission_global') . ')',
+			'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
+			'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
+			'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
+			'print' => ['not_applicable' => false, 'name' => 'Print'],
+			'export' => ['not_applicable' => false, 'name' => 'Export'],
 		];
-		register_staff_capabilities('accounting_contra_entry', $capabilities, _l('accounting_contra_entry'),'Accounts');
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
-		];
-		register_staff_capabilities('accounting_payment_entry', $capabilities, _l('accounting_payments_entry'),'Accounts');
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
-		];
-		register_staff_capabilities('accounting_receipt_entry', $capabilities, _l('accounting_receipts_entry'),'Accounts');
-		$ViewEdit['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-		'edit' => ['not_applicable' => false, 'name' => _l('permission_edit')],
-		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
-		];
-		register_staff_capabilities('accounting_voucher_entry_approve', $ViewEdit, 'Voucher Entry Approve','Accounts');
-		register_staff_capabilities('openingbaledit', $ViewEdit, 'Opening Balance Edit','Accounts');
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-		'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-		'print' => ['not_applicable' => false, 'name' => "Print"],
-		'export' => ['not_applicable' => false, 'name' => "Export"],
-		];
-		register_staff_capabilities('accounting_voucher_register_entry', $capabilities, 'Voucher Register','Accounts');
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-		'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-		'print' => ['not_applicable' => false, 'name' => "Print"],
-		'export' => ['not_applicable' => false, 'name' => "Export"],
-		];
-		register_staff_capabilities('accounting_trial_balance', $capabilities, 'Trial Balance','Accounts');
-		register_staff_capabilities('trial_balance_summary', $capabilities, 'Trial Balance Summary','Accounts');
-		//register_staff_capabilities('profitlossreport', $capabilities, 'Profit & Loss Statement','Accounts');
-		register_staff_capabilities('profitlossTFormat', $capabilities, 'T Format P&L Statement','Accounts');
-		//register_staff_capabilities('balancesheet', $capabilities, 'Balance Sheet','Accounts');
-		register_staff_capabilities('TFormatBalanceSheet', $capabilities, 'T Format Balance Sheet','Accounts');
-		register_staff_capabilities('accounting_cd_report', $capabilities, 'CD Report','Accounts');
-		register_staff_capabilities('account_monitor_report', $capabilities, 'Account Monitor','Accounts');
-		register_staff_capabilities('PartyWiseRateReport', $capabilities, 'Party Wise Rate Report','Accounts');
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		'print' => ['not_applicable' => true, 'name' => "Print"],
-		'export' => ['not_applicable' => true, 'name' => "Export"],
-		];
-		register_staff_capabilities('SchemeMaster', $capabilities, 'Scheme Master','Accounts');
-		register_staff_capabilities('cd_notes', $capabilities, 'Credit/Debit Notes','Accounts');
-		register_staff_capabilities('SplDisc', $capabilities, 'Special Discount','Accounts');
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => ['not_applicable' => true, 'name' => _l('permission_create')],
-		'edit' => ['not_applicable' => true, 'name' => _l('permission_edit')],
-		'delete' => ['not_applicable' => true, 'name' => _l('permission_delete')],
-		'print' => ['not_applicable' => false, 'name' => "Print"],
-		'export' => ['not_applicable' => false, 'name' => "Export"],
-		];
-		register_staff_capabilities('accounting_tcs_report', $capabilities, 'TCS Report','Accounts');
-		register_staff_capabilities('accounting_tds_report', $capabilities, 'TDS Report','Accounts');
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		];
-		//register_staff_capabilities('accounting_transfer', $capabilities, _l('accounting_transfer'));
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		'delete' => _l('permission_delete'),
-		];
-		//register_staff_capabilities('accounting_chart_of_accounts', $capabilities, _l('accounting_chart_of_accounts'));
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		];
-		//register_staff_capabilities('accounting_reconcile', $capabilities, _l('accounting_reconcile'));
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'create' => _l('permission_create'),
-		'edit' => _l('permission_edit'),
-		];
-		//register_staff_capabilities('accounting_budget', $capabilities, _l('accounting_budget'));
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		];
-		//register_staff_capabilities('accounting_report', $capabilities, _l('accounting_report'));
-		$capabilities = [];
-		$capabilities['capabilities'] = [
-		'view' => _l('permission_view'),
-		'edit' => _l('permission_edit'),
-		];
-		//register_staff_capabilities('accounting_setting', $capabilities, _l('accounting_setting'));
+
+		register_staff_capabilities('accMainGroup', $allPermissionsArray, 'Account Main Group', 'Account');
+		register_staff_capabilities('accSubGroup1', $allPermissionsArray, 'Account Sub Group1', 'Account');
+		register_staff_capabilities('accSubGroup2', $allPermissionsArray, 'Account Sub Group2', 'Account');
+		register_staff_capabilities('accCreateLedger', $allPermissionsArray, 'Create Ledger', 'Account');
 	}
 	function acc_automatic_invoice_conversion($invoice_id) {
 		if ($invoice_id) {

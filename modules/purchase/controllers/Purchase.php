@@ -37,9 +37,7 @@ class purchase extends AdminController
 			redirect(admin_url('purchase/AddPurchaseOrder'));
 		}
 
-		if (!has_permission_new('CashPurchaseList', '', 'view')) {
-			access_denied('Invoices');
-		}
+		if (!has_permission_new('PurchaseOrderList', '', 'view')) { access_denied('Access Denied'); }
 		$invoice = [];
 		$invoice1  = $this->purchase_model->GetPurchaseOrderDetailsForPdf($PurchID);
 		$history  = $this->purchase_model->get_order_data($PurchID);
@@ -353,9 +351,7 @@ class purchase extends AdminController
 	//========================= Save Purchase Order (Custom) ============================
 	public function savepurchase()
 	{
-		if (!has_permission_new('purchase-order-po', '', 'create')) {
-			access_denied('purchase');
-		}
+		if (!has_permission_new('PurchaseOrder', '', 'create')) { access_denied('Access Denied'); }
 
 
 
@@ -1564,9 +1560,7 @@ class purchase extends AdminController
 
 	public function AddEditVendor($id = '')
 	{
-		if (!has_permission_new('Purchase', '', 'view')) {
-			access_denied('Purchase');
-		}
+		if (!has_permission_new('vendors', '', 'view')) { access_denied('Access Denied'); }
 
 		// Handle POST request for adding/updating vendor
 		if ($this->input->post() && !$this->input->is_ajax_request()) {
@@ -1637,6 +1631,9 @@ class purchase extends AdminController
 		$data['Broker'] = $this->purchase_model->get_broker();
 		$data['position'] = $this->purchase_model->get_position();
 		$data['country'] = $this->purchase_model->get_country();
+		$this->load->model('currencies_model');
+
+        $data['currencies'] = $this->currencies_model->get();
 
 
 		// Get location data
@@ -17250,7 +17247,25 @@ class purchase extends AdminController
 		}
 	}
 
-	public function GetQuotationMasterdate()
+	// public function GetQuotationMasterdate()
+	// {
+	// 	$QuotationID = $this->input->post('QuotationID');
+	// 	$date = $this->purchase_model->GetQuotationMasterdate($QuotationID);
+	// 	if ($date) {
+	// 		echo json_encode([
+	// 			'success' => true,
+	// 			'data' => $date
+	// 		]);
+	// 	} else {
+	// 		echo json_encode([
+	// 			'success' => false,
+	// 			'message' => 'No data found'
+	// 		]);
+	// 	}
+	// }
+
+
+public function GetQuotationMasterdate()
 	{
 		$QuotationID = $this->input->post('QuotationID');
 		$date = $this->purchase_model->GetQuotationMasterdate($QuotationID);
@@ -17267,28 +17282,24 @@ class purchase extends AdminController
 		}
 	}
 
+public function getCurrency()
+{
+    $AccountID = $this->input->post('AccountID');
 
+    $currencyData = $this->purchase_model->getCurrency($AccountID);
 
-	public function GetquotationDetails()
-	{
-		$AccountID = $this->input->post('AccountID');
-
-		$quotationData = $this->purchase_model->GetquotationDetails($AccountID);
-
-		$quotation = array();
-		if (!empty($quotationData)) {
-			foreach ($quotationData as $row) {
-				$quotation[] = array(
-					'PurchID' => $row['PurchID'],
-				);
-			}
-		}
-
-		echo json_encode([
-			'status' => 'success',
-			'locations' => $quotation
-		]);
-	}
+    if ($currencyData) {
+        echo json_encode([
+            'status' => 'success',
+            'data' => $currencyData
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'No data found'
+        ]);
+    }
+}
 
 
 	public function GetvandocDetails()

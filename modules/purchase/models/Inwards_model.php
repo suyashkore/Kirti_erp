@@ -362,7 +362,7 @@ class Inwards_model extends App_Model
   }
 
   public function GetGateInNo($location_id){
-    $this->db->where('TransDate', date('Y-m-d'));
+    $this->db->where('DATE(TransDate)', date('Y-m-d'));
     $this->db->where('LocationID', $location_id);
     $count = $this->db->count_all_results(db_prefix().'GateMaster');
     $next_no = $count + 1;

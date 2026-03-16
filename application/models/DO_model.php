@@ -3,7 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class DO_model extends App_Model
 {
-  protected $table = 'SalesOrderMaster';
+  protected $table = 'DeliveryOrderMaster';
   protected $primaryKey = 'id';
   public function __construct()
   {
@@ -371,7 +371,7 @@ class DO_model extends App_Model
   }
 
   public function getDeliveryOrderDetails($id)
-{
+  {
     // ── Get Master Record ──
     $this->db->select('dom.*, c.company, icm.CategoryName');
     $this->db->from(db_prefix() . 'DeliveryOrderMaster dom');
@@ -382,7 +382,7 @@ class DO_model extends App_Model
     $master = $this->db->get()->row_array();
 
     if (!$master || empty($master['OrderID'])) {
-        return [];
+      return [];
     }
 
     // ── Subquery for Total Ordered Qty (TransID IS NULL) ──
@@ -428,20 +428,20 @@ class DO_model extends App_Model
     $history = $this->db->get()->result_array();
 
     foreach ($history as &$row) {
-        $row['is_locked'] = $this->isHistoryLocked(
-            $row['id'],
-            $row['OrderID'],
-            $row['ItemID'],
-            $row['AccountID'],
-            $row['TransID']
-        ) ? 1 : 0;
+      $row['is_locked'] = $this->isHistoryLocked(
+        $row['id'],
+        $row['OrderID'],
+        $row['ItemID'],
+        $row['AccountID'],
+        $row['TransID']
+      ) ? 1 : 0;
     }
     unset($row);
 
     $master['history'] = $history;
 
     return $master;
-}
+  }
 
   public function getCustomerBrokerList($customer_id)
   {
@@ -512,18 +512,10 @@ class DO_model extends App_Model
   {
     $from_date  = $data['from_date'] ?? date('Y-m-01');
     $to_date    = $data['to_date'] ?? date('Y-m-d');
-    $customer_id  = $data['customer_id'] ?? '';
-    $broker_id  = $data['broker_id'] ?? '';
-    $status     = $data['status'] ?? 1;
 
     $this->db->from(db_prefix() . $this->table);
 
     $this->db->join(db_prefix() . 'clients customer', 'customer.AccountID = ' . db_prefix() . $this->table . '.AccountID', 'left');
-    $this->db->join(db_prefix() . 'clients broker', 'broker.AccountID = ' . db_prefix() . $this->table . '.BrokerID', 'left');
-
-    if ($customer_id != '')       $this->db->where(db_prefix() . $this->table . '.AccountID', $customer_id);
-    if ($broker_id != '')       $this->db->where(db_prefix() . $this->table . '.BrokerID', $broker_id);
-    // if($status != '')          $this->db->where(db_prefix().$this->table.'.Status', $status);
 
     $from_date  = $data['from_date'] ?? '';
     $to_date    = $data['to_date'] ?? '';
@@ -537,35 +529,91 @@ class DO_model extends App_Model
     }
 
 
-    if ($from_date != '')       $this->db->where(db_prefix() . $this->table . '.TransDate >=', $from_date);
-    if ($to_date != '')         $this->db->where(db_prefix() . $this->table . '.TransDate <=', $to_date);
+    // if ($from_date != '')       $this->db->where(db_prefix() . $this->table . '.TransDate >=', $from_date);
+    // if ($to_date != '')         $this->db->where(db_prefix() . $this->table . '.TransDate <=', $to_date);
+
+    // $total = $this->db->count_all_results('', FALSE);
+
+    if ($from_date != '') $this->db->where(db_prefix() . $this->table . '.TransDate >=', $from_date);
+    if ($to_date != '')   $this->db->where(db_prefix() . $this->table . '.TransDate <=', $to_date);
+
+    // Status filter using HAVING (since Status is a computed column)
+    $status = $data['status'] ?? '';
+    if ($status == 1) {
+      // Pending: no Invoice row with BillID for this DO
+      $this->db->where("NOT EXISTS (
+        SELECT 1 FROM " . db_prefix() . "history inv
+        WHERE inv.TransID = " . db_prefix() . $this->table . ".OrderID
+          AND inv.TType2   = 'Invoice'
+          AND inv.BillID  IS NOT NULL
+    )", null, false);
+    } elseif ($status == 2) {
+      // Complete: at least one Invoice row with BillID exists
+      $this->db->where("EXISTS (
+        SELECT 1 FROM " . db_prefix() . "history inv
+        WHERE inv.TransID = " . db_prefix() . $this->table . ".OrderID
+          AND inv.TType2   = 'Invoice'
+          AND inv.BillID  IS NOT NULL
+    )", null, false);
+    }
 
     $total = $this->db->count_all_results('', FALSE);
+
+    // $this->db->select([
+    //   db_prefix() . $this->table . '.id',
+    //   db_prefix() . $this->table . '.OrderID',
+    //   db_prefix() . $this->table . '.DODate',
+    //   db_prefix() . $this->table . '.AccountID',
+    //   db_prefix() . $this->table . '.TotalWt',
+    //   db_prefix() . $this->table . '.TotalQty',
+    //   db_prefix() . $this->table . '.ItemTotal',
+    //   db_prefix() . $this->table . '.TotalDisc',
+    //   db_prefix() . $this->table . '.TaxAmt',
+    //   db_prefix() . $this->table . '.CGSTAmt',
+    //   db_prefix() . $this->table . '.SGSTAmt',
+    //   db_prefix() . $this->table . '.IGSTAmt',
+    //   db_prefix() . $this->table . '.RoundOff',
+    //   db_prefix() . $this->table . '.NetAmt',
+
+    //   db_prefix() . $this->table . '.NetAmt',
+    //   'customer.company as customer_name',
+    // ]);
+
+    $status_subquery = "
+    CASE 
+        WHEN EXISTS (
+            SELECT 1 FROM " . db_prefix() . "history inv
+            WHERE inv.TransID = " . db_prefix() . $this->table . ".OrderID
+              AND inv.TType2   = 'Invoice'
+              AND inv.BillID  IS NOT NULL
+        )
+        THEN 'Complete'
+        ELSE 'Pending'
+    END
+";
 
     $this->db->select([
       db_prefix() . $this->table . '.id',
       db_prefix() . $this->table . '.OrderID',
-      db_prefix() . $this->table . '.TransDate',
+      db_prefix() . $this->table . '.DODate',
       db_prefix() . $this->table . '.AccountID',
-      db_prefix() . $this->table . '.BrokerID',
-      db_prefix() . $this->table . '.TotalWeight',
-
-      db_prefix() . $this->table . '.TotalQuantity',
-      db_prefix() . $this->table . '.ItemAmt',
-      db_prefix() . $this->table . '.DiscAmt',
-      db_prefix() . $this->table . '.TaxableAmt',
+      db_prefix() . $this->table . '.TotalWt',
+      db_prefix() . $this->table . '.TotalQty',
+      db_prefix() . $this->table . '.ItemTotal',
+      db_prefix() . $this->table . '.TotalDisc',
+      db_prefix() . $this->table . '.TaxAmt',
       db_prefix() . $this->table . '.CGSTAmt',
       db_prefix() . $this->table . '.SGSTAmt',
       db_prefix() . $this->table . '.IGSTAmt',
-      db_prefix() . $this->table . '.RoundOffAmt',
-      db_prefix() . $this->table . '.NetAmt',
-
+      db_prefix() . $this->table . '.RoundOff',
       db_prefix() . $this->table . '.NetAmt',
       'customer.company as customer_name',
-      'broker.company as broker_name'
     ]);
 
-    $this->db->order_by($this->primaryKey, 'desc');
+    // Add status as a raw expression
+    $this->db->select("($status_subquery) as Status", false);
+
+    $this->db->order_by($this->primaryKey, 'asc');
     $this->db->limit($limit, $offset);
 
     $rows = $this->db->get()->result_array();
@@ -607,14 +655,14 @@ class DO_model extends App_Model
   // {
   //   $this->db->select(
   //     'AccountID,
-	// 		company,
-	// 		GSTIN as gst_number,
-	// 		PAN as pan,
-	// 		billing_city as city,
-	// 		billing_zip as postal_code,
-	// 		billing_address as address,
-	// 		tblxx_statelist.state_name as state,
-	// 		tblcountries.long_name as country'
+  // 		company,
+  // 		GSTIN as gst_number,
+  // 		PAN as pan,
+  // 		billing_city as city,
+  // 		billing_zip as postal_code,
+  // 		billing_address as address,
+  // 		tblxx_statelist.state_name as state,
+  // 		tblcountries.long_name as country'
   //   );
 
   //   $this->db->from(db_prefix() . 'clients');
@@ -647,7 +695,7 @@ class DO_model extends App_Model
   // {
   //   $this->db->select(
   //     'tblclientwiseshippingdata.id,
-	// 		tblxx_citylist.city_name'
+  // 		tblxx_citylist.city_name'
   //   );
 
   //   $this->db->from('tblclientwiseshippingdata');
@@ -657,5 +705,5 @@ class DO_model extends App_Model
   //   return $this->db->get()->result_array();
   // }
 
-  
+
 }

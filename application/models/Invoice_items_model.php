@@ -1127,7 +1127,7 @@
 			$this->db->select(db_prefix() . 'ItemsSubGroup2.*,'.db_prefix() . 'ItemsSubGroup1.name AS SubGroup1Name,'.db_prefix() . 'items_main_groups.name AS MainGroupName');
 			$this->db->from(db_prefix() . 'ItemsSubGroup2');
 			$this->db->join(db_prefix() . 'ItemsSubGroup1', '' . db_prefix() . 'ItemsSubGroup1.id = ' . db_prefix() . 'ItemsSubGroup2.sub_group_id1');
-			$this->db->join(db_prefix() . 'items_main_groups', '' . db_prefix() . 'items_main_groups.id = ' . db_prefix() . 'ItemsSubGroup1.main_group_id');
+			$this->db->join(db_prefix() . 'items_main_groups', '' . db_prefix() . 'items_main_groups.id = ' . db_prefix() . 'ItemsSubGroup2.main_group_id');
 			$this->db->order_by(db_prefix() . 'ItemsSubGroup2.id', 'ASC');
 			return $this->db->get()->result_array();
 		}

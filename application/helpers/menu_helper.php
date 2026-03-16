@@ -33,7 +33,7 @@ function app_init_admin_sidebar_menu_items()
 
 	if (has_permission_new('customers', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
-			'slug' => 'account-master',
+			'slug' => 'customers',
 			'name' => 'Customer',
 			'href' => admin_url('clients/AddEditAccount'),
 			'position' => 2,
@@ -59,7 +59,7 @@ function app_init_admin_sidebar_menu_items()
 	// }
 
 	// Broker Master menu item
-	if (has_permission_new('broker', '', 'view')) {
+	if (has_permission_new('broker_master', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'broker_master',
 			'name' => 'Broker Master',
@@ -79,7 +79,7 @@ function app_init_admin_sidebar_menu_items()
 	}
 
 	// Location Master menu item
-	if (has_permission_new('location', '', 'view')) {
+	if (has_permission_new('location_form', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'location_form',
 			'name' => 'Location Master',
@@ -88,7 +88,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
 	}
 
-	if (has_permission_new('payments', '', 'view')) {
+	if (has_permission_new('payment_terms', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'payment_terms',
 			'name' => 'Payment Terms',
@@ -130,7 +130,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
 	}*/
 
-	if (has_permission_new('routemaster', '', 'view')) {
+	if (has_permission_new('route_master', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'route_master',
 			'name' => 'Route Master',
@@ -166,7 +166,7 @@ function app_init_admin_sidebar_menu_items()
 	// 	'position' => 13,
 	// 	]);
 	// }
-	if (has_permission('tdsmaster', '', 'view')) {
+	if (has_permission('tdsMaster', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'tdsMaster',
 			'name' => 'TDS Master',
@@ -229,7 +229,7 @@ function app_init_admin_sidebar_menu_items()
 	// }
 
 	// / Transport Master menu item
-	if (has_permission_new('AddEditTransport', '', 'view')) {
+	if (has_permission_new('TransportMaster', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'TransportMaster',
 			'name' => 'Transport Master',
@@ -247,7 +247,7 @@ function app_init_admin_sidebar_menu_items()
 	// 	]);
 	// }
 
-	if (has_permission_new('manage', '', 'view')) {
+	if (has_permission_new('Chamber', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'Chamber',
 			'name' => 'Chamber Master',
@@ -255,15 +255,7 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 21,
 		]);
 	}
-	if (has_permission_new('AddEditLot', '', 'view')) {
-		$CI->app_menu->add_sidebar_children_item('master', [
-			'slug' => 'Lot',
-			'name' => 'Lot Master',
-			'href' => admin_url('Lot'),
-			'position' => 22,
-		]);
-	}
-	if (has_permission_new('AddEditStack', '', 'view')) {
+	if (has_permission_new('Stack', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'Stack',
 			'name' => 'Stack Master',
@@ -271,8 +263,16 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 23,
 		]);
 	}
+	if (has_permission_new('Lot', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('master', [
+			'slug' => 'Lot',
+			'name' => 'Lot Master',
+			'href' => admin_url('Lot'),
+			'position' => 22,
+		]);
+	}
 
-	if (has_permission_new('manage', '', 'view')) {
+	if (has_permission_new('Country', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'Country',
 			'name' => 'Country Master',
@@ -281,7 +281,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
 	}
 
-	if (has_permission_new('manage', '', 'view')) {
+	if (has_permission_new('Form', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('master', [
 			'slug' => 'Form',
 			'name' => 'Form Master',
@@ -347,7 +347,7 @@ function app_init_admin_sidebar_menu_items()
 
 	if (has_permission_new('itemsmaingrp', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
-			'slug' => 'MainGroups',
+			'slug' => 'itemsmaingrp',
 			'name' => "Item Main Group",
 			'href' => admin_url('invoice_items/MainGroups'),
 			'position' => 4,
@@ -356,7 +356,7 @@ function app_init_admin_sidebar_menu_items()
 
 	if (has_permission_new('itemssubgrp', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
-			'slug' => 'ItemGroups',
+			'slug' => 'itemssubgrp',
 			'name' => "Item SubGroup 1",
 			'href' => admin_url('invoice_items/ItemGroups'),
 			'position' => 5,
@@ -364,7 +364,7 @@ function app_init_admin_sidebar_menu_items()
 	}
 	if (has_permission_new('itemssubgrp2', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
-			'slug' => 'ItemSubGroups2',
+			'slug' => 'itemssubgrp2',
 			'name' => "Item SubGroup 2",
 			'href' => admin_url('invoice_items/ItemSubGroups2'),
 			'position' => 6,
@@ -381,7 +381,7 @@ function app_init_admin_sidebar_menu_items()
 	}
 
 	// Item Category Master menu item
-	if (has_permission_new('manage', '', 'view')) {
+	if (has_permission_new('ItemCategory', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
 			'slug' => 'ItemCategory',
 			'name' => 'Item Category Master',
@@ -390,7 +390,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
 	}
 
-	if (has_permission_new('hsnmaster', '', 'view')) {
+	if (has_permission_new('hsn_master', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
 			'slug' => 'hsn_master',
 			'name' => 'HSN Master',
@@ -426,9 +426,9 @@ function app_init_admin_sidebar_menu_items()
 	}
 
 	// Brand Master menu item
-	if (has_permission_new('manage', '', 'view')) {
+	if (has_permission_new('brandMaster', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
-			'slug' => 'Brand',
+			'slug' => 'brandMaster',
 			'name' => 'Brand Master',
 			'href' => admin_url('Brand'),
 			'position' => 13,
@@ -436,9 +436,9 @@ function app_init_admin_sidebar_menu_items()
 	}
 
 	// Priority Master menu item
-	if (has_permission_new('AddEditPriority', '', 'view')) {
+	if (has_permission_new('priorityMaster', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
-			'slug' => 'Priority',
+			'slug' => 'priorityMaster',
 			'name' => 'Priority Master',
 			'href' => admin_url('Priority'),
 			'position' => 14,
@@ -447,7 +447,7 @@ function app_init_admin_sidebar_menu_items()
 
 	if (has_permission_new('ItemList', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('Inventory', [
-			'slug' => 'itemlist',
+			'slug' => 'ItemList',
 			'name' => 'Item List',
 			'href' => admin_url('ItemMaster/List'),
 			'position' => 15,
@@ -561,9 +561,9 @@ function app_init_admin_sidebar_menu_items()
 	]);
 
 
-	if (has_permission_new('vehiclemaster', '', 'view')) {
+	if (has_permission_new('vehicleMaster', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('transport', [
-		'slug'     => 'vehicle_master',
+		'slug'     => 'vehicleMaster',
 		'name'     => 'Vehicle Master',
 		'href'     => admin_url('VehicleMaster'),
 		'position' => 1,
@@ -740,44 +740,44 @@ function app_init_admin_sidebar_menu_items()
 		'icon' => 'fa fa-balance-scale',
 	]);
 	
-	if (has_permission_new('pending_orders', '', 'view')) {
+	if (has_permission_new('salesQuotation', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'pending-orders',
+			'slug' => 'salesQuotation',
 			'name' => 'Sales Quotation',
 			'href' => admin_url('SalesQuotation'),
 			'position' => 1,
 		]);
 	}
 	
-	if (has_permission_new('pending_orders', '', 'view')) {
+	if (has_permission_new('salesQuotationList', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'pending-orders',
+			'slug' => 'salesQuotationList',
 			'name' => 'Quotation List',
 			'href' => admin_url('SalesQuotation/List'),
 			'position' => 2,
 		]);
 	}
 	
-	if (has_permission_new('pending_orders', '', 'view')) {
+	if (has_permission_new('salesOrder', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'pending-orders',
+			'slug' => 'salesOrder',
 			'name' => 'Sales Orders',
 			'href' => admin_url('SalesOrder'),
 			'position' => 3,
 		]);
 	}
 	
-	if (has_permission_new('pending_orders', '', 'view')) {
+	if (has_permission_new('salesOrderList', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'pending-orders',
+			'slug' => 'salesOrderList',
 			'name' => 'Orders List',
 			'href' => admin_url('SalesOrder/List'),
 			'position' => 4,
 		]);
 	}
-	if (has_permission_new('DeliveryOrder', '', 'create')) {
+	if (has_permission_new('DelideliveryOrderveryOrder', '', 'create')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'DeliveryOrder',
+			'slug' => 'deliveryOrder',
 			'name' => 'Delivery Order',
 			'href' => admin_url('DeliveryOrder'),
 			'position' => 5,
@@ -791,37 +791,62 @@ function app_init_admin_sidebar_menu_items()
 	// 	'position' => 1,
 	// 	]);
 	// }
-	if (has_permission_new('pending_orders', '', 'view')) {
+	if (has_permission_new('pendingDeliveryOrder', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'pending-orders',
+			'slug' => 'pendingDeliveryOrder',
 			'name' => 'Pending Orders',
 			'href' => admin_url('order/pending_orders'),
 			'position' => 6,
 		]);
 	}
 
-	if (has_permission_new('LimitExceededOrders', '', 'view')) {
+	if (has_permission_new('limitExceedDeliveryOrder', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'LimitExceededOrders',
+			'slug' => 'limitExceedDeliveryOrder',
 			'name' => 'Limit Exceeded Orders',
 			'href' => admin_url('order/LimitExceededOrders'),
 			'position' => 7,
 		]);
 	}
-	if (has_permission_new('SalesInvoice', '', 'view')) {
+	if (has_permission_new('salesInvoice', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'sale-SalesInvoice',
+			'slug' => 'salesInvoice',
 			'name' => 'Sales Invoice',
 			'href' => admin_url('SalesInvoice'),
 			'position' => 8,
 		]);
 	}
-	if (has_permission_new('sale_list', '', 'view')) {
+	if (has_permission_new('salesInvoiceList', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'sale-list',
+			'slug' => 'salesInvoiceList',
 			'name' => 'Sale List',
 			'href' => admin_url('order/SaleList'),
 			'position' => 8,
+		]);
+	}
+
+	if (has_permission_new('changeVehicle', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'changeVehicle',
+			'name' => 'Change Vehicle',
+			'href' => admin_url('challan/VehicleUpdate'),
+			'position' => 9,
+		]);
+	}
+	if (has_permission_new('salesTradeSettlement', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'salesTradeSettlement',
+			'name' => 'Sales Trade Settlement',
+			'href' => admin_url('TradeSettlement/Sales'),
+			'position' => 10,
+		]);
+	}
+	if (has_permission_new('stockTransfer', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'stockTransfer',
+			'name' => 'Stock Transfer',
+			'href' => admin_url('StockTransfer'),
+			'position' => 10,
 		]);
 	}
 
@@ -842,23 +867,6 @@ function app_init_admin_sidebar_menu_items()
 	// 	'position' => 4,
 	// 	]);
 	// }
-
-	if (has_permission_new('change_vehicle', '', 'view')) {
-		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'UpdateVehicle',
-			'name' => 'Change Vehicle',
-			'href' => admin_url('challan/VehicleUpdate'),
-			'position' => 9,
-		]);
-	}
-	if (has_permission_new('TradeSettlement', '', 'view')) {
-		$CI->app_menu->add_sidebar_children_item('tansaction', [
-			'slug' => 'TradeSettlement',
-			'name' => 'Sales Trade Settlement',
-			'href' => admin_url('TradeSettlement/Sales'),
-			'position' => 11,
-		]);
-	}
 
 	// if (has_permission_new('gatepass', '', 'view') || has_permission_new('gatepass', '', 'view_own')) {
 	// 	$CI->app_menu->add_sidebar_children_item('tansaction', [
@@ -1157,18 +1165,18 @@ function app_init_admin_sidebar_menu_items()
 		'icon' => 'fa fa-balance-scale',
 	]);
 
-	if (has_permission_new('qc_unit', '', 'view')) {
+	if (has_permission_new('qcUnit', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('QC', [
-			'slug' => 'qc-unit',
+			'slug' => 'qcUnit',
 			'name' => 'QC Unit',
 			'href' => admin_url('purchase/QC_Unit'),
 			'position' => 1,
 		]);
 	}
 
-	if (has_permission_new('qc_parameter', '', 'view')) {
+	if (has_permission_new('qcMaster', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('QC', [
-			'slug' => 'qc-parameter',
+			'slug' => 'qcMaster',
 			'name' => 'QC Parameter',
 			'href' => admin_url('QC_Parameter'),
 			'position' => 2,
@@ -1192,25 +1200,25 @@ function app_init_admin_sidebar_menu_items()
 	// 	]);
 	// }
 
-	if (has_permission_new('Item_QC', '', 'view')) {
+	if (has_permission_new('itemWiseQc', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('QC', [
-			'slug' => 'Item_QC',
+			'slug' => 'itemWiseQc',
 			'name' => 'Item Wise QC',
 			'href' => admin_url('QC_Parameter/Item'),
 			'position' => 5,
 		]);
 	}
-	if (has_permission_new('Item_QC', '', 'view')) {
+	if (has_permission_new('deductionMatrix', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('QC', [
-			'slug' => 'Item_QC',
+			'slug' => 'deductionMatrix',
 			'name' => 'Deduction Matrix',
 			'href' => admin_url('ItemMaster/DeductionMatrix'),
 			'position' => 6,
 		]);
 	}
-	if (has_permission_new('Fg_Test', '', 'view')) {
+	if (has_permission_new('finishGoodTest', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('QC', [
-			'slug' => 'Fg_Test',
+			'slug' => 'finishGoodTest',
 			'name' => 'Finish Good Test',
 			'href' => admin_url('purchase/FG_Test_Report'),
 			'position' => 7,
@@ -1224,9 +1232,9 @@ function app_init_admin_sidebar_menu_items()
 	// 'position' => 6,
 	// ]);
 	// }
-	if (has_permission_new('Metal_Detector', '', 'view')) {
+	if (has_permission_new('metalDetectorQC', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('QC', [
-			'slug' => 'Metal_Detector',
+			'slug' => 'metalDetectorQC',
 			'name' => 'Metal Detector QC',
 			'href' => admin_url('purchase/Metal_Detector_Report'),
 			'position' => 8,
@@ -1930,9 +1938,9 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		'icon' => 'fa fa-user-circle menu-icon',
 	]);
 
-	if (has_permission_new('hrm_hr_records', '', 'create')) {
+	if (has_permission_new('hrmDashboard', '', 'create')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'hr_profile_hr_records',
+			'slug' => 'hrmDashboard',
 			'name' => _l('HR Dashboard'),
 			'icon' => 'fa fa-user',
 			'href' => admin_url('hr_profile/dashboard'),
@@ -1940,18 +1948,18 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		]);
 	}
 
-	if (has_permission_new('hrm_hr_records', '', 'create')) {
+	if (has_permission_new('hrmStaffMembers', '', 'create')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'hr_profile_hr_records',
+			'slug' => 'hrmStaffMembers',
 			'name' => _l('Staff members'),
 			'icon' => 'fa fa-user',
 			'href' => admin_url('hr_profile/AddEditStaff'),
 			'position' => 2,
 		]);
 	}
-	if (has_permission_new('hrm_hr_recordslist', '', 'view')) {
+	if (has_permission_new('hrmStaffList', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'hr_profile_hr_records',
+			'slug' => 'hrmStaffList',
 			'name' => 'Staff List',
 			'icon' => 'fa fa-user',
 			'href' => admin_url('hr_profile/staff_infor'),
@@ -1976,18 +1984,18 @@ $CI->app_menu->add_setup_children_item('contracts', [
 	// 	'position' => 5,
 	// 	]);
 	// }
-	if (has_permission_new('AttendanceSheet', '', 'view')) {
+	if (has_permission_new('hrmAttendanceSheet', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'Attendance Sheet',
+			'slug' => 'hrmAttendanceSheet',
 			'name' => 'Attendance Sheet',
 			'icon' => 'fa fa-user',
 			'href' => admin_url('hr_profile/AttendanceSheet'),
 			'position' => 6,
 		]);
 	}
-	if (has_permission_new('cliam_expenses', '', 'view') || has_permission_new('cliam_expenses', '', 'edit')) {
+	if (has_permission_new('hrmClaimExpenses', '', 'view') || has_permission_new('cliam_expenses', '', 'edit')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'claim_expenses',
+			'slug' => 'hrmClaimExpenses',
 			'name' => 'Claim Expenses',
 			'icon' => 'fa fa-user',
 			'href' => admin_url('claim_expenses'),
@@ -1995,18 +2003,18 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		]);
 	}
 
-	if (has_permission_new('Departments', '', 'view')) {
+	if (has_permission_new('hrmJobDepartments', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'Departments',
+			'slug' => 'hrmJobDepartments',
 			'name' => "Job Departments",
 			'icon' => 'fa fa-map-pin',
 			'href' => admin_url('departments'),
 			'position' => 8,
 		]);
 	}
-	if (has_permission_new('staffmanage_job_position', '', 'view')) {
+	if (has_permission_new('hrmJobDesignation', '', 'view')) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'hr_profile_job_position_manage',
+			'slug' => 'hrmJobDesignation',
 			'name' => "Job Designation",
 			'icon' => 'fa fa-map-pin',
 			'href' => admin_url('hr_profile/job_positions'),
@@ -2014,9 +2022,9 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		]);
 	}
 
-	if (has_permission_new('timesheets_shift_type', '', 'view_own') || has_permission_new('timesheets_shift_type', '', 'view') || is_admin()) {
+	if (has_permission_new('hrmShiftCategories', '', 'view_own') || has_permission_new('timesheets_shift_type', '', 'view') || is_admin()) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'timesheets_shift_type',
+			'slug' => 'hrmShiftCategories',
 			'name' => _l('shift_type'),
 			'href' => admin_url('timesheets/manage_shift_type'),
 			'icon' => 'fa fa-magic',
@@ -2024,9 +2032,9 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		]);
 	}
 
-	if (has_permission_new('table_shiftwork_management', '', 'view_own') || has_permission_new('table_shiftwork_management', '', 'view') || is_admin()) {
+	if (has_permission_new('hrmShift', '', 'view_own') || has_permission_new('table_shiftwork_management', '', 'view') || is_admin()) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'timesheets_shift_management',
+			'slug' => 'hrmShift',
 			'name' => _l('shift_management'),
 			'href' => admin_url('timesheets/shift_management'),
 			'icon' => 'fa fa-calendar',
@@ -2034,9 +2042,9 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		]);
 	}
 
-	if (has_permission_new('timesheets_table_shiftwork', '', 'view_own') || has_permission_new('timesheets_table_shiftwork', '', 'view') || is_admin()) {
+	if (has_permission_new('hrmWorkShift', '', 'view_own') || has_permission_new('timesheets_table_shiftwork', '', 'view') || is_admin()) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'timesheets_table_shiftwork',
+			'slug' => 'hrmWorkShift',
 			'name' => _l('shiftwork'),
 			'href' => admin_url('timesheets/table_shiftwork'),
 			'icon' => 'fa fa-ticket',
@@ -2054,9 +2062,9 @@ $CI->app_menu->add_setup_children_item('contracts', [
 		]);
 	}
 
-	if (has_permission_new('leave_management', '', 'view_own') || has_permission_new('leave_management', '', 'view') || is_admin()) {
+	if (has_permission_new('hrmLeave', '', 'view_own') || has_permission_new('leave_management', '', 'view') || is_admin()) {
 		$CI->app_menu->add_sidebar_children_item('hr', [
-			'slug' => 'timesheets_timekeeping_mnrh',
+			'slug' => 'hrmLeave',
 			'name' => _l('leave'),
 			'icon' => 'fa fa-clipboard',
 			'href' => admin_url('timesheets/requisition_manage'),

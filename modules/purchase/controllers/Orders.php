@@ -14,6 +14,7 @@ class Orders extends AdminController
 		* ADD / EDIT PAGE
 		* ========================= */
 	public function index(){
+    if (!has_permission_new('PurchaseOrder', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Orders Master';
     
 		$this->load->view('admin/Orders/OrdersAddEdit', $data);
@@ -23,6 +24,7 @@ class Orders extends AdminController
 		* LIST PAGE
 		* ========================= */
 	public function List(){
+    if (!has_permission_new('PurchaseOrderList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Orders List';
     
     $data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
@@ -77,6 +79,7 @@ class Orders extends AdminController
   }
 
   public function ListExportExcel(){
+    if (!has_permission_new('PurchaseOrderList', '', 'export')) { access_denied('Access Denied'); }
     $this->output->enable_profiler(FALSE);
     ob_end_clean();
 
