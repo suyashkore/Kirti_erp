@@ -107,7 +107,7 @@
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="item_category">
                     <label for="item_category" class="control-label"><small class="req text-danger">* </small>Sales Category</label>
-                    <select name="item_category" id="item_category" class="form-control selectpicker" data-live-search="true" app-field-label="Category">
+                    <select name="item_category" id="item_category" class="form-control selectpicker" data-live-search="true" app-field-label="Category" onchange="getNextSalesInvoiceNo();">
                       <option value="" selected>None selected</option>
                       <?php
                       if (!empty($category_list)) :
@@ -122,7 +122,7 @@
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="OrderID">
                     <label for="OrderID" class="control-label"><small class="req text-danger">* </small> Invoice ID</label>
-                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly value="<?=  $NextSINumber; ?>">
+                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly>
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">
@@ -513,6 +513,35 @@ $(document).ready(function(){
         }
     });
 }
+
+function getNextSalesInvoiceNo(callback = null) {
+   var categoryId = $('#item_category').val();
+    if (!categoryId) {
+      $('#OrderID').val('');
+      return;
+    }
+    $.ajax({
+      url: '<?= admin_url('SalesInvoice/getNextSalesInvoiceNo'); ?>',
+      type: 'POST',
+      dataType: 'json',
+      success: function(response) {
+        if (response.success == true) {
+          let form_mode = $('#form_mode').val();
+          if (form_mode == 'add') {
+            $('#OrderID').val(response.NextSINo).prop('readonly', true);
+          }
+        } else {
+          $('#OrderID').val('');
+        }
+        if (callback) callback();
+      },
+      error: function() {
+        $('#OrderID').val('').prop('readonly', true);
+      }
+    });
+  }
+
+
   function getDeliveryOrderListDetails(deliveryorder_id) {
     if (!deliveryorder_id) return;
     $.ajax({
@@ -653,6 +682,7 @@ $(document).ready(function(){
     $('#form_mode').val('add');
     $('#update_id').val('');
     $('#deliveryorder_id').val('').prop('disabled', false);
+
     $('.updateBtn').hide();
     $('.printBtn').hide();
     $('.saveBtn').show();

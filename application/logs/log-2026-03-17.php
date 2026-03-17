@@ -1,0 +1,438 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+
+ERROR - 2026-03-17 09:40:39 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:39 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:39 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:39 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:39 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:40 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:40 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:46 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:46 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:46 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:46 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:46 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:46 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:46 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:47 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:47 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:47 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:47 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:50 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:50 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:40:50 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:50 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:50 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:40:51 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:40:51 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:00 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:00 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:01 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:01 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:02 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:02 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:03 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:07 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:07 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:08 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:08 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:09 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:09 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:09 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:09 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:09 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:14 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:14 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:14 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:14 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:14 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:15 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:15 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:15 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:15 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:16 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:16 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:17 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:17 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:17 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:17 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:17 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:18 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:18 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:18 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:18 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:21 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:21 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:42:21 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:21 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:21 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 09:42:22 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:42:22 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:41 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:42 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:43 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:43 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:43 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:43 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:43 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:43 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 09:49:44 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 09:49:44 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:02:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:02:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:02:57 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:02:57 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:02:57 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:02:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:02:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:00 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:00 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:00 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:00 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:01 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:01 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:01 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:01 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:01 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:01 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:02 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:02 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:02 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:02 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:02 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:02 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:08 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:08 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:08 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:08 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:09 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:09 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:09 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:09 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:09 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:09 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:14 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:14 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:26 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:26 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:26 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:03:26 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:03:26 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:03:27 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:27 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:33 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:34 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:39 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:39 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:39 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:39 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:39 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:39 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:40 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:41 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:41 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:42 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:42 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:50 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:50 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:50 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:50 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:50 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:50 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:51 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:52 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:52 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:59 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:59 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:03:59 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:03:59 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:07 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:07 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:07 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:04:07 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:04:07 --> Severity: Warning --> Undefined array key "slug" /home/kirti2erpgl/public_html/application/views/admin/includes/aside.php 97
+ERROR - 2026-03-17 10:04:08 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:08 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 04:34:13 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 04:34:13 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 04:34:13 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 04:34:13 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 04:34:13 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 04:34:13 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 10:04:25 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:25 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:26 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:27 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:27 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:27 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:27 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:27 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:27 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:04:34 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:04:34 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:14 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:14 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:16 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:16 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:16 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:16 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:05:17 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 05:49:38 --> Severity: error --> Exception: Access denied for user 'kirti2erpgl_db_usr'@'localhost' (using password: YES) C:\xampp\htdocs\public_html\system\database\drivers\mysqli\mysqli_driver.php 203
+ERROR - 2026-03-17 05:49:40 --> Severity: error --> Exception: Access denied for user 'kirti2erpgl_db_usr'@'localhost' (using password: YES) C:\xampp\htdocs\public_html\system\database\drivers\mysqli\mysqli_driver.php 203
+ERROR - 2026-03-17 05:49:43 --> Severity: error --> Exception: Access denied for user 'kirti2erpgl_db_usr'@'localhost' (using password: YES) C:\xampp\htdocs\public_html\system\database\drivers\mysqli\mysqli_driver.php 203
+ERROR - 2026-03-17 05:49:46 --> Severity: error --> Exception: Access denied for user 'kirti2erpgl_db_usr'@'localhost' (using password: YES) C:\xampp\htdocs\public_html\system\database\drivers\mysqli\mysqli_driver.php 203
+ERROR - 2026-03-17 10:21:50 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:50 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:21:52 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:21:52 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:21:52 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:21:53 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:53 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:21:54 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:54 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:21:55 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:55 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:21:56 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:56 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:21:56 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:21:56 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:21:56 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:21:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:21:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:21:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:22:00 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:22:00 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:22:00 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:22:00 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:22:00 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:22:01 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:22:01 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 05:52:08 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:08 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:08 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:08 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:08 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:08 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 10:22:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:22:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:22:58 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:22:58 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:22:58 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 05:52:59 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:59 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:59 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:59 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:59 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 05:52:59 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 10:23:00 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:00 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:23:18 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:18 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:23:18 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:18 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:23:19 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:19 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:23:19 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:19 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:23:20 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:20 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:23:20 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:23:20 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 05:53:21 --> Severity: error --> Exception: Class "GuzzleHttp\Handler\StreamHandler" not found C:\xampp\htdocs\public_html\application\vendor\guzzlehttp\guzzle\src\Utils.php 102
+ERROR - 2026-03-17 05:53:21 --> Severity: error --> Exception: Class "GuzzleHttp\Handler\StreamHandler" not found C:\xampp\htdocs\public_html\application\vendor\guzzlehttp\guzzle\src\Utils.php 102
+ERROR - 2026-03-17 10:32:55 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:32:55 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:32:55 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:32:55 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:32:55 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:33:00 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:33:00 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:33:00 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:33:00 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:33:00 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:33:01 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:33:01 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:51 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:51 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:51 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:34:51 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:34:51 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:34:52 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:52 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:57 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:57 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:58 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:58 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:59 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:59 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:59 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:59 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:34:59 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:34:59 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:05 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:05 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:05 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:05 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:06 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:06 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:06 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:06 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:06 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:06 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:07 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:07 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:07 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:07 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:07 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:07 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:11 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:11 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:11 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:11 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:11 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:11 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:12 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:12 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:12 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:12 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:35:13 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:35:13 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:36:06 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:36:06 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:36:07 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:36:07 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:36:22 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:36:22 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:36:23 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:36:23 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:36:23 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:36:23 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:36:23 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:36:23 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:36:23 --> Severity: Warning --> Undefined array key "slug" C:\xampp\htdocs\public_html\application\views\admin\includes\aside.php 193
+ERROR - 2026-03-17 10:36:24 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:36:24 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 06:07:58 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 06:07:58 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 06:07:58 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 06:07:58 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 06:07:58 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 06:07:58 --> 404 Page Not Found: /index
+ERROR - 2026-03-17 10:38:05 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:05 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:38:08 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:08 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:38:09 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:09 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:38:09 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:09 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:38:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:38:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:10 --> Could not find the language line "Staff members"
+ERROR - 2026-03-17 10:38:10 --> Could not find the language line "HR Dashboard"
+ERROR - 2026-03-17 10:38:10 --> Could not find the language line "Staff members"

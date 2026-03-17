@@ -89,7 +89,7 @@
                     <select name="status" id="status" class="form-control selectpicker filterInput" data-live-search="true" app-field-label="Status">
                       <option value="" selected>None selected</option>
                       <?php
-                      $status = [1 => 'Pending', 2 => 'Complete'];
+                      $status = [1 => 'Pending', 2 => 'Invoice Created'];
                       if (!empty($status)) :
                         foreach ($status as $key => $value) :
                           echo '<option value="' . $key . '">' . $value . '</option>';

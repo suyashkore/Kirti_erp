@@ -80,7 +80,7 @@
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="TransferNo">
                     <label for="TransferNo" class="control-label"><small class="req text-danger">* </small> Transfer No</label>
-                    <input type="text" name="TransferNo" id="TransferNo" class="form-control" app-field-label="Transfer No" value="<?= $NextSTNumber; ?>" readonly>
+                    <input type="text" name="TransferNo" id="TransferNo" class="form-control" app-field-label="Transfer No" readonly>
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">
@@ -329,10 +329,16 @@
 
                   </div>
                 </div>
-
+                <!-- E-Way Bill Lock Warning -->
+                <div class="col-md-12" style="margin-top: 8px;">
+                  <span id="eway_lock_warning"
+                    style="display:none; color:#c0392b; font-size:13px; font-weight:600;">
+                    ⚠ This record is locked and cannot be updated because an E-Way Bill has been generated.
+                  </span>
+                </div>
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('salesOrder', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('salesOrder', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('stockTransfer', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('stockTransfer', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn eWayBillBtn" style="display:none; background-color:#6f42c1; color:#fff; border:none;" onclick="generateEWayBill();"><i class="fa fa-truck"></i> Generate E-Way Bill</button>
                   <button type="button" class="btn btn-warning" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
                   <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
@@ -535,12 +541,38 @@ if ($last_date_yr < $curr_date_new) {
   });
 
 
+  $(document).ready(function() {
+    getNextSTNo();
+  });
+
+  function getNextSTNo(callback = null) {
+    $.ajax({
+      url: '<?= admin_url('StockTransfer/getNextSTNo'); ?>',
+      type: 'POST',
+      dataType: 'json',
+      success: function(response) {
+        if (response.success == true) {
+          let form_mode = $('#form_mode').val();
+          if (form_mode == 'add') {
+            $('#TransferNo').val(response.NextSTNo).prop('readonly', true);
+          }
+        } else {
+          $('#TransferNo').val('');
+        }
+        if (callback) callback();
+      },
+      error: function() {
+        $('#TransferNo').val('').prop('readonly', true);
+      }
+    });
+  }
 
   function ResetForm() {
     $('#main_save_form')[0].reset();
     $('#form_mode').val('add');
     $('#update_id').val('');
     $('.updateBtn').hide();
+    getNextSTNo();
 
     $('.eWayBillBtn').hide();
     $('.saveBtn').show();
@@ -548,16 +580,18 @@ if ($last_date_yr < $curr_date_new) {
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
-    //   $.ajax({
-    //   url: "<?= admin_url(); ?>StockTransfer/getNextTransferID",
-    //   type: "GET",
-    //   dataType: "JSON",
-    //   success: function(res) {
-    //     if (res.success) {
-    //       $('#TransferNo').val(res.TransferID);
-    //     }
-    //   }
-    // });
+    
+    $('#ewayBillSection').hide();
+
+    $('#eway_lock_warning').hide();
+    $('#main_save_form input:not([type="hidden"])').prop('readonly', false);
+    $('#main_save_form select').prop('disabled', false).selectpicker('refresh');
+    $('#main_save_form textarea').prop('readonly', false);
+    $('#items_body input').prop('readonly', false);
+    $('#items_body select').prop('disabled', false).selectpicker('refresh');
+
+    $('#hsn_code, #uom, #unit_weight, #current_stock_qty, #total_wt').prop('readonly', true);
+    $('#DriverName, #FromPincode, #ToPincode').prop('readonly', true);
   }
 
   $(document).on('input', '#Distance', function() {
@@ -890,18 +924,15 @@ if ($last_date_yr < $curr_date_new) {
     var unitWt = parseFloat($('#unit_weight' + row).val()) || 0;
     var maxStock = parseFloat($('#current_stock_qty' + row).attr('data-stock')) || 0;
 
-    // Cap qty at max available stock
     if (qty > maxStock) {
       alert_float('warning', 'Qty cannot exceed available stock of ' + fmt(maxStock));
       $('#qty' + row).val(fmt(maxStock));
       qty = maxStock;
     }
 
-    // Total weight for this row
     var rowTotalWt = unitWt * qty;
     $('#total_wt' + row).val(fmt(rowTotalWt));
 
-    // Remaining stock = full available - what user typed
     var remaining = maxStock - qty;
     if (maxStock > 0) {
       $('#current_stock_qty' + row)
@@ -924,7 +955,6 @@ if ($last_date_yr < $curr_date_new) {
 
     var remaining = maxStock - qty;
 
-    // Clamp display — don't go below 0 visually while typing
     if (remaining < 0) remaining = 0;
 
     $('#current_stock_qty' + row)
@@ -994,7 +1024,7 @@ if ($last_date_yr < $curr_date_new) {
           $('#unit_weight' + id).val(parseFloat(data.UnitWeight || 0).toFixed(0));
           $('#gst' + id).val(parseFloat(data.tax || 0).toFixed(0));
           if (stockQty <= 0) {
-            // Out of Stock — show label, disable qty
+
             $('#current_stock_qty' + id)
               .val('Out of Stock')
               .css('color', 'red')
@@ -1005,7 +1035,7 @@ if ($last_date_yr < $curr_date_new) {
               .prop('disabled', true)
               .css('background-color', '#f5f5f5');
           } else {
-            // In Stock — show qty, enable qty input
+
             $('#current_stock_qty' + id)
               .val(fmt(stockQty))
               .css('color', 'green')
@@ -1040,7 +1070,6 @@ if ($last_date_yr < $curr_date_new) {
       return;
     }
 
-    // Build itemList from the DOM rows
     var itemList = [];
     $('#items_body tr').each(function() {
       var row = $(this);
@@ -1083,11 +1112,11 @@ if ($last_date_yr < $curr_date_new) {
         subSupplyDesc: ' ',
         docType: 'INV',
 
-        docNo: DataForBill.TransferID || TransferID,
+        // docNo: DataForBill.TransferID || TransferID,
+        docNo: 'ST25108',
         docDate: moment().format('DD/MM/YYYY'),
 
-        // fromGstin: '29AAGCB1286Q000',
-        fromTrdName: DataForBill.FromTrdName || 'welton',
+        fromTrdName: DataForBill.FromGodown || 'welton',
         fromAddr1: DataForBill.FromAddress || '2ND CROSS NO 59  19  A',
         fromAddr2: ' ',
         fromPlace: DataForBill.FromCity || 'FRAZER TOWN',
@@ -1098,13 +1127,15 @@ if ($last_date_yr < $curr_date_new) {
         dispatchFromGSTIN: DataForBill.FromGSTIN || '29AAAAA1303P1ZV',
         dispatchFromTradeName: DataForBill.FromCompany || 'ABC Traders',
 
-        toGstin: '05AAACH6188F1ZM',
-        toTrdName: DataForBill.ToTrdName || 'sthuthya',
+        toGstin: DataForBill.ToGSTIN || '05AAACH6188F1ZM',
+        toTrdName: DataForBill.ToGodown || 'sthuthya',
         toAddr1: DataForBill.ToAddress || 'Shree Nilaya',
         toAddr2: ' ',
         toPlace: DataForBill.ToCity || 'Beml Nagar',
         toPincode: parseInt(DataForBill.ToPincode) || 263652,
         toStateCode: parseInt(DataForBill.ToStateCode) || 5,
+        // toStateCode: parseInt(DataForBill.to_state_code) || 5,
+
         actToStateCode: parseInt(DataForBill.ActToStateCode) || 5,
 
         shipToGSTIN: DataForBill.ToGSTIN || '29ALSPR1722R1Z3',
@@ -1121,9 +1152,9 @@ if ($last_date_yr < $curr_date_new) {
 
         transMode: '1',
         transDistance: DataForBill.Distance || '2487',
-        transporterName: DataForBill.DriverName || $('#DriverName').val() || 'Dummy',
-        transporterId: DataForBill.TransporterID || '05AAACG0904A1ZL',
-        transDocNo: DataForBill.TransDocNo || '12',
+        transporterName: DataForBill.TransporterName || $('#DriverName').val() || 'Dummy',
+        transporterId: DataForBill.TRANSIN || '05AAACG0904A1ZL',
+        transDocNo: '12',
         transDocDate: moment().format('DD/MM/YYYY'),
         vehicleNo: DataForBill.VehicleNo || $('#VehicleNo').val() || 'APR3214',
         vehicleType: 'R',
@@ -1150,6 +1181,7 @@ if ($last_date_yr < $curr_date_new) {
           if (response.success && response.ewayBillNo) {
             alert_float('success', 'E-Way Bill generated! EWB No: ' + response.ewayBillNo +
               ' | Valid Upto: ' + response.validUpto);
+              ResetForm();
           } else if (response.success === false) {
             var msg = response.message || response.info || 'Failed to generate E-Way Bill';
             if (response.error_code) msg = '[' + response.error_code + '] ' + msg;
@@ -1263,6 +1295,10 @@ if ($last_date_yr < $curr_date_new) {
             function processRow(index) {
               if (index >= d.history.length) {
                 calculateTotals();
+                if (d.isEwayBill === 'Y') {
+                  $('#items_body input').prop('readonly', true);
+                  $('#items_body select').prop('disabled', true).selectpicker('refresh');
+                }
                 return;
               }
 
@@ -1318,9 +1354,22 @@ if ($last_date_yr < $curr_date_new) {
           $('.eWayBillBtn').show();
           $('#ListModal').modal('hide');
           if (d.isEwayBill === 'Y') {
+            $('#eway_lock_warning').show();
+
+            // Disable buttons
             $('.updateBtn').prop('disabled', true);
             $('.eWayBillBtn').prop('disabled', true);
+
+            // Lock all form inputs
+            $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
+            $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
+            $('#main_save_form textarea').prop('readonly', true);
+
           } else {
+            $('#eway_lock_warning').hide();
+
+            $('#DriverName, #FromPincode, #ToPincode').prop('readonly', true);
+
             $('.updateBtn').prop('disabled', false);
             $('.eWayBillBtn').prop('disabled', false);
           }

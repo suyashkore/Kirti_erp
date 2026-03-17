@@ -81,7 +81,7 @@
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="OrderID">
                     <label for="OrderID" class="control-label"><small class="req text-danger">* </small> Order ID</label>
-                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" value="<?php echo $NextDONumber; ?>" readonly>
+                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly>
                   </div>
                 </div>
 
@@ -462,12 +462,12 @@
                 <!-- </div> -->
 
                 <!-- Invoice Lock Warning -->
-<div class="col-md-12" style="margin-top: 8px;">
-    <span id="invoice_lock_warning"
-        style="display:none; color:#c0392b; font-size:13px; font-weight:600;">
-        ⚠ This record is locked and cannot be updated because an Invoice has been created.
-    </span>
-</div>
+                <div class="col-md-12" style="margin-top: 8px;">
+                  <span id="invoice_lock_warning"
+                    style="display:none; color:#c0392b; font-size:13px; font-weight:600;">
+                    ⚠ This record is locked and cannot be updated because an Invoice has been created.
+                  </span>
+                </div>
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('deliveryOrder', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
@@ -667,25 +667,24 @@
 </div>
 
 <?php
-    $fy = $this->session->userdata('finacial_year');
-    $fy_new = $fy + 1;
-    $lastdate_date = '20'.$fy_new.'-03-31';
-    $curr_date = date('Y-m-d');
-    $curr_date_new = new DateTime($curr_date);
-    $last_date_yr = new DateTime($lastdate_date);
-    if($last_date_yr < $curr_date_new){
-        $max_date_php = $lastdate_date;
-    } else {
-        $max_date_php = $curr_date;
-    }
+$fy = $this->session->userdata('finacial_year');
+$fy_new = $fy + 1;
+$lastdate_date = '20' . $fy_new . '-03-31';
+$curr_date = date('Y-m-d');
+$curr_date_new = new DateTime($curr_date);
+$last_date_yr = new DateTime($lastdate_date);
+if ($last_date_yr < $curr_date_new) {
+  $max_date_php = $lastdate_date;
+} else {
+  $max_date_php = $curr_date;
+}
 ?>
 <?php init_tail(); ?>
 <script>
-
-$(document).ready(function(){
-    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
-    var year    = "20" + fin_y;
-    var cur_y   = new Date().getFullYear().toString().substr(-2);
+  $(document).ready(function() {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
 
     // Min date: April 1st of FY start year
     var minStartDate = new Date(year, 3, 1); // month index 3 = April
@@ -693,32 +692,59 @@ $(document).ready(function(){
     // Max date: March 31 of FY end year, OR today if still within FY
     var maxEndDate;
     if (parseInt(cur_y) > parseInt(fin_y)) {
-        var fy_new   = parseInt(fin_y) + 1;
-        var fy_new_s = "20" + fy_new;
-        maxEndDate   = new Date(fy_new_s + '/03/31');
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
     } else {
-        maxEndDate = new Date();
+      maxEndDate = new Date();
     }
 
     // Order Date — restricted within FY, up to today or March 31
     $('#delivery_order_date').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,
-        maxDate: maxEndDate,
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
 
     // Delivery From — same FY restriction
     $('#lr_date').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,
-        maxDate: maxEndDate,
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
 
-   
-});
-  
+
+  });
+
+
+  $(document).ready(function() {
+    getNextDONo();
+  });
+
+  function getNextDONo(callback = null) {
+    $.ajax({
+      url: '<?= admin_url('DeliveryOrder/getNextDONo'); ?>',
+      type: 'POST',
+      dataType: 'json',
+      success: function(response) {
+        if (response.success == true) {
+          let form_mode = $('#form_mode').val();
+          if (form_mode == 'add') {
+            $('#OrderID').val(response.NextDONo).prop('readonly', true);
+          }
+        } else {
+          $('#OrderID').val('');
+        }
+        if (callback) callback();
+      },
+      error: function() {
+        $('#OrderID').val('').prop('readonly', true);
+      }
+    });
+  }
+
   function renumberRows() {
     $('#items_body tr').each(function(index) {
       $(this).find('input[name="sr[]"]').val(index + 1);
@@ -1111,6 +1137,7 @@ $(document).ready(function(){
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
+    getNextDONo();
 
     $('#invoice_lock_warning').hide();
     $('#main_save_form input:not([type="hidden"])').prop('readonly', false);
@@ -1552,7 +1579,7 @@ $(document).ready(function(){
             if (alreadySelectedSoNos.length > 0) {
               $('#valid_so_body .row_checkbox, #invalid_so_body .row_checkbox').each(function() {
                 var rowSoNo = $(this).closest('tr').find('td').eq(2).text().trim();
-              
+
                 var checkboxVal = $(this).val().trim();
                 if (alreadySelectedSoNos.indexOf(rowSoNo) !== -1 ||
                   alreadySelectedSoNos.indexOf(checkboxVal) !== -1) {
@@ -1833,27 +1860,27 @@ $(document).ready(function(){
           }
 
           // ── Invoice Lock: disable entire form if invoice exists ──
-if (d.is_invoice_locked == 1) {
+          if (d.is_invoice_locked == 1) {
 
-    // Show warning message
-    $('#invoice_lock_warning').show();
+            // Show warning message
+            $('#invoice_lock_warning').show();
 
-    // Lock all form inputs
-    $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
-    $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
-    $('#main_save_form textarea').prop('readonly', true);
+            // Lock all form inputs
+            $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
+            $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
+            $('#main_save_form textarea').prop('readonly', true);
 
-    // Lock all dispatch qty fields in items table
-    $('#items_body input').prop('readonly', true);
+            // Lock all dispatch qty fields in items table
+            $('#items_body input').prop('readonly', true);
 
-    // Hide Save/Update buttons
-    $('.saveBtn').hide();
-    $('.updateBtn').hide();
+            // Hide Save/Update buttons
+            $('.saveBtn').hide();
+            $('.updateBtn').hide();
 
-} else {
-    $('#invoice_lock_warning').hide();
-    $('.updateBtn').show();
-}
+          } else {
+            $('#invoice_lock_warning').hide();
+            $('.updateBtn').show();
+          }
 
           $('.selectpicker').selectpicker('refresh');
           $('#form_mode').val('edit');
@@ -1997,6 +2024,7 @@ if (d.is_invoice_locked == 1) {
     cursor: not-allowed !important;
     color: #999 !important;
   }
+
   #table_ListModal tbody tr:hover {
     background-color: rgb(171, 174, 176);
   }

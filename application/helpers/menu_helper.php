@@ -775,12 +775,20 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 4,
 		]);
 	}
-	if (has_permission_new('DelideliveryOrderveryOrder', '', 'create')) {
+	if (has_permission_new('deliveryOrder', '', 'create')) {
 		$CI->app_menu->add_sidebar_children_item('tansaction', [
 			'slug' => 'deliveryOrder',
 			'name' => 'Delivery Order',
 			'href' => admin_url('DeliveryOrder'),
 			'position' => 5,
+		]);
+	}
+	if (has_permission_new('pendingDeliveryOrder', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'pendingDeliveryOrder',
+			'name' => 'Delivery Order List',
+			'href' => admin_url('DeliveryOrder/List'),
+			'position' => 6,
 		]);
 	}
 	// if (has_permission_new('orders', '', 'create')) {
@@ -796,7 +804,7 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'pendingDeliveryOrder',
 			'name' => 'Pending Orders',
 			'href' => admin_url('order/pending_orders'),
-			'position' => 6,
+			'position' => 7,
 		]);
 	}
 
@@ -805,7 +813,7 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'limitExceedDeliveryOrder',
 			'name' => 'Limit Exceeded Orders',
 			'href' => admin_url('order/LimitExceededOrders'),
-			'position' => 7,
+			'position' => 8,
 		]);
 	}
 	if (has_permission_new('salesInvoice', '', 'view')) {
@@ -813,7 +821,15 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'salesInvoice',
 			'name' => 'Sales Invoice',
 			'href' => admin_url('SalesInvoice'),
-			'position' => 8,
+			'position' => 9,
+		]);
+	}
+	if (has_permission_new('salesInvoiceList', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('tansaction', [
+			'slug' => 'salesInvoiceList',
+			'name' => 'Sales Invoice List',
+			'href' => admin_url('SalesInvoice/List'),
+			'position' => 10,
 		]);
 	}
 	if (has_permission_new('salesInvoiceList', '', 'view')) {
@@ -821,7 +837,7 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'salesInvoiceList',
 			'name' => 'Sale List',
 			'href' => admin_url('order/SaleList'),
-			'position' => 8,
+			'position' => 11,
 		]);
 	}
 
@@ -830,7 +846,7 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'changeVehicle',
 			'name' => 'Change Vehicle',
 			'href' => admin_url('challan/VehicleUpdate'),
-			'position' => 9,
+			'position' => 12,
 		]);
 	}
 	if (has_permission_new('salesTradeSettlement', '', 'view')) {
@@ -838,7 +854,7 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'salesTradeSettlement',
 			'name' => 'Sales Trade Settlement',
 			'href' => admin_url('TradeSettlement/Sales'),
-			'position' => 10,
+			'position' => 13,
 		]);
 	}
 	if (has_permission_new('stockTransfer', '', 'view')) {
@@ -846,7 +862,7 @@ function app_init_admin_sidebar_menu_items()
 			'slug' => 'stockTransfer',
 			'name' => 'Stock Transfer',
 			'href' => admin_url('StockTransfer'),
-			'position' => 10,
+			'position' => 14,
 		]);
 	}
 

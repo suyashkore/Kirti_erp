@@ -111,6 +111,14 @@
                     <input type="text" id="item_code" required name="item_code" class="form-control" value="" readonly>
                   </div>
                 </div>
+                <div class="col-md-3 mbot5">
+                  <div class="form-group" app-field-wrapper="old_item_code">
+                    <label for="old_item_code" class="control-label">
+                      Old Item Code
+                    </label>
+                    <input type="text" id="old_item_code" name="old_item_code" class="form-control" value="">
+                  </div>
+                </div>
                 <div class="col-md-4 mbot5">
                   <div class="form-group" app-field-wrapper="item_name">
                     <label for="item_name" class="control-label">
@@ -559,13 +567,14 @@
             if(selected_value){
               $('#'+child_id).val(selected_value);
             }
-            $('.selectpicker').selectpicker('refresh');
             if(callback){
               callback();
             }
           }else{
-            alert_float('danger', response.message);
+            // alert_float('danger', response.message);
+            $('#'+child_id).html('<option value="" selected disabled>Not Found</option>');
           }
+          $('.selectpicker').selectpicker('refresh');
         }
       });
     }
@@ -707,6 +716,7 @@
             
             $('#item_division').val(d.DivisionID);
             $('#item_code').val(d.ItemID);
+            $('#old_item_code').val(d.old_item_id);
             $('#item_name').val(d.ItemName);
             $('#item_description').val(d.description);
             $('#hsn').val(d.hsn_code);

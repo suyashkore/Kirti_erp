@@ -75,7 +75,6 @@ class SalesInvoice extends AdminController
 		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
 		$data['category_list'] = $this->DO_model->getCategoryDropdown();
 		$data['dispatchlocation'] = $this->DO_model->get_dispatch_location();
-		$data['NextSINumber'] = $this->SalesInvoice_model->getNextSINo();
 		$data['gate_in'] = $this->DO_model->getgateinList();
 		$data['salesinvoice_list'] = $this->SalesInvoice_model->getSalesInvoiceList();
 
@@ -83,6 +82,11 @@ class SalesInvoice extends AdminController
 
 
 		$this->load->view('admin/SalesInvoice/SalesInvoiceAddEdit', $data);
+	}
+
+	public function getNextSalesInvoiceNo() {
+		$NextSINo = $this->SalesInvoice_model->getNextSINo();
+		echo json_encode(['success' => true, 'NextSINo' => $NextSINo]);
 	}
 
 	public function getCustomerDetailsLocation()
@@ -510,85 +514,93 @@ class SalesInvoice extends AdminController
 		$post = $this->input->post(NULL, TRUE);
 
 		$sheetName = 'Sales Invoice List';
-		$writer = new XLSXWriter();
+		$writer    = new XLSXWriter();
 
 		$header = [
-			'Inovice No'  => 'string',
-			'Invoice Date'  => 'string',
-			'Customer Name'     => 'string',
-			'Total Weight' => 'string',
-			'Total Amount' => 'string',
+			'Invoice No'     => 'string',
+			'Invoice Date'   => 'string',
+			'Customer Name'  => 'string',
+			'Total Weight'   => 'string',
+			'Dispatched Qty' => 'string',
+			'Item Total'     => 'string',
+			'Total Disc'     => 'string',
+			'Taxable Amt'    => 'string',
+			'CGST Amt'       => 'string',
+			'SGST Amt'       => 'string',
+			'IGST Amt'       => 'string',
+			'Round Off'      => 'string',
+			'Amount'         => 'string',
 		];
+
+		$col_count = count($header) - 1; // 12 (0-based last index)
 
 		$writer->writeSheetHeader($sheetName, $header, ['suppress_row' => true]);
 
 		$selected_company = $this->session->userdata('root_company');
-		$company_detail   = $this->SalesQuotation_model->get_company_detail($selected_company);
+		$company_detail   = $this->SalesInvoice_model->get_company_detail($selected_company);
 
 		// ===== COMPANY NAME ROW =====
-		$writer->markMergedCell($sheetName, 0, 0, 0, 12);
-		$writer->writeSheetRow($sheetName, [$company_detail->company_name]);
+		$writer->markMergedCell($sheetName, 0, 0, 0, $col_count);
+		$writer->writeSheetRow($sheetName, [$company_detail->company_name ?? '']);
 
 		// ===== COMPANY ADDRESS ROW =====
-		$writer->markMergedCell($sheetName, 1, 0, 1, 12);
-		$writer->writeSheetRow($sheetName, [$company_detail->address]);
+		$writer->markMergedCell($sheetName, 1, 0, 1, $col_count);
+		$writer->writeSheetRow($sheetName, [$company_detail->address ?? '']);
 
 		// ===== FILTER ROW =====
-		$reportedBy = "Filtered By : ";
-		$from_date  = $post['from_date'] ?? date('Y-m-01');
-		$to_date    = $post['to_date'] ?? date('Y-m-d');
-		$customer_id  = $post['customer_id'] ?? '';
-		$broker_id  = $post['broker_id'] ?? '';
-		$status     = $post['status'] ?? 1;
+		$from_date = $post['from_date'] ?? '';
+		$to_date   = $post['to_date']   ?? '';
+
+		$reportedBy = 'Filtered By : ';
 
 		if ($from_date != '') {
 			$reportedBy .= 'From Date : ' . $from_date . ', ';
 		}
-
 		if ($to_date != '') {
 			$reportedBy .= 'To Date : ' . $to_date . ', ';
 		}
 
-		if ($customer_id != '') {
-			$reportedBy .= 'Customer : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $customer_id])['company'] ?? '') . ', ';
-		}
+		$reportedBy = rtrim($reportedBy, ', ');
 
-		if ($broker_id != '') {
-			$reportedBy .= 'Broker : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $broker_id])['company'] ?? '') . ', ';
-		}
-
-		if ($status != '') {
-			$status_list = [1 => 'Pending', 2 => 'Cancel', 3 => 'Expired', 4 => 'Approved', 5 => 'Inprogress', 6 => 'Complete', 7 => 'Partially Complete'];
-			$reportedBy .= 'Status : ' . ($status_list[$status] ?? '') . ', ';
-		}
-
-		$writer->markMergedCell($sheetName, 2, 0, 2, 12);
+		$writer->markMergedCell($sheetName, 2, 0, 2, $col_count);
 		$writer->writeSheetRow($sheetName, [$reportedBy]);
+
+		// ===== BLANK ROW =====
 		$writer->writeSheetRow($sheetName, []);
 
 		// ===== HEADER ROW =====
 		$writer->writeSheetRow($sheetName, array_keys($header));
 
-		// ===== CHUNK FETCH START =====
-		$limit = 100;
+		// ===== CHUNK FETCH =====
+		$limit  = 100;
 		$offset = 0;
 
 		while (true) {
-			$result = $this->SalesQuotation_model->getListByFilter($post, $limit, $offset);
+			$result = $this->SalesInvoice_model->getListByFilter($post, $limit, $offset);
+
 			if (empty($result['rows'])) {
 				break;
 			}
 
 			foreach ($result['rows'] as $row) {
+				$invoice_date = !empty($row['InvoiceDate'])
+					? date('d/m/Y', strtotime($row['InvoiceDate']))
+					: '';
+
 				$writer->writeSheetRow($sheetName, [
-					$row['QuotationID'] ?? '',
-					$row['TransDate'] ?? '',
-					$row['customer_name'] ?? '' . ' (' . $row['AccountID'] ?? '' . ')',
-					$row['broker_name'] ?? '' . ' (' . $row['BrokerID'] ?? '' . ')',
-					$row['TotalWeight'] ?? '',
-					$row['NetAmt'] ?? '',
-					'',
-					'Pending'
+					$row['InvoiceID']     ?? '',
+					$invoice_date,
+					($row['customer_name'] ?? '') . ' (' . ($row['AccountID'] ?? '') . ')',
+					$row['TotalWt']       ?? '',
+					$row['TotalQty']      ?? '',
+					$row['ItemTotal']     ?? '',
+					$row['TotalDisc']     ?? '',
+					$row['TaxAmt']        ?? '',
+					$row['CGSTAmt']       ?? '',
+					$row['SGSTAmt']       ?? '',
+					$row['IGSTAmt']       ?? '',
+					$row['RoundOff']      ?? '',
+					$row['NetAmt']        ?? '',
 				]);
 			}
 
@@ -607,7 +619,7 @@ class SalesInvoice extends AdminController
 		$writer->writeToFile($filepath);
 
 		echo json_encode([
-			'success' => true,
+			'success'  => true,
 			'file_url' => base_url('uploads/exports/' . $filename)
 		]);
 	}

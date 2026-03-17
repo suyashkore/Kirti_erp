@@ -33,13 +33,38 @@ class StockTransfer_model extends App_Model
   } 
 
   public function GetDataForEWayBill($id) {
-    $this->db->select('stm.TransferID,stm.Distance,pld1.LocationName as FromLocation,sl1.id as FromStateCode,pld1.PinCode as FromPincode, pld2.LocationName as ToLocation,sl2.id as ToStateCode, pld2.PinCode as ToPincode, rc1.gst as FromGSTIN,rc1.company_name as FromCompany, rc2.gst as ToGSTIN, rc2.company_name as ToCompany,sl3.id as ActFromStateCode,sl4.id as ActToStateCode, gm1.GodownName as FromGodown,gm2.GodownName as ToGodown,gm1.Address as FromAddress,gm2.Address as ToAddress,cl1.city_name as FromCity, cl2.city_name as ToCity');
+    $this->db->select('
+    stm.TransferID,
+    stm.Distance,
+    stm.VehicleNo,
+    stm.DriverName,
+    v.TransporterID,
+
+    pld1.LocationName as FromLocation,
+    sl1.id as FromStateCode,
+    pld1.PinCode as FromPincode, 
+    rc1.gst as FromGSTIN,
+    rc1.company_name as FromCompany,
+    gm1.GodownName as FromGodown,
+    gm1.Address as FromAddress,
+    cl1.city_name as FromCity,
+    sl3.id as ActFromStateCode,
+     
+    pld2.LocationName as ToLocation,
+    sl2.id as ToStateCode, 
+    pld2.PinCode as ToPincode, 
+    rc2.gst as ToGSTIN, 
+    rc2.company_name as ToCompany,
+    gm2.GodownName as ToGodown,
+    gm2.Address as ToAddress,
+    cl2.city_name as ToCity,
+    sl4.id as ActToStateCode 
+    ');
 
     $this->db->from(db_prefix() . 'StockTransferMaster stm');
 
-
-    
-
+    // Transport
+    $this->db->join(db_prefix() . 'vehicle v', 'v.VehicleNo = stm.VehicleNo', 'left');
 
     // From Location
     $this->db->join(db_prefix(). 'PlantLocationDetails pld1', 'pld1.id = stm.FromLocationID', 'left');

@@ -23,6 +23,13 @@ class Api_model extends App_Model
     return $this->db->insert_id();
   }
 
+  // ===== SAVE BATCH DATA =====
+  public function saveBatchData($table, $data)
+  {
+    $this->db->insert_batch(db_prefix().$table, $data);
+    return $this->db->insert_id();
+  }
+
   // ===== UPDATE DATA =====
   public function updateData($table, $data, $where = null)
   {

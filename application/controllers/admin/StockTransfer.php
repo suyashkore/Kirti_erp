@@ -25,7 +25,6 @@ class StockTransfer extends AdminController
 		$data['ToPlantLocation'] = $this->StockTransfer_model->getPlantLocationDropdown();
 		$data['VehicleNo'] = $this->StockTransfer_model->getVehicleNoDropdown();
 		$data['Items'] = $this->StockTransfer_model->getItemsDropdown();
-		$data['NextSTNumber'] = $this->StockTransfer_model->getNextSTNo();
 		$data['category_list'] = $this->SalesOrder_model->getCategoryDropdown();
 		$data['FreightTerms'] = $this->SalesQuotation_model->get_freight_terms();
 		$data['saleslocation'] = $this->SalesQuotation_model->get_sales_location();
@@ -36,6 +35,12 @@ class StockTransfer extends AdminController
 
 
 		$this->load->view('admin/StockTransfer/StockTransferAddEdit', $data);
+	}
+
+	public function getNextSTNo()
+	{
+		$NextSTNo = $this->StockTransfer_model->getNextSTNo();
+		echo json_encode(['success' => true, 'NextSTNo' => $NextSTNo]);
 	}
 
 	public function GetDataForEWayBill(){
@@ -285,8 +290,8 @@ class StockTransfer extends AdminController
 			'FromWHID'       => $FromWHID,
 			'FromChamberID'  => $FromChamberID,
 			'FromStackID'    => $FromStackID,
-			'FromLotID'      => $FromLotID,      // ← was missing from $insertData
-			'ToLocationID'   => $ToLocationID,   // ← was missing from $insertData
+			'FromLotID'      => $FromLotID,
+			'ToLocationID'   => $ToLocationID,
 			'ToWHID'         => $ToWHID,
 			'ToChamberID'    => $ToChamberID,
 			'ToStackID'      => $ToStackID,
@@ -299,7 +304,7 @@ class StockTransfer extends AdminController
 		];
 
 		if ($form_mode == 'add') {
-			if (!has_permission_new('salesOrder', '', 'create')) {
+			if (!has_permission_new('stockTransfer', '', 'create')) {
 				access_denied('Access Denied');
 			}
 			$insertData['UserID'] = $UserID;
@@ -308,7 +313,7 @@ class StockTransfer extends AdminController
 			// $details = $this->StockTransfer_model->getOrderDetails($result);
 			$master_id = $result;
 		} else {
-			if (!has_permission_new('salesOrder', '', 'edit')) {
+			if (!has_permission_new('stockTransfer', '', 'edit')) {
 				access_denied('Access Denied');
 			}
 			$insertData['UserID2'] = $UserID;

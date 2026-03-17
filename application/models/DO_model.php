@@ -149,19 +149,41 @@ class DO_model extends App_Model
    * - different TransID
    * - excluding the current record (by id)
    */
+  // public function isHistoryLocked($history_id, $order_id, $item_id, $account_id, $trans_id)
+  // {
+  //   $this->db->from(db_prefix() . 'history');
+  //   $this->db->where('OrderID', $order_id);
+  //   $this->db->where('ItemID', $item_id);
+  //   $this->db->where('AccountID', $account_id);
+  //   $this->db->where('TransID !=', $trans_id);
+  //   $this->db->where('TransID IS NOT NULL', null, false);
+  //   // $this->db->where('id !=', $history_id);
+  //   $this->db->where('id >', $history_id);
+  //   $count = $this->db->count_all_results();
+  //   return $count > 0;
+  // }
+
   public function isHistoryLocked($history_id, $order_id, $item_id, $account_id, $trans_id)
-  {
+{
+    // Condition 1: A newer Delivery Order already exists for this SO line
     $this->db->from(db_prefix() . 'history');
     $this->db->where('OrderID', $order_id);
     $this->db->where('ItemID', $item_id);
     $this->db->where('AccountID', $account_id);
     $this->db->where('TransID !=', $trans_id);
     $this->db->where('TransID IS NOT NULL', null, false);
-    // $this->db->where('id !=', $history_id);
     $this->db->where('id >', $history_id);
-    $count = $this->db->count_all_results();
-    return $count > 0;
-  }
+    $newerDOExists = $this->db->count_all_results() > 0;
+
+    // Condition 2: An invoice has already been created for this Delivery Order
+    $this->db->from(db_prefix() . 'history');
+    $this->db->where('TransID', $trans_id);
+    $this->db->where('TType2', 'Invoice');
+    $this->db->where('BillID IS NOT NULL', null, false);
+    $invoiceExists = $this->db->count_all_results() > 0;
+
+    return $newerDOExists || $invoiceExists;
+}
 
 
 
@@ -372,7 +394,6 @@ class DO_model extends App_Model
 
   public function getDeliveryOrderDetails($id)
   {
-    // ── Get Master Record ──
     $this->db->select('dom.*, c.company, icm.CategoryName');
     $this->db->from(db_prefix() . 'DeliveryOrderMaster dom');
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = dom.AccountID', 'left');
@@ -385,7 +406,7 @@ class DO_model extends App_Model
       return [];
     }
 
-    // ── Subquery for Total Ordered Qty (TransID IS NULL) ──
+    // Subquery for Total Ordered Qty (TransID IS NULL)
     $order_subquery = "
         (
             SELECT 
@@ -398,7 +419,7 @@ class DO_model extends App_Model
         ) u
     ";
 
-    // ── Subquery for Used Qty ──
+    // Subquery for Used Qty 
     $used_subquery = "
         (
             SELECT 
@@ -411,7 +432,7 @@ class DO_model extends App_Model
         ) used
     ";
 
-    // ── Get History Records ──
+    // Get History Records 
     $this->db->select('
         h.*,
         IFNULL(u.TotalOrderQty, 0) as TotalOrderQty,
@@ -437,6 +458,13 @@ class DO_model extends App_Model
       ) ? 1 : 0;
     }
     unset($row);
+
+    // Check if entire DO is locked due to invoice
+$this->db->from(db_prefix() . 'history');
+$this->db->where('TransID', $master['OrderID']);
+$this->db->where('TType2', 'Invoice');
+$this->db->where('BillID IS NOT NULL', null, false);
+$master['is_invoice_locked'] = $this->db->count_all_results() > 0 ? 1 : 0;
 
     $master['history'] = $history;
 
@@ -587,7 +615,7 @@ class DO_model extends App_Model
               AND inv.TType2   = 'Invoice'
               AND inv.BillID  IS NOT NULL
         )
-        THEN 'Complete'
+        THEN 'Invoice Created'
         ELSE 'Pending'
     END
 ";

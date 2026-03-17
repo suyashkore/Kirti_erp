@@ -28,7 +28,6 @@ class DeliveryOrder extends AdminController
 		$data['FreightTerms'] = $this->SalesQuotation_model->get_freight_terms();
 		$data['dispatchlocation'] = $this->DO_model->get_dispatch_location();
 		$data['order_list'] = $this->DO_model->getOrderList();
-		$data['NextDONumber'] = $this->DO_model->getNextDONo();
 		$data['city_list'] = $this->DO_model->getCityList();
 		$data['so_list'] = $this->DO_model->getSODropdown();
 		$data['transporter_list'] = $this->DO_model->getTransporterDropdown();
@@ -38,6 +37,11 @@ class DeliveryOrder extends AdminController
 		$data['gate_in'] = $this->DO_model->getgateinList();
 
 		$this->load->view('admin/DO/DOAddEdit', $data);
+	}
+
+	public function getNextDONo() {
+		$NextDONo = $this->DO_model->getNextDONo();
+		echo json_encode(['success' => true, 'NextDONo' => $NextDONo]);
 	}
 
 	public function getItem()
@@ -586,89 +590,101 @@ class DeliveryOrder extends AdminController
 
 		$post = $this->input->post(NULL, TRUE);
 
-		$sheetName = 'Quotation List';
-		$writer = new XLSXWriter();
+		$sheetName = 'Delivery Order List';
+		$writer    = new XLSXWriter();
 
 		$header = [
-			'Quotation Code'  => 'string',
-			'Quotation Date'  => 'string',
+			'Delivery Order No' => 'string',
+			'Order Date'        => 'string',
 			'Customer Name'     => 'string',
-			'Broker Name'     => 'string',
-			'Quotation Weight' => 'string',
-			'Quotation Amount' => 'string',
-			'Inward Weight'   => 'string',
-			'Status'          => 'string'
+			'Total Weight'      => 'string',
+			'Dispatched Qty'    => 'string',
+			'Item Total'        => 'string',
+			'Total Disc'        => 'string',
+			'Taxable Amt'       => 'string',
+			'CGST Amt'          => 'string',
+			'SGST Amt'          => 'string',
+			'IGST Amt'          => 'string',
+			'Round Off'         => 'string',
+			'Amount'            => 'string',
+			'Status'            => 'string',
 		];
+
+		$col_count = count($header) - 1; // 13 (0-based last index)
 
 		$writer->writeSheetHeader($sheetName, $header, ['suppress_row' => true]);
 
 		$selected_company = $this->session->userdata('root_company');
-		$company_detail   = $this->SalesQuotation_model->get_company_detail($selected_company);
+		$company_detail   = $this->DO_model->get_company_detail($selected_company);
 
 		// ===== COMPANY NAME ROW =====
-		$writer->markMergedCell($sheetName, 0, 0, 0, 12);
-		$writer->writeSheetRow($sheetName, [$company_detail->company_name]);
+		$writer->markMergedCell($sheetName, 0, 0, 0, $col_count);
+		$writer->writeSheetRow($sheetName, [$company_detail->company_name ?? '']);
 
 		// ===== COMPANY ADDRESS ROW =====
-		$writer->markMergedCell($sheetName, 1, 0, 1, 12);
-		$writer->writeSheetRow($sheetName, [$company_detail->address]);
+		$writer->markMergedCell($sheetName, 1, 0, 1, $col_count);
+		$writer->writeSheetRow($sheetName, [$company_detail->address ?? '']);
 
 		// ===== FILTER ROW =====
-		$reportedBy = "Filtered By : ";
-		$from_date  = $post['from_date'] ?? date('Y-m-01');
-		$to_date    = $post['to_date'] ?? date('Y-m-d');
-		$customer_id  = $post['customer_id'] ?? '';
-		$broker_id  = $post['broker_id'] ?? '';
-		$status     = $post['status'] ?? 1;
+		$from_date = $post['from_date'] ?? '';
+		$to_date   = $post['to_date']   ?? '';
+		$status    = $post['status']    ?? '';
+
+		$reportedBy = 'Filtered By : ';
 
 		if ($from_date != '') {
 			$reportedBy .= 'From Date : ' . $from_date . ', ';
 		}
-
 		if ($to_date != '') {
 			$reportedBy .= 'To Date : ' . $to_date . ', ';
 		}
-
-		if ($customer_id != '') {
-			$reportedBy .= 'Customer : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $customer_id])['company'] ?? '') . ', ';
-		}
-
-		if ($broker_id != '') {
-			$reportedBy .= 'Broker : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $broker_id])['company'] ?? '') . ', ';
-		}
-
 		if ($status != '') {
-			$status_list = [1 => 'Pending', 2 => 'Cancel', 3 => 'Expired', 4 => 'Approved', 5 => 'Inprogress', 6 => 'Complete', 7 => 'Partially Complete'];
+			$status_list = [1 => 'Pending', 2 => 'Complete'];
 			$reportedBy .= 'Status : ' . ($status_list[$status] ?? '') . ', ';
 		}
 
-		$writer->markMergedCell($sheetName, 2, 0, 2, 12);
+		$reportedBy = rtrim($reportedBy, ', ');
+
+		$writer->markMergedCell($sheetName, 2, 0, 2, $col_count);
 		$writer->writeSheetRow($sheetName, [$reportedBy]);
+
+		// ===== BLANK ROW =====
 		$writer->writeSheetRow($sheetName, []);
 
 		// ===== HEADER ROW =====
 		$writer->writeSheetRow($sheetName, array_keys($header));
 
-		// ===== CHUNK FETCH START =====
-		$limit = 100;
+		// ===== CHUNK FETCH =====
+		$limit  = 100;
 		$offset = 0;
 
 		while (true) {
-			$result = $this->SalesQuotation_model->getListByFilter($post, $limit, $offset);
+			$result = $this->DO_model->getListByFilter($post, $limit, $offset);
+
 			if (empty($result['rows'])) {
 				break;
 			}
 
 			foreach ($result['rows'] as $row) {
+				$order_date = !empty($row['DODate'])
+					? date('d/m/Y', strtotime($row['DODate']))
+					: '';
+
 				$writer->writeSheetRow($sheetName, [
-					$row['QuotationID'] ?? '',
-					$row['TransDate'] ?? '',
-					$row['customer_name'] ?? '' . ' (' . $row['AccountID'] ?? '' . ')',
-					$row['broker_name'] ?? '' . ' (' . $row['BrokerID'] ?? '' . ')',
-					$row['TotalWeight'] ?? '',
-					$row['NetAmt'] ?? '',
-					'',
-					'Pending'
+					$row['OrderID']       ?? '',
+					$order_date,
+					($row['customer_name'] ?? '') . ' (' . ($row['AccountID'] ?? '') . ')',
+					$row['TotalWt']       ?? '',
+					$row['TotalQty']      ?? '',
+					$row['ItemTotal']     ?? '',
+					$row['TotalDisc']     ?? '',
+					$row['TaxAmt']        ?? '',
+					$row['CGSTAmt']       ?? '',
+					$row['SGSTAmt']       ?? '',
+					$row['IGSTAmt']       ?? '',
+					$row['RoundOff']      ?? '',
+					$row['NetAmt']        ?? '',
+					$row['Status']        ?? 'Pending',
 				]);
 			}
 
@@ -677,7 +693,7 @@ class DeliveryOrder extends AdminController
 		}
 
 		// ===== SAVE FILE =====
-		$filename = 'QuotationList_' . date('YmdHis') . '.xlsx';
+		$filename = 'DeliveryOrderList_' . date('YmdHis') . '.xlsx';
 		$filepath = FCPATH . 'uploads/exports/' . $filename;
 
 		if (!is_dir(FCPATH . 'uploads/exports')) {
@@ -687,7 +703,7 @@ class DeliveryOrder extends AdminController
 		$writer->writeToFile($filepath);
 
 		echo json_encode([
-			'success' => true,
+			'success'  => true,
 			'file_url' => base_url('uploads/exports/' . $filename)
 		]);
 	}

@@ -159,7 +159,8 @@ class ItemMaster extends AdminController
         'PreferVendorID' => $data['prefer_vendor'] ?? '',
         'VendorPartNo' => $data['vendor_part_no'] ?? '',
         'HindiName' => $data['hindi_name'] ?? '',
-        'AdditionalInformation' => $data['additional_info'] ?? ''
+        'AdditionalInformation' => $data['additional_info'] ?? '',
+        'old_item_id' => $data['old_item_code'] ?? '',
       ];
 
       $attachmentUrl = null;
