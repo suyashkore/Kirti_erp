@@ -57,6 +57,16 @@
     text-align: right;
     font-weight: 600;
   }
+
+  .text-truncate-custom {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+  }
 </style>
 <div id="wrapper">
   <div class="content">
@@ -217,7 +227,7 @@
                         <td><input type="text" id="uom" class="form-control fixed_row" readonly tabindex="-1"></td>
                         <td><input type="tel" id="unit_weight" class="form-control fixed_row" min="0" step="0.01" readonly tabindex="-1"></td>
                         <td><input type="tel" id="min_qty" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
-                        <td><input type="tel" id="max_qty" class="form-control fixed_row" min="0" step="0.01" readonly></td>
+                        <td><input type="tel" id="max_qty" class="form-control fixed_row" min="0" step="0.01" readonly tabindex="-1"></td>
                         <td><input type="tel" id="disc_amt" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="unit_rate" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="gst" class="form-control fixed_row" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -279,6 +289,13 @@
                           <option value="OnDelivery">On Delivery</option>
                         </select>
                       </div>
+                    </div>
+
+                    <!-- SQ Lock Warning -->
+                    <div class="col-md-12" style="margin-top: 8px;">
+                      <span id="sq_lock_warning"
+                        style="display:none; color:#c0392b; font-size:13px; font-weight:600;">
+                      </span>
                     </div>
 
                   </div>
@@ -370,6 +387,19 @@
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('salesQuotation', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="button" class="btn btn-primary printBtn <?= (has_permission_new('salesQuotation', '', 'print')) ? '' : 'disabled'; ?>" style="display: none;" onclick="printSalesQuotationPdf();"><i class="fa fa-print"></i> Print PDF</button>
+                  <script>
+                    // Print PDF function
+                    function printSalesQuotationPdf() {
+                      var OrderID = $('#quotation_no').val();
+                      if (!OrderID) {
+                        alert_float('warning', 'Order ID not found!');
+                        return;
+                      }
+                      var url = "<?= admin_url('SalesQuotation/SalesQuotationPrint/'); ?>" + OrderID;
+                      window.open(url, '_blank');
+                    }
+                  </script>
                   <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('salesQuotation', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn btn-warning" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
                   <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
@@ -419,6 +449,35 @@
             </div>
           </div>
 
+          <div class="filter-group">
+            <label>Sales Location</label>
+            <select id="modal_location_filter" class="selectpicker" data-live-search="false" title="All Sales Location">
+              <option value="">All</option>
+              <?php
+              if (!empty($saleslocation)) :
+                foreach ($saleslocation as $value) :
+                  echo '<option value="' . $value['id'] . '">' . $value['LocationName'] . '</option>';
+                endforeach;
+              endif;
+              ?>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Status</label>
+            <select id="modal_status_filter" class="selectpicker" data-live-search="false" title="All Status">
+              <option value="">All</option>
+              <option value="1">Pending</option>
+              <option value="2">Cancel</option>
+              <option value="3">Expired</option>
+              <option value="4">Approved</option>
+              <option value="5">Complete</option>
+              <option value="6">In Progress</option>
+              <option value="7">Partially Complete</option>
+            </select>
+          </div>
+
+
           <!-- Search Button -->
           <div class="filter-group" style="align-self:flex-end;">
             <button type="button" class="btn btn-success" id="searchBtn">
@@ -442,30 +501,59 @@
                 <th class="sortablePop">Quotation No</th>
                 <th class="sortablePop">Quotation Date</th>
                 <th class="sortablePop">Customer</th>
+                <th class="sortablePop">Broker</th>
+                <th class="sortablePop">Sale Location</th>
                 <th class="sortablePop">Total Weight</th>
-
                 <th class="sortablePop">Total Qty</th>
                 <th class="sortablePop">Item Total</th>
                 <th class="sortablePop">Total Disc</th>
                 <th class="sortablePop">Taxable Amt</th>
-
                 <th class="sortablePop">CGST Amt</th>
                 <th class="sortablePop">SGST Amt</th>
                 <th class="sortablePop">IGST Amt</th>
-                <th class="sortablePop">Round Off</th>
-
                 <th class="sortablePop">Amount</th>
+                <th class="sortablePop">Status</th>
               </tr>
             </thead>
             <tbody>
               <?php
               if (!empty($quotation_list)):
+                $status_labels = [
+                  1 => ['label' => 'Pending'],
+                  2 => ['label' => 'Cancel'],
+                  3 => ['label' => 'Expired'],
+                  4 => ['label' => 'Approved'],
+                  5 => ['label' => 'Complete'],
+                  6 => ['label' => 'In Progress'],
+                  7 => ['label' => 'Partially Complete'],
+                ];
                 foreach ($quotation_list as $key => $value):
+                  $status_key   = (int)($value['Status'] ?? 1);
+                  $status_info  = $status_labels[$status_key] ?? ['label' => 'Pending'];
               ?>
-                  <tr class="get_Details" data-id="<?= $value["id"]; ?>" onclick="getDetails(<?= $value['id']; ?>)">
+                  <tr class="get_Details" data-id="<?= $value["id"]; ?>" data-status="<?= (int)($value['Status'] ?? 1); ?>" data-location="<?= (int)($value['SalesLocation'] ?? 0); ?>" onclick="getDetails(<?= $value['id']; ?>)">
                     <td><?= $value["QuotationID"]; ?></td>
                     <td><?= date('d/m/Y', strtotime($value["TransDate"])); ?></td>
-                    <td><?= $value["company"]; ?></td>
+                    <td>
+                      <?php
+                      $company = ($value['company'] ?? '') . ' - ' . ($value['billing_state'] ?? '') . ' (' . ($value['AccountID'] ?? '') . ')';
+                      $display = (strlen($company) > 50) ? substr($company, 0, 50) . '...' : $company;
+                      ?>
+                      <span class="text-truncate-custom" title="<?= htmlspecialchars($company, ENT_QUOTES); ?>">
+                        <?= htmlspecialchars($display, ENT_QUOTES); ?>
+                      </span>
+                    </td>
+                    <td>
+                      <?php
+                      $broker = ($value['broker_name'] ?? '');
+                      $broker_full = $broker ? $broker . ' - ' . ($value['broker_state'] ?? '') . ' (' . ($value['BrokerID'] ?? '') . ')' : '-';
+                      $broker_display = (strlen($broker_full) > 50) ? substr($broker_full, 0, 50) . '...' : $broker_full;
+                      ?>
+                      <span class="text-truncate-custom" title="<?= htmlspecialchars($broker_full, ENT_QUOTES); ?>">
+                        <?= htmlspecialchars($broker_display, ENT_QUOTES); ?>
+                      </span>
+                    </td>
+                    <td><?= $value["LocationName"]; ?></td>
                     <td><?= $value["TotalWeight"]; ?></td>
                     <td><?= $value["TotalQuantity"]; ?></td>
                     <td><?= $value["ItemAmt"]; ?></td>
@@ -474,8 +562,8 @@
                     <td><?= $value["CGSTAmt"]; ?></td>
                     <td><?= $value["SGSTAmt"]; ?></td>
                     <td><?= $value["IGSTAmt"]; ?></td>
-                    <td><?= $value["RoundOffAmt"]; ?></td>
                     <td><?= $value["NetAmt"]; ?></td>
+                    <td style="text-align:center;"><?= $status_info['label']; ?></td>
                   </tr>
               <?php
                 endforeach;
@@ -508,7 +596,25 @@ if ($last_date_yr < $curr_date_new) {
 ?>
 <?php init_tail(); ?>
 <script>
+  function refreshItemDropdownState() {
+    var itemType = $('#item_type').val();
+    var itemCategory = $('#item_category').val();
+    var customerId = $('#customer_id').val();
+    var allFilled = itemType && itemCategory && customerId;
+
+    $('#item_id').prop('disabled', !allFilled);
+    $('.selectpicker').selectpicker('refresh');
+  }
+
   $(document).ready(function() {
+    $('.printBtn').hide();
+    var urlParams = new URLSearchParams(window.location.search);
+    var editId = urlParams.get('id');
+    if (editId) {
+      getDetails(editId);
+    }
+    $('#item_id').prop('disabled', true);
+    $('.selectpicker').selectpicker('refresh');
     var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
     var year = "20" + fin_y;
     var cur_y = new Date().getFullYear().toString().substr(-2);
@@ -556,17 +662,23 @@ if ($last_date_yr < $curr_date_new) {
   $('#ListModal').on('shown.bs.modal', function() {
     $('#searchBtn').trigger('click');
   });
+  $('#ListModal').on('hidden.bs.modal', function() {
+    $('#modal_status_filter').val('').selectpicker('refresh');
+    $('#modal_location_filter').val('').selectpicker('refresh');
+  });
+
   $('#searchBtn').on('click', function() {
 
     var fromDate = $('#from_date').val();
     var toDate = $('#to_date').val();
+    var statusFilter = $('#modal_status_filter').val();
+    var locationFilter = $('#modal_location_filter').val();
 
     if (!fromDate || !toDate) {
       alert_float('warning', 'Please select both From Date and To Date');
       return;
     }
 
-    // Convert dd/mm/yyyy to Date object
     function parseDate(dateStr) {
       var parts = dateStr.split('/');
       return new Date(parts[2], parts[1] - 1, parts[0]);
@@ -575,19 +687,32 @@ if ($last_date_yr < $curr_date_new) {
     var from = parseDate(fromDate);
     var to = parseDate(toDate);
 
+    // Remove any existing "No Data" row
+    $('#table_ListModal tbody tr.no-data-row').remove();
+
+    var visibleCount = 0;
+
     $('#table_ListModal tbody tr').each(function() {
-
-      var rowDateText = $(this).find('td').eq(1).text().trim(); // Quotation Date column
+      var rowDateText = $(this).find('td').eq(1).text().trim();
       var rowDate = parseDate(rowDateText);
+      var rowStatusVal = String($(this).data('status') || '');
+      var rowLocationVal = String($(this).data('location') || '');
 
-      if (rowDate >= from && rowDate <= to) {
-        $(this).show();
-      } else {
-        $(this).hide();
-      }
+      var dateMatch = (rowDate >= from && rowDate <= to);
+      var statusMatch = !statusFilter || rowStatusVal === statusFilter;
+      var locationMatch = !locationFilter || rowLocationVal === locationFilter;
 
+      var show = dateMatch && statusMatch && locationMatch;
+      $(this).toggle(show);
+      if (show) visibleCount++;
     });
 
+    if (visibleCount === 0) {
+      var colspan = $('#table_ListModal thead tr th').length;
+      $('#table_ListModal tbody').append(
+        '<tr class="no-data-row"><td colspan="' + colspan + '" style="text-align:center; padding:12px !important; color:#888; font-style:italic;">No data found</td></tr>'
+      );
+    }
   });
 
   function ResetForm() {
@@ -600,6 +725,20 @@ if ($last_date_yr < $curr_date_new) {
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
+
+    // ── Clear lock state ──
+    $('#sq_lock_warning').text('').hide();
+    $('#main_save_form input:not([type="hidden"])').prop('readonly', false);
+    $('#main_save_form select').prop('disabled', false).selectpicker('refresh');
+    $('#main_save_form textarea').prop('readonly', false);
+    $('#items_body input, #items_body select').prop('readonly', false).prop('disabled', false);
+    $('.saveBtn').show();
+
+    $('#main_save_form .bootstrap-select button').prop('disabled', false).css({
+      'background-color': '',
+      'cursor': '',
+      'pointer-events': ''
+    });
   }
   $(document).on('input', 'input[type="tel"]', function() {
     this.value = this.value
@@ -634,6 +773,13 @@ if ($last_date_yr < $curr_date_new) {
       if (data === false) {
         return false;
       }
+      var itemType = $('#item_type').val();
+      var itemCategory = $('#item_category').val();
+      var customerId = $('#customer_id').val();
+      if (!itemType || !itemCategory || !customerId) {
+        alert_float('warning', 'Please select Item / Service, Category, and Customer before adding items.');
+        return false;
+      }
 
       var row_btn = `<button type="button" class="btn btn-danger" onclick="$(this).closest('tr').remove();" style="float:right; padding: 2px; width: 30px;"><i class="fa fa-xmark"></i></button>`;
     } else {
@@ -650,7 +796,7 @@ if ($last_date_yr < $curr_date_new) {
         <td><input type="text" name="uom[]" id="uom${next_id}" class="form-control dynamic_row${next_id}" readonly tabindex="-1"></td>
         <td><input type="tel" name="unit_weight[]" id="unit_weight${next_id}" class="form-control unit-weight dynamic_row${next_id}" min="0" step="0.01" readonly tabindex="-1"></td>
         <td><input type="tel" name="min_qty[]" id="min_qty${next_id}" class="form-control min-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="max_qty[]" id="max_qty${next_id}" class="form-control max-qty dynamic_row${next_id}" min="0" step="0.01" readonly></td>
+        <td><input type="tel" name="max_qty[]" id="max_qty${next_id}" class="form-control max-qty dynamic_row${next_id}" min="0" step="0.01" readonly tabindex="-1"></td>
         <td><input type="tel" name="disc_amt[]" id="disc_amt${next_id}" class="form-control disc-amt dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="unit_rate[]" id="unit_rate${next_id}" class="form-control unit-rate dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="gst[]" id="gst${next_id}" class="form-control gst-percent dynamic_row${next_id}" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -675,7 +821,7 @@ if ($last_date_yr < $curr_date_new) {
     $('#row_id').val(next_id);
     $('.selectpicker').selectpicker('refresh');
   }
-  
+
 
   function calculateAmount(row) {
     var minQty = parseFloat($('#min_qty' + row).val()) || 0;
@@ -868,6 +1014,7 @@ if ($last_date_yr < $curr_date_new) {
         if (callback) {
           callback();
         }
+        refreshItemDropdownState();
       },
       error: function() {
         $('#quotation_no').val('');
@@ -920,6 +1067,7 @@ if ($last_date_yr < $curr_date_new) {
 
           $('.selectpicker').selectpicker('refresh');
           calculateTotals();
+          refreshItemDropdownState();
           if (callback) {
             callback();
           }
@@ -927,6 +1075,51 @@ if ($last_date_yr < $curr_date_new) {
       }
     });
   }
+
+  // function getItemDetails(itemId, id = '') {
+  //   var isDuplicate = false;
+
+  //   $('.dynamic_item').not('#item_id' + id).each(function() {
+  //     if ($(this).val() == itemId && itemId != '') {
+  //       isDuplicate = true;
+  //       return false;
+  //     }
+  //   });
+  //   if (isDuplicate) {
+  //     alert_float('warning', 'Please select other item, this item already selected.');
+  //     $('#item_id' + id).val('').focus();
+  //     $('.selectpicker').selectpicker('refresh');
+  //     $('.fixed_row').val('');
+  //     $('.dynamic_row' + id).val('');
+  //     return;
+  //   }
+
+  //   $.ajax({
+  //     url: '<?= admin_url('purchase/GetItemDetails'); ?>',
+  //     type: 'POST',
+  //     data: {
+  //       item_id: itemId
+  //     },
+  //     dataType: 'json',
+  //     success: function(response) {
+  //       if (response.status === 'success' && response.data) {
+  //         var data = response.data;
+  //         $('#hsn_code' + id).val(data.hsn_code || '');
+  //         $('#uom' + id).val(data.unit || '');
+  //         $('#unit_weight' + id).val(Number(data.UnitWeight) || 0);
+  //         $('#gst' + id).val(Number(data.tax) || 0);
+  //         $('#min_qty' + id).focus();
+  //       } else {
+  //         $('.fixed_row').val('');
+  //         $('.selectpicker').selectpicker('refresh');
+  //       }
+  //       calculateTotals();
+  //     },
+  //     error: function(xhr, status, err) {
+  //       console.log('Error fetching item details:', err);
+  //     }
+  //   });
+  // }
 
   function getItemDetails(itemId, id = '') {
     var isDuplicate = false;
@@ -939,10 +1132,15 @@ if ($last_date_yr < $curr_date_new) {
     });
     if (isDuplicate) {
       alert_float('warning', 'Please select other item, this item already selected.');
-      $('#item_id' + id).val('').focus();
-      $('.selectpicker').selectpicker('refresh');
-      $('.fixed_row').val('');
-      $('.dynamic_row' + id).val('');
+
+      // ── Only clear if the row is NOT locked ──
+      var rowLocked = $('#item_id' + id).closest('tr').data('locked') == 1;
+      if (!rowLocked) {
+        $('#item_id' + id).val('').focus();
+        $('.selectpicker').selectpicker('refresh');
+        $('.fixed_row').val('');
+        $('.dynamic_row' + id).val('');
+      }
       return;
     }
 
@@ -978,11 +1176,13 @@ if ($last_date_yr < $curr_date_new) {
 
     let form_mode = $('#form_mode').val();
 
-    let required_fields = get_required_fields('main_save_form');
-    let validated = validate_fields(required_fields);
-
-    if (validated === false) {
-      return;
+    var isLocked = $('#sq_lock_warning').is(':visible');
+    if (!isLocked) {
+      let required_fields = get_required_fields('main_save_form');
+      let validated = validate_fields(required_fields);
+      if (validated === false) {
+        return;
+      }
     }
 
     var form_data = new FormData(this);
@@ -1012,10 +1212,31 @@ if ($last_date_yr < $curr_date_new) {
         if (response.success == true) {
           alert_float('success', response.message);
           ResetForm();
-          let html = `<tr class="get_Details" data-id="${response.data.id}" onclick="getDetails(${response.data.id})">
+          let statusLabels = {
+            1: { label: 'Pending' },
+            2: { label: 'Cancel' },
+            3: { label: 'Expired' },
+            4: { label: 'Approved' },
+            5: { label: 'Complete' },
+            6: { label: 'In Progress' },
+            7: { label: 'Partially Complete' },
+          };
+          let brokerFull = (response.data.broker_name || '') ?
+            (response.data.broker_name || '') + ' - ' + (response.data.broker_state || '') + ' (' + (response.data.BrokerID || '') + ')' :
+            '-';
+          let brokerDisp = brokerFull.length > 50 ? brokerFull.substring(0, 50) + '...' : brokerFull;
+          let statusKey = parseInt(response.data.Status) || 1;
+          let statusInfo = statusLabels[statusKey] || statusLabels[1];
+          let html = `<tr class="get_Details" data-id="${response.data.id}" data-status="<?= (int)($value['Status'] ?? 1); ?>" onclick="getDetails(${response.data.id})">
 						<td>${response.data.QuotationID}</td>
             <td>${moment(response.data.TransDate).format('DD/MM/YYYY')}</td>
-            <td>${response.data.company}</td>
+            <td>${(() => { 
+        const full = (response.data.company || '') + ' - ' + (response.data.billing_state || '') + ' (' + (response.data.AccountID || '') + ')';
+        const disp = full.length > 50 ? full.substring(0, 50) + '...' : full;
+        return `<span class="text-truncate-custom" title="${full}">${disp}</span>`;
+    })()}</td>
+    <td><span class="text-truncate-custom" title="${brokerFull}">${brokerDisp}</span></td>
+            <td>${response.data.LocationName}</td>
             <td>${response.data.TotalWeight}</td>
             <td>${response.data.TotalQuantity}</td>
             <td>${response.data.ItemAmt}</td>
@@ -1024,8 +1245,8 @@ if ($last_date_yr < $curr_date_new) {
             <td>${response.data.CGSTAmt}</td>
             <td>${response.data.SGSTAmt}</td>
             <td>${response.data.IGSTAmt}</td>
-            <td>${response.data.RoundOffAmt}</td>
             <td>${response.data.NetAmt}</td>
+            <td style="text-align:center;">${statusInfo.label}</td>
 					</tr>`;
           if (form_mode == 'edit') {
             $('.get_Details[data-id="' + response.data.id + '"]').replaceWith(html);
@@ -1047,18 +1268,25 @@ if ($last_date_yr < $curr_date_new) {
       method: "POST",
       dataType: "JSON",
       data: {
-        id: id,
+        id: id
       },
       success: function(response) {
         if (response.success == true) {
           let d = response.data;
           $('#update_id').val(id);
           $('#item_type').val(d.ItemType);
+
+          $('#form_mode').val('edit');
+
           getCustomDropdownList('item_type', d.ItemType, 'item_category', d.ItemCategory, function() {
             getNextQuotationNo(function() {
+
+              $('#quotation_no').val(d.QuotationID);
+
               let history = response.data.history;
               for (var i = 0; i < history.length; i++) {
                 addRow(2);
+                var isLocked = history[i].is_locked == 1;
                 $('#item_uid' + (i + 1)).val(history[i].id);
                 $('#item_id' + (i + 1)).val(history[i].ItemID);
                 getItemDetails(history[i].ItemID, (i + 1));
@@ -1069,30 +1297,105 @@ if ($last_date_yr < $curr_date_new) {
                 $('#amount' + (i + 1)).val(Number(history[i].NetOrderAmt));
                 $('.selectpicker').selectpicker('refresh');
                 calculateAmount(i + 1);
+
+                // Per-row lock: make editable fields readonly
+                // MASTER LOCK: Status 2/5/7 locks entire form 
+                if (d.is_sq_locked == 1) {
+                  var lockMsg = d.lock_reason || 'This Quotation is locked and cannot be updated.';
+
+                  // Show inline warning banner with the actual reason
+                  $('#sq_lock_warning').text('⚠ ' + lockMsg).show();
+
+                  // Lock all standard form inputs and textareas
+                  $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
+                  $('#main_save_form textarea').prop('readonly', true);
+
+                  // Disable all selects (including selectpicker dropdowns)
+                  $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
+
+                  // Lock all item row inputs
+                  $('#items_body input').prop('readonly', true).css({
+                    'background-color': '#f5f5f5',
+                    'cursor': 'not-allowed'
+                  });
+
+                  // Explicitly disable item dropdowns in rows (selectpicker needs both)
+                  $('#items_body select').prop('disabled', true);
+                  $('#items_body .bootstrap-select button').prop('disabled', true).css({
+                    'background-color': '#f5f5f5',
+                    'cursor': 'not-allowed',
+                    'pointer-events': 'none'
+                  });
+
+                  // Remove all row delete buttons
+                  $('#items_body .btn-danger').remove();
+
+                  // Disable (not hide) the Update button
+                  $('.saveBtn').hide();
+                  $('.updateBtn').show().prop('disabled', true).addClass('disabled');
+
+                } else {
+                  $('#sq_lock_warning').hide();
+                  $('#form_mode').val('edit');
+                  $('.printBtn').show();
+                  $('.saveBtn').hide();
+                  $('.updateBtn').show().prop('disabled', false).removeClass('disabled');
+                }
               }
             });
           });
+
           $('#quotation_no').val(d.QuotationID);
           $('#quotation_date').val(moment(d.TransDate).format('DD/MM/YYYY'));
           $('#sales_location').val(d.SalesLocation);
           $('#customer_id').val(d.AccountID);
+
           getCustomerDetailsLocation(function() {
             $('#customer_location').val(d.CustomerLocation);
             $('#broker_id').val(d.BrokerID);
           });
-          // $('#quotation_validity').val(d.Validity.split(' ')[0]);
+
           $('#delivery_from').val(moment(d.DeliveryFrom).format('DD/MM/YYYY'));
           $('#delivery_to').val(moment(d.DeliveryTo).format('DD/MM/YYYY'));
           $('#payment_terms').val(d.PaymentTerms);
           $('#freight_terms').val(d.FreightTerms);
-
           $('.selectpicker').selectpicker('refresh');
-          $('#form_mode').val('edit');
-          $('.saveBtn').hide();
-          $('.updateBtn').show();
+
+          // ── MASTER LOCK: Status = 5 (Complete) locks entire form ──
+          if (d.is_sq_locked == 1) {
+            $('#sq_lock_warning').show();
+
+            // Lock all form inputs
+            $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
+            $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
+            $('#main_save_form textarea').prop('readonly', true);
+
+            // Lock all item rows
+            $('#items_body input').prop('readonly', true).css({
+              'background-color': '#f5f5f5',
+              'cursor': 'not-allowed'
+            });
+            $('#items_body select').prop('disabled', true);
+
+            // Hide both action buttons — no save or update allowed
+            $('.saveBtn').hide();
+            $('.printBtn').show();
+            $('.updateBtn').hide();
+
+          } else {
+            $('#sq_lock_warning').hide();
+            $('#form_mode').val('edit');
+            $('.saveBtn').hide();
+            $('.updateBtn').show();
+          }
+
           $('#ListModal').modal('hide');
+
         } else {
           alert_float('warning', response.message);
+        }
+        if (window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
       }
     });

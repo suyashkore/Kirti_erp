@@ -461,6 +461,16 @@ function MandiPurchOrder_pdf($invoice, $tag = '')
 
 }
 
+//================== MandiPurchase Order PDF Helper =================================
+
+function quotation_pdf($invoice, $tag = '')
+
+{
+
+    return app_pdf('invoice', LIBSPATH . 'pdf/Quotation_pdf', $invoice, $tag);
+
+}
+
 
 //================== GateinPass_pdf  PDF Helper =================================
 
@@ -470,6 +480,14 @@ function GateinPass_pdf($invoice, $tag = '')
 
     return app_pdf('invoice', LIBSPATH . 'pdf/GateinPass_pdf', $invoice, $tag);
 
+}
+
+/* =========================
+*Sales Quotation PDF Helper
+* ========================= */
+function SalesQuotation_pdf($invoice, $tag = '')
+{
+    return app_pdf('invoice', LIBSPATH . 'pdf/SalesQuotation_pdf', $invoice, $tag);
 }
 
 /* =========================
@@ -489,16 +507,19 @@ function SalesInvoice_pdf($invoice, $tag = '')
 }
 
 /* =========================
-	*Sales Order PDF Helper
-	* ========================= */
-
-
-function PurchInward_pdf($invoice, $tag = '')
-
+*Stock Transfer PDF Helper
+* ========================= */
+function StockTransfer_pdf($invoice, $tag = '')
 {
+    return app_pdf('invoice', LIBSPATH . 'pdf/StockTransfer_pdf', $invoice, $tag);
+}
 
+/* =========================
+*Purchase Inward PDF Helper
+* ========================= */
+function PurchInward_pdf($invoice, $tag = '')
+{
     return app_pdf('invoice', LIBSPATH . 'pdf/PurchInward_pdf', $invoice, $tag);
-
 }
 
 function PurchInvoice_pdf($invoice, $tag = '')

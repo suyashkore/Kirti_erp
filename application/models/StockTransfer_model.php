@@ -38,7 +38,7 @@ class StockTransfer_model extends App_Model
     stm.Distance,
     stm.VehicleNo,
     stm.DriverName,
-    v.TransporterID,
+    c.company as TransporterName,
 
     pld1.LocationName as FromLocation,
     sl1.id as FromStateCode,
@@ -53,7 +53,7 @@ class StockTransfer_model extends App_Model
     pld2.LocationName as ToLocation,
     sl2.id as ToStateCode, 
     pld2.PinCode as ToPincode, 
-    rc2.gst as ToGSTIN, 
+    rc2.gst as ToGSTIN,
     rc2.company_name as ToCompany,
     gm2.GodownName as ToGodown,
     gm2.Address as ToAddress,
@@ -63,8 +63,11 @@ class StockTransfer_model extends App_Model
 
     $this->db->from(db_prefix() . 'StockTransferMaster stm');
 
-    // Transport
+    // Getting The Transporter ID
     $this->db->join(db_prefix() . 'vehicle v', 'v.VehicleNo = stm.VehicleNo', 'left');
+
+    // Getting The Transporter GSTIN
+    $this->db->join(db_prefix() . 'clients c', 'c.AccountID = v.TransporterID', 'left');
 
     // From Location
     $this->db->join(db_prefix(). 'PlantLocationDetails pld1', 'pld1.id = stm.FromLocationID', 'left');
@@ -351,28 +354,9 @@ class StockTransfer_model extends App_Model
             'GodownID' => $data['ToGodown'] ?? null,
         ]);
 
-        // if (!empty($data['item_uid'][$i]) && $data['item_uid'][$i] != 0) {
-        //     $out_data['UserID2'] = $this->session->userdata('username');
-        //     $out_data['Lupdate'] = date('Y-m-d H:i:s');
-        //     $this->db->where('id', $data['item_uid'][$i]);
-        //     $this->db->where('TType2', 'Out');
-        //     $this->db->update(db_prefix() . 'history', $out_data);
-
-        //     $in_data['UserID2'] = $this->session->userdata('username');
-        //     $in_data['Lupdate'] = date('Y-m-d H:i:s');
-        //     $this->db->where('id', $data['item_uid'][$i]);
-        //     $this->db->where('TType2', 'In');
-        //     $this->db->update(db_prefix() . 'history', $in_data);
-        // } else {
-        //     $this->db->insert(db_prefix() . 'history', $out_data);
-        //     $this->db->insert(db_prefix() . 'history', $in_data);
-        // }
-
         $item_uid = !empty($data['item_uid'][$i]) ? (int)$data['item_uid'][$i] : 0;
 
         if ($item_uid > 0) {
-            // UPDATE — find Out and In records by OrderID + ItemID + Ordinalno + TType2
-            // Do NOT rely on item_uid alone since Out and In are separate rows with different IDs
             $out_data['UserID2'] = $this->session->userdata('username');
             $out_data['Lupdate'] = date('Y-m-d H:i:s');
             $this->db->where('OrderID', $data['OrderID']);
@@ -642,105 +626,108 @@ public function getGodownById($godownId)
 
 
   /* =========================
-	* Sales Order Print Model
+	* Stock Transfer Print Model
 	* ========================= */
 
-  public function GetSalesOrderDetailsForPdf($OrderID)
+  public function GetStockTransferDetailsForPdf($TransferID)
   {
     $selected_company = $this->session->userdata('root_company');
 
-    $this->db->select(
-      db_prefix() . 'SalesOrderMaster.*, ' .
-        db_prefix() . 'clients.company, ' .
-        db_prefix() . 'clients.billing_address, ' .
-        db_prefix() . 'clients.billing_city, ' .
-        db_prefix() . 'clients.billing_state, ' .
-        db_prefix() . 'clients.GSTIN, ' .
-        db_prefix() . 'xx_statelist.state_name, ' .
-        db_prefix() . 'ItemTypeMaster.ItemTypeName, ' .
-        db_prefix() . 'ItemCategoryMaster.CategoryName, ' .
-        db_prefix() . 'clientwiseshippingdata.ShippingCity, ' .
-        'delivery_city.city_name, ' .
-        db_prefix() . 'FreightTerms.FreightTerms, ' .
-        db_prefix() . 'PlantLocationDetails.LocationName , ' .
-        db_prefix() . 'SalesQuotationMaster.TransDate as QuotationDate, ' .
-        'shipping_citys.city_name as ShippingCityName'
-    );
+    $this->db->select('
+    stm.FY,
+    stm.TransferID,
+    stm.TransferDate,
+    stm.Distance,
+    stm.VehicleNo,
+    stm.DriverName,
+    stm.isEwayBill,
+    stm.EwayBillNo,
+    stm.EwayBillDate,
+    stm.EwayBillExpDate,
+    stm.TotalWeight,
+    stm.TotalQuantity,
 
-    $this->db->join(
-      db_prefix() . 'clients',
-      db_prefix() . 'clients.AccountID = ' . db_prefix() . 'SalesOrderMaster.AccountID',
-      'left'
-    );
+    c.company as TransporterName,
 
-    $this->db->join(
-      db_prefix() . 'xx_statelist',
-      db_prefix() . 'xx_statelist.short_name = ' . db_prefix() . 'clients.billing_state',
-      'left'
-    );
+    pld1.LocationName as FromLocation,
+    sl1.id as FromStateCode,
+    pld1.PinCode as FromPincode, 
+    rc1.gst as FromGSTIN,
+    rc1.company_name as FromCompany,
+    gm1.GodownName as FromGodown,
+    gm1.Address as FromAddress,
+    cl1.city_name as FromCity,
+    sl3.id as ActFromStateCode,
+     
+    pld2.LocationName as ToLocation,
+    sl2.id as ToStateCode, 
+    pld2.PinCode as ToPincode, 
+    rc2.gst as ToGSTIN,
+    rc2.company_name as ToCompany,
+    gm2.GodownName as ToGodown,
+    gm2.Address as ToAddress,
+    cl2.city_name as ToCity,
+    sl4.id as ActToStateCode 
+    ');
 
-    $this->db->join(
-      db_prefix() . 'ItemTypeMaster',
-      db_prefix() . 'ItemTypeMaster.Id = ' . db_prefix() . 'SalesOrderMaster.ItemType',
-      'left'
-    );
+    $this->db->from(db_prefix() . 'StockTransferMaster stm');
 
-    $this->db->join(
-      db_prefix() . 'ItemCategoryMaster',
-      db_prefix() . 'ItemCategoryMaster.Id = ' . db_prefix() . 'SalesOrderMaster.ItemCategory',
-      'left'
-    );
+    // Getting The Transporter ID
+    $this->db->join(db_prefix() . 'vehicle v', 'v.VehicleNo = stm.VehicleNo', 'left');
 
-    $this->db->join(
-      db_prefix() . 'clientwiseshippingdata',
-      db_prefix() . 'clientwiseshippingdata.id = ' . db_prefix() . 'SalesOrderMaster.DeliveryLocation',
-      'left'
-    );
+    // Getting The Transporter GSTIN
+    $this->db->join(db_prefix() . 'clients c', 'c.AccountID = v.TransporterID', 'left');
 
-    // Aliased to avoid conflict with the second xx_citylist join
-    $this->db->join(
-      db_prefix() . 'PlantLocationDetails',
-      db_prefix() . 'PlantLocationDetails.id = ' . db_prefix() . 'SalesOrderMaster.SalesLocation',
-      'left'
-    )->join(db_prefix() . 'xx_citylist as delivery_city', 'delivery_city.id = delivery_city.Id', 'left');
+    // From Location
+    $this->db->join(db_prefix(). 'PlantLocationDetails pld1', 'pld1.id = stm.FromLocationID', 'left');
 
-    $this->db->join(
-      db_prefix() . 'FreightTerms',
-      db_prefix() . 'SalesOrderMaster.FreightTerms = ' . db_prefix() . 'FreightTerms.Id',
-      'left'
-    );
+    // To Location
+    $this->db->join(db_prefix(). 'PlantLocationDetails pld2', 'pld2.id = stm.ToLocationID', 'left');
 
-    // $this->db->join(db_prefix() . 'SalesQuotationMaster',
-    //     db_prefix() . 'SalesQuotationMaster.QuotationID = ' . db_prefix() . 'SalesOrderMaster.QuotationID', 'left');
+    // From Plant ID GSTIN
+    $this->db->join(db_prefix(). 'rootcompany rc1', 'rc1.id = pld1.PlantID', 'left');
 
-    $this->db->join(
-      db_prefix() . 'SalesQuotationMaster',
-      db_prefix() . 'SalesQuotationMaster.QuotationID COLLATE utf8mb4_general_ci = '
-        . db_prefix() . 'SalesOrderMaster.QuotationID COLLATE utf8mb4_general_ci',
-      'left',
-      false
-    );
+    // To Plant ID GSTIN
+    $this->db->join(db_prefix(). 'rootcompany rc2', 'rc2.id = pld2.PlantID', 'left');
 
+    // From Godown
+    $this->db->join(db_prefix(). 'godownmaster gm1', 'gm1.id = stm.FromWHID', 'left');
 
-    // Aliased for ShippingCity
-    $this->db->join(
-      db_prefix() . 'xx_citylist as shipping_citys',
-      'shipping_citys.id = ' . db_prefix() . 'clientwiseshippingdata.ShippingCity',
-      'left'
-    );
+    // To Godown
+    $this->db->join(db_prefix(). 'godownmaster gm2', 'gm2.id = stm.ToWHID', 'left');
 
-    $this->db->where(db_prefix() . 'SalesOrderMaster.OrderID', $OrderID);
+    // From City
+    $this->db->join(db_prefix(). 'xx_citylist cl1', 'gm1.CityID = cl1.id', 'left');
 
-    return $this->db->get(db_prefix() . 'SalesOrderMaster')->row();
+    // To City
+    $this->db->join(db_prefix(). 'xx_citylist cl2', 'gm2.CityID = cl2.id', 'left');
+
+    // From State Code
+    $this->db->join(db_prefix(). 'xx_statelist sl1', 'sl1.short_name = pld1.StateCode', 'left');
+
+    // To State Code
+    $this->db->join(db_prefix(). 'xx_statelist sl2', 'sl2.short_name = pld2.StateCode', 'left');
+
+    // From Act State Code
+    $this->db->join(db_prefix(). 'xx_statelist sl3', 'sl3.short_name = rc1.state_code', 'left');
+
+    // To Act State Code
+    $this->db->join(db_prefix(). 'xx_statelist sl4', 'sl4.short_name = rc2.state_code', 'left');
+
+    $this->db->where('stm.TransferID', $TransferID);
+
+    return $this->db->get()->row();
   }
 
-  public function get_order_data($OrderID)
+  public function get_order_data($TransferID)
   {
     $selected_company = $this->session->userdata('root_company');
 
-    $this->db->select([db_prefix() . 'history.*', 'tblitems.ItemName']);
+    $this->db->select([db_prefix() . 'history.*', 'tblitems.ItemName', 'tblitems.hsn_code']);
     $this->db->join('tblitems', 'tblitems.ItemID = ' . db_prefix() . 'history.ItemID', 'left');
-    $this->db->where(db_prefix() . 'history.OrderID', $OrderID);
+    $this->db->where(db_prefix() . 'history.OrderID', $TransferID);
+    $this->db->where(db_prefix() . 'history.TType2', 'Out');
     return $this->db->get('tblhistory')->result_array();
   }
+
 }

@@ -98,7 +98,7 @@ define('APP_DB_USERNAME', 'root');
 
  */
 
-define('APP_DB_PASSWORD', '');
+define('APP_DB_PASSWORD', 'root');
 
 
 

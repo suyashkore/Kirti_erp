@@ -97,7 +97,7 @@ class Mandi extends AdminController
 			'location_id'           => $this->input->post('location_id'),
 			'godown_id'             => $this->input->post('godown_id'),
 			'item_id_header'        => $this->input->post('item_id_header'),
-			'tds_code'              => $this->input->post('tds_code'),
+			// 'tds_code'              => $this->input->post('tds_code'),
 			'vehicle_no'            => $this->input->post('vehicle_no'),
 			'total_qty_quintal'     => $this->input->post('total_qty_quintal'),
 			'total_value'           => $this->input->post('total_value'),

@@ -210,7 +210,7 @@ class DirectPurchase_model extends App_Model
     $this->db->join(db_prefix().'godownmaster gm', 'gm.id = dpm.WarehouseID', 'left');
     $this->db->join(db_prefix().'ItemTypeMaster itm', 'itm.Id = dpm.ItemType', 'left');
     $this->db->join(db_prefix().'TDSMaster tdsm', 'tdsm.TDSCode = dpm.TDSCode', 'left');
-    $this->db->join(db_prefix().'TDSDetails tdsd', 'tdsd.rate = dpm.TDSRate', 'left');
+    // $this->db->join(db_prefix().'TDSDetails tdsd', 'tdsd.rate = dpm.TDSRate', 'left');
     
     if($from_date != '')       $this->db->where('dpm.TransDate >=', $from_date);
     if($to_date != '')         $this->db->where('dpm.TransDate <=', $to_date);
@@ -222,7 +222,7 @@ class DirectPurchase_model extends App_Model
 
     $total = $this->db->count_all_results('', FALSE);
 
-    $this->db->select(['dpm.id', 'dpm.OrderID', 'dpm.OrderDate', 'dpm.PurchaseAmt', 'dpm.DiscAmt', 'dpm.CGSTAmt', 'dpm.SGSTAmt', 'dpm.IGSTAmt', 'dpm.FreightAmt', 'dpm.OtherAmt', 'dpm.RoundOff', 'dpm.TDSAmt', 'dpm.FinalAmt', 'pld.LocationName', 'c.company as VendorName', 'b.company as BrokerName', 'gm.GodownName', 'itm.ItemTypeName', 'tdsm.TDSName', 'tdsd.rate as TDSRate']);
+    $this->db->select(['dpm.id', 'dpm.OrderID', 'dpm.OrderDate', 'dpm.PurchaseAmt', 'dpm.DiscAmt', 'dpm.CGSTAmt', 'dpm.SGSTAmt', 'dpm.IGSTAmt', 'dpm.FreightAmt', 'dpm.OtherAmt', 'dpm.RoundOff', 'dpm.TDSAmt', 'dpm.FinalAmt', 'pld.LocationName', 'c.company as VendorName', 'b.company as BrokerName', 'gm.GodownName', 'itm.ItemTypeName', 'tdsm.TDSName', 'dpm.TDSRate']);
 
     // $this->db->order_by($this->primaryKey, 'desc');
     $this->db->limit($limit, $offset);

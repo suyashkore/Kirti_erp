@@ -24,6 +24,47 @@ class SalesOrder_model extends App_Model
     return $this->db->get()->result_array();
   }
 
+  // ===== GET HISTORY DATA =====
+public function getHistoryDetails($QuotationID)
+{
+    $used_subquery = "
+    (
+        SELECT 
+            h2.ItemID,
+            SUM(h2.OrderQty) AS TotalUsedQty
+        FROM " . db_prefix() . "history h2
+        INNER JOIN " . db_prefix() . "SalesOrderMaster som 
+            ON som.OrderID = h2.OrderID
+        WHERE 
+            h2.TType2 = 'Order'
+            AND som.QuotationID = '" . $QuotationID . "'
+            AND som.OrderID != '" . $QuotationID . "'
+            AND h2.TType2 != 'Quotation'
+        GROUP BY h2.ItemID
+    ) used
+    ";
+
+    $this->db->select("
+        h.*,
+        h.OrderQty AS TotalOrderQty,
+        IFNULL(used.TotalUsedQty, 0) AS UsedQty,
+        (h.OrderQty - IFNULL(used.TotalUsedQty, 0)) AS BalanceQty
+    ", false);
+
+    $this->db->from(db_prefix() . 'history h');
+
+    $this->db->join(
+        $used_subquery,
+        'used.ItemID = h.ItemID',
+        'left',
+        false
+    );
+
+    $this->db->where('h.OrderID', $QuotationID);
+    $this->db->where('h.TType2', 'Quotation');
+
+    return $this->db->get()->result_array();
+}
   // ===== CHECK DUPLICATE =====
   public function checkDuplicate($table, $where = null)
   {
@@ -82,6 +123,18 @@ class SalesOrder_model extends App_Model
     return $query->result_array();
   }
 
+public function isSoLocked($history_id, $quotation_id, $item_id, $account_id, $order_id)
+{
+    // Locking based on SO status (Cancelled/Expired/Complete/Partially Complete).
+    $so = $this->db
+        ->select('Status')
+        ->where('OrderID', $order_id)
+        ->get(db_prefix() . 'SalesOrderMaster')
+        ->row_array();
+
+    return !empty($so) && in_array((int)$so['Status'], [2, 3, 5, 7]);
+}
+
   public function getNextSalesOrderNoByCategory($category_id)
   {
     if (!$category_id) return '';
@@ -123,58 +176,172 @@ class SalesOrder_model extends App_Model
       return false;
     }
 
+    // for ($i = 0; $i < count($data['item_id']); $i++) {
+    //   $gst_percent = floatval($data['gst'][$i]) ?? 0;
+    //   $taxable_amt = ((floatval($data['unit_rate'][$i]) ?? 0) - (floatval($data['disc_amt'][$i]) ?? 0)) * (floatval($data['quantity'][$i]) ?? 0);
+
+    //   $cgst = $sgst = $cgstamt = $sgstamt = $igst = $igstamt = 0;
+    //   if ($customer_state === 'MAHARASHTRA') {
+    //     $cgst = $sgst = $gst_percent / 2;
+    //     $cgstamt = $sgstamt = ($taxable_amt * $cgst) / 100;
+    //   } else {
+    //     $igst = $gst_percent;
+    //     $igstamt = ($taxable_amt * $igst) / 100;
+    //   }
+
+    //   $item_data = [
+    //     'OrderID' => $data['OrderID'],
+    //     'PlantID' => $data['plant_id'],
+    //     'FY' => $data['fy'],
+    //     'TransDate' => $data['quotation_date'] ?? date('Y-m-d'),
+    //     'AccountID' => $data['customer_id'] ?? '',
+    //     'ItemID' => $data['item_id'][$i],
+    //     'BasicRate' => $data['unit_rate'][$i],
+    //     'SaleRate' => ($data['unit_rate'][$i] * $gst_percent) / 100,
+    //     'SuppliedIn' => $data['uom'][$i],
+    //     'UnitWeight' => $data['unit_weight'][$i],
+    //     'WeightUnit' => $data['uom'][$i],
+    //     'OrderQty' => $data['quantity'][$i],
+    //     'DiscAmt' => $data['disc_amt'][$i],
+    //     'cgst' => $cgst,
+    //     'cgstamt' => $cgstamt,
+    //     'sgst' => $sgst,
+    //     'sgstamt' => $sgstamt,
+    //     'igst' => $igst,
+    //     'igstamt' => $igstamt,
+    //     'OrderAmt' => $data['quantity'][$i] * $data['unit_rate'][$i],
+    //     'NetOrderAmt' => $data['amount'][$i],
+    //     'Ordinalno' =>  $i + 1,
+    //     'TType' => 'S',
+    //     'TType2' => 'Order',
+    //   ];
+    //   //   echo json_encode($item_data);
+    //   //   exit;
+    //   if ($data['item_uid'][$i] == 0) {
+    //     $item_data['UserID'] = $this->session->userdata('username');
+    //     $item_data['TransDate2'] = date('Y-m-d H:i:s');
+    //     $this->db->insert(db_prefix() . 'history', $item_data);
+    //   } else {
+    //     $locked = $this->isSoLocked(
+    //     $data['item_uid'][$i],
+    //     $data['QuotationID_ref'] ?? '',   // pass from controller (see below)
+    //     $data['item_id'][$i],
+    //     $data['customer_id'],
+    //     $data['OrderID']
+    // );
+
     for ($i = 0; $i < count($data['item_id']); $i++) {
-      $gst_percent = floatval($data['gst'][$i]) ?? 0;
-      $taxable_amt = ((floatval($data['unit_rate'][$i]) ?? 0) - (floatval($data['disc_amt'][$i]) ?? 0)) * (floatval($data['quantity'][$i]) ?? 0);
+    $gst_percent = floatval($data['gst'][$i]) ?? 0;
+    $sale_qty    = floatval($data['quantity'][$i]) ?? 0;
+    $unit_rate   = floatval($data['unit_rate'][$i]) ?? 0;
+    $disc_amt    = floatval($data['disc_amt'][$i]) ?? 0;
 
-      $cgst = $sgst = $cgstamt = $sgstamt = $igst = $igstamt = 0;
-      if ($customer_state === 'MAHARASHTRA') {
-        $cgst = $sgst = $gst_percent / 2;
+    // ── Balance cap: QuotationQty − qty used by OTHER SOs for this item ──
+    $quotation_id = $data['QuotationID_ref'] ?? '';
+    $order_id     = $data['OrderID'];
+    $item_id      = $data['item_id'][$i];
+    $history_uid  = $data['item_uid'][$i];
+
+    if (!empty($quotation_id)) {
+        $quot_row = $this->db
+            ->select('OrderQty')
+            ->where('OrderID', $quotation_id)
+            ->where('ItemID',  $item_id)
+            ->where('TType2',  'Quotation')
+            ->get(db_prefix() . 'history')
+            ->row_array();
+
+        $quot_qty = floatval($quot_row['OrderQty'] ?? 0);
+
+        $used_row = $this->db
+            ->select('SUM(h2.OrderQty) as UsedQty')
+            ->from(db_prefix() . 'history h2')
+            ->join(db_prefix() . 'SalesOrderMaster som', 'som.OrderID = h2.OrderID', 'inner')
+            ->where('h2.TType2',       'Order')
+            ->where('som.QuotationID', $quotation_id)
+            ->where('h2.ItemID',       $item_id)
+            ->where('h2.OrderID !=',   $order_id)   // exclude current SO
+            ->get()
+            ->row_array();
+
+        $used_by_others = floatval($used_row['UsedQty'] ?? 0);
+        $max_allowed    = $quot_qty - $used_by_others;
+
+        if ($sale_qty > $max_allowed) {
+            $sale_qty = max(0, $max_allowed);   // clamp silently; frontend already warned
+        }
+        $data['quantity'][$i] = $sale_qty;
+    }
+
+    $taxable_amt = ($unit_rate - $disc_amt) * $sale_qty;
+    $cgst = $sgst = $cgstamt = $sgstamt = $igst = $igstamt = 0;
+
+    if ($customer_state === 'MAHARASHTRA') {
+        $cgst    = $sgst    = $gst_percent / 2;
         $cgstamt = $sgstamt = ($taxable_amt * $cgst) / 100;
-      } else {
-        $igst = $gst_percent;
+    } else {
+        $igst    = $gst_percent;
         $igstamt = ($taxable_amt * $igst) / 100;
-      }
+    }
 
-      $item_data = [
-        'OrderID' => $data['OrderID'],
-        'PlantID' => $data['plant_id'],
-        'FY' => $data['fy'],
-        'TransDate' => $data['quotation_date'] ?? date('Y-m-d'),
-        'AccountID' => $data['customer_id'] ?? '',
-        'ItemID' => $data['item_id'][$i],
-        'BasicRate' => $data['unit_rate'][$i],
-        'SaleRate' => ($data['unit_rate'][$i] * $gst_percent) / 100,
+    $item_data = [
+        'OrderID'    => $order_id,
+        'PlantID'    => $data['plant_id'],
+        'FY'         => $data['fy'],
+        'TransDate'  => $data['quotation_date'] ?? date('Y-m-d'),
+        'AccountID'  => $data['customer_id'] ?? '',
+        'ItemID'     => $item_id,
+        'BasicRate'  => $unit_rate,
+        'SaleRate'   => ($unit_rate * $gst_percent) / 100,
         'SuppliedIn' => $data['uom'][$i],
         'UnitWeight' => $data['unit_weight'][$i],
         'WeightUnit' => $data['uom'][$i],
-        'OrderQty' => $data['quantity'][$i],
-        'DiscAmt' => $data['disc_amt'][$i],
-        'cgst' => $cgst,
-        'cgstamt' => $cgstamt,
-        'sgst' => $sgst,
-        'sgstamt' => $sgstamt,
-        'igst' => $igst,
-        'igstamt' => $igstamt,
-        'OrderAmt' => $data['quantity'][$i] * $data['unit_rate'][$i],
-        'NetOrderAmt' => $data['amount'][$i],
-        'Ordinalno' =>  $i+1,
-        'TType' => 'S',
-        'TType2' => 'Order',
-      ];
-      //   echo json_encode($item_data);
-      // exit;
-      if ($data['item_uid'][$i] == 0) {
-        $item_data['UserID'] = $this->session->userdata('username');
+        'OrderQty'   => $sale_qty,
+        'DiscAmt'    => $disc_amt,
+        'cgst'       => $cgst,
+        'cgstamt'    => $cgstamt,
+        'sgst'       => $sgst,
+        'sgstamt'    => $sgstamt,
+        'igst'       => $igst,
+        'igstamt'    => $igstamt,
+        'OrderAmt'   => $sale_qty * $unit_rate,
+        'NetOrderAmt'=> $data['amount'][$i],
+        'Ordinalno'  => $i + 1,
+        'TType'      => 'S',
+        'TType2'     => 'Order',
+    ];
+
+    if ($history_uid == 0) {
+        $item_data['UserID']     = $this->session->userdata('username');
         $item_data['TransDate2'] = date('Y-m-d H:i:s');
         $this->db->insert(db_prefix() . 'history', $item_data);
-      } else {
+    } else {
+        $locked = $this->isSoLocked(
+            $history_uid,
+            $quotation_id,
+            $item_id,
+            $data['customer_id'],
+            $order_id
+        );
+        if ($locked) {
+            continue;
+        }
         $item_data['UserID2'] = $this->session->userdata('username');
         $item_data['Lupdate'] = date('Y-m-d H:i:s');
-        $this->db->where('id', $data['item_uid'][$i]);
+        $this->db->where('id', $history_uid);
         $this->db->update(db_prefix() . 'history', $item_data);
-      }
     }
+}
+
+    // if ($locked) {
+    //     continue; // silently skip locked rows
+    // }
+    //     $item_data['UserID2'] = $this->session->userdata('username');
+    //     $item_data['Lupdate'] = date('Y-m-d H:i:s');
+    //     $this->db->where('id', $data['item_uid'][$i]);
+    //     $this->db->update(db_prefix() . 'history', $item_data);
+    //   }
+    // }
   }
 
   public function getOrderList()
@@ -183,36 +350,152 @@ class SalesOrder_model extends App_Model
     $this->db->from(db_prefix() . 'SalesOrderMaster pm');
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pm.AccountID', 'left');
     $this->db->join(db_prefix() . 'ItemCategoryMaster icm', 'icm.id = pm.ItemCategory', 'left');
-    $this->db->order_by('pm.TransDate', 'ASC');
+    $this->db->order_by('pm.TransDate', 'DESC');
     return $this->db->get()->result_array();
   }
 
+  // public function getOrderDetails($id)
+  // {
+  //   $this->db->select('pm.*, c.company, icm.CategoryName as CategoryName');
+  //   $this->db->from(db_prefix() . 'SalesOrderMaster pm');
+  //    $this->db->join(
+  //     db_prefix() . 'ItemCategoryMaster icm',
+  //     'icm.Id = pm.ItemCategory',
+  //     'left'
+  //   );
+  //   $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pm.AccountID', 'left');
+  //   $this->db->where('pm.id', $id);
+  //   $master = $this->db->get()->row_array();
+
+  //   if (!$master) {
+  //     return [];
+  //   }
+
+  //   $this->db->from(db_prefix() . 'history');
+  //   $this->db->where('OrderID', $master['OrderID']);
+  //   $this->db->where('TransID IS NULL', null, false);
+
+  //   $history = $this->db->get()->result_array();
+  //   $master['history'] = $history;
+
+  //   return $master;
+  // }
+
   public function getOrderDetails($id)
-  {
+{
     $this->db->select('pm.*, c.company, icm.CategoryName as CategoryName');
     $this->db->from(db_prefix() . 'SalesOrderMaster pm');
-     $this->db->join(
-      db_prefix() . 'ItemCategoryMaster icm',
-      'icm.Id = pm.ItemCategory',
-      'left'
+    $this->db->join(
+        db_prefix() . 'ItemCategoryMaster icm',
+        'icm.Id = pm.ItemCategory',
+        'left'
     );
     $this->db->join(db_prefix() . 'clients c', 'c.AccountID = pm.AccountID', 'left');
     $this->db->where('pm.id', $id);
     $master = $this->db->get()->row_array();
 
     if (!$master) {
-      return [];
+        return [];
     }
 
-    $this->db->from(db_prefix() . 'history');
-    $this->db->where('OrderID', $master['OrderID']);
-    $this->db->where('TransID IS NULL', null, false);
+    $QuotationID = $master['QuotationID'];
+    $OrderID     = $master['OrderID'];
+
+    // ── Subquery 1: Quotation qty per item ──────────────────────────────
+    // Reads the RAW quotation history row — no SUM, no GROUP BY
+    // Matches exactly what getHistoryDetails does with h.OrderQty
+    $quotation_subquery = "
+    (
+        SELECT
+            hq.ItemID,
+            hq.OrderQty AS TotalQuotationQty
+        FROM " . db_prefix() . "history hq
+        WHERE hq.OrderID = '" . $QuotationID . "'
+          AND hq.TType2  = 'Quotation'
+    ) q
+    ";
+
+    // ── Subquery 2: ALL used qty across ALL Sales Orders of this Quotation ──
+    // INCLUDING the current order (so BalanceQty = QuotationQty - ALL used)
+    // $used_subquery = "
+    // (
+    //     SELECT
+    //         h2.ItemID,
+    //         SUM(h2.OrderQty) AS TotalUsedQty
+    //     FROM " . db_prefix() . "history h2
+    //     INNER JOIN " . db_prefix() . "SalesOrderMaster som
+    //         ON som.OrderID = h2.OrderID
+    //     WHERE
+    //         h2.TType2        = 'Order'
+    //         AND som.QuotationID = '" . $QuotationID . "'
+    //     GROUP BY h2.ItemID
+    // ) used
+    // ";
+    $used_subquery = "
+(
+    SELECT
+        h2.ItemID,
+        SUM(h2.OrderQty) AS TotalUsedQty
+    FROM " . db_prefix() . "history h2
+    INNER JOIN " . db_prefix() . "SalesOrderMaster som
+        ON som.OrderID = h2.OrderID
+    WHERE
+        h2.TType2        = 'Order'
+        AND som.QuotationID = '" . $QuotationID . "'
+        AND h2.OrderID      != '" . $OrderID . "'
+    GROUP BY h2.ItemID
+) used
+";
+
+    $this->db->select('
+        h.*,
+        IFNULL(q.TotalQuotationQty,  0)                                   AS TotalOrderQty,
+        IFNULL(used.TotalUsedQty,    0)                                   AS UsedQty,
+        (IFNULL(q.TotalQuotationQty, 0) - IFNULL(used.TotalUsedQty, 0))  AS BalanceQty,
+        h.OrderQty                                                        AS SaleQty
+    ', false);
+
+    $this->db->from(db_prefix() . 'history h');
+
+    $this->db->join($quotation_subquery, 'q.ItemID = h.ItemID',    'left', false);
+    $this->db->join($used_subquery,      'used.ItemID = h.ItemID', 'left', false);
+
+    // Only the current Sales Order's own rows
+    $this->db->where('h.OrderID', $OrderID);
+    $this->db->where('h.TType2',  'Order');
 
     $history = $this->db->get()->result_array();
-    $master['history'] = $history;
+
+    // Add per-row lock flag
+foreach ($history as &$row) {
+    $row['is_locked'] = $this->isSoLocked(
+        $row['id'],
+        $master['QuotationID'],
+        $row['ItemID'],
+        $row['AccountID'],
+        $master['OrderID']
+    ) ? 1 : 0;
+}
+unset($row);
+
+$master['history'] = $history;
+
+// Form-level lock: Status 2, 3, 5, 7
+$lockedStatuses = [2, 3, 5, 7];
+$statusLabels   = [
+    2 => 'This Sales Order has been Cancelled and cannot be updated.',
+    3 => 'This Sales Order has Expired and cannot be updated.',
+    5 => 'This Sales Order is Complete and cannot be updated.',
+    7 => 'This Sales Order is Partially Complete and cannot be updated.',
+];
+$soStatus = (int)($master['Status'] ?? 0);
+
+$master['is_so_locked']  = in_array($soStatus, $lockedStatuses) ? 1 : 0;
+$master['lock_reason']   = $statusLabels[$soStatus] ?? '';
 
     return $master;
-  }
+}
+
   public function getCustomerBrokerList($customer_id)
   {
     $this->db->select('c.AccountID, c.company, c.billing_state');
@@ -228,23 +511,9 @@ class SalesOrder_model extends App_Model
     $this->db->select('QuotationID');
     $this->db->from(db_prefix() . 'SalesQuotationMaster');
     $this->db->where('AccountID', $customer_id);
-    $this->db->where('Status !=', 6);
+    $this->db->where_in('Status', [1, 4, 6]); 
     return $this->db->get()->result_array();
   }
-
-  //   public function getQuotationFullDetails($quotation_id)
-  // {
-
-  //     $master = $this->db
-  //         ->where('QuotationID', $quotation_id)
-  //         ->get(db_prefix().'SalesQuotationMaster')
-  //         ->result_array();
-
-  //     return [
-  //         'master' => $master
-  //     ];
-  // }
-
 
   public function getItemDetailsById($item_id)
   {

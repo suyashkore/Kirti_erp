@@ -338,6 +338,19 @@
                 </div>
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('stockTransfer', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
+                  <button type="button" class="btn btn-primary printBtn <?= (has_permission_new('stockTransfer', '', 'print')) ? '' : 'disabled'; ?>" style="display: none;" onclick="printStockTransferPdf();"><i class="fa fa-print"></i> Print PDF</button>
+                  <script>
+                    // Print PDF function
+                    function printStockTransferPdf() {
+                      var TransferID = $('#TransferNo').val();
+                      if (!TransferID) {
+                        alert_float('warning', 'Transfer ID not found!');
+                        return;
+                      }
+                      var url = "<?= admin_url('StockTransfer/StockTransferPrint/'); ?>" + TransferID;
+                      window.open(url, '_blank');
+                    }
+                  </script>
                   <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('stockTransfer', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
                   <button type="button" class="btn eWayBillBtn" style="display:none; background-color:#6f42c1; color:#fff; border:none;" onclick="generateEWayBill();"><i class="fa fa-truck"></i> Generate E-Way Bill</button>
                   <button type="button" class="btn btn-warning" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
@@ -502,7 +515,6 @@ if ($last_date_yr < $curr_date_new) {
 
   });
 
-
   // Helper: safely format a number to 2 decimal places
   function fmt(val) {
     var n = parseFloat(val);
@@ -572,6 +584,7 @@ if ($last_date_yr < $curr_date_new) {
     $('#form_mode').val('add');
     $('#update_id').val('');
     $('.updateBtn').hide();
+    $('.printBtn').hide();
     getNextSTNo();
 
     $('.eWayBillBtn').hide();
@@ -1112,8 +1125,8 @@ if ($last_date_yr < $curr_date_new) {
         subSupplyDesc: ' ',
         docType: 'INV',
 
-        // docNo: DataForBill.TransferID || TransferID,
-        docNo: 'ST25108',
+        docNo: DataForBill.TransferID || TransferID,
+        // docNo: 'ST251011',
         docDate: moment().format('DD/MM/YYYY'),
 
         fromTrdName: DataForBill.FromGodown || 'welton',
@@ -1127,21 +1140,20 @@ if ($last_date_yr < $curr_date_new) {
         dispatchFromGSTIN: DataForBill.FromGSTIN || '29AAAAA1303P1ZV',
         dispatchFromTradeName: DataForBill.FromCompany || 'ABC Traders',
 
-        toGstin: DataForBill.ToGSTIN || '05AAACH6188F1ZM',
+        toGstin: '05AAACH6188F1ZM',
         toTrdName: DataForBill.ToGodown || 'sthuthya',
         toAddr1: DataForBill.ToAddress || 'Shree Nilaya',
         toAddr2: ' ',
         toPlace: DataForBill.ToCity || 'Beml Nagar',
         toPincode: parseInt(DataForBill.ToPincode) || 263652,
         toStateCode: parseInt(DataForBill.ToStateCode) || 5,
-        // toStateCode: parseInt(DataForBill.to_state_code) || 5,
 
         actToStateCode: parseInt(DataForBill.ActToStateCode) || 5,
 
         shipToGSTIN: DataForBill.ToGSTIN || '29ALSPR1722R1Z3',
         shipToTradeName: DataForBill.ToCompany || 'XYZ Traders',
 
-        transactionType: 4,
+        transactionType: 1,
         totalValue: 0,
         cgstValue: 0,
         sgstValue: 0,
@@ -1153,7 +1165,7 @@ if ($last_date_yr < $curr_date_new) {
         transMode: '1',
         transDistance: DataForBill.Distance || '2487',
         transporterName: DataForBill.TransporterName || $('#DriverName').val() || 'Dummy',
-        transporterId: DataForBill.TRANSIN || '05AAACG0904A1ZL',
+        transporterId: '05AAACG0904A1ZL',
         transDocNo: '12',
         transDocDate: moment().format('DD/MM/YYYY'),
         vehicleNo: DataForBill.VehicleNo || $('#VehicleNo').val() || 'APR3214',
@@ -1350,6 +1362,7 @@ if ($last_date_yr < $curr_date_new) {
           $('.selectpicker').selectpicker('refresh');
           $('#form_mode').val('edit');
           $('.saveBtn').hide();
+          $('.printBtn').show();
           $('.updateBtn').show();
           $('.eWayBillBtn').show();
           $('#ListModal').modal('hide');
@@ -1481,6 +1494,7 @@ if ($last_date_yr < $curr_date_new) {
           $('.selectpicker').selectpicker('refresh');
           $('#form_mode').val('edit');
           $('.saveBtn').hide();
+          $('.printBtn').show();
           $('.updateBtn').show();
           $('.eWayBillBtn').show();
           $('#ListModal').modal('hide');

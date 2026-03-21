@@ -235,7 +235,6 @@
                       </tr>
                     </thead>
                     <tbody id="items_body">
-
                     </tbody>
                   </table>
                 </div>

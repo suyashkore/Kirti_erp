@@ -122,7 +122,7 @@
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="OrderID">
                     <label for="OrderID" class="control-label"><small class="req text-danger">* </small> Invoice ID</label>
-                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly>
+                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly placeholder="Auto Generated">
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">

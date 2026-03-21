@@ -29,6 +29,11 @@ class EWayBillAPI extends AdminController
         
         $payload['fromGstin'] = $this->ewb_gstin;
 
+        // echo json_encode(['success' => true,
+        // 'data' => $payload
+        // ]);
+        // exit;
+
         $authResponse = $this->authenticateEWBPortel();
 
         if (empty($authResponse) || !$authResponse['success']) {

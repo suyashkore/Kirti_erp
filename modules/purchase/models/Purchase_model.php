@@ -18955,407 +18955,494 @@ class Purchase_model extends App_Model
 		return 'PO' . str_pad($next_no, 5, '0', STR_PAD_LEFT);
 	}
 
-	/** 
-	 * Update Purchase Order (PO) - aligned with add_pur_order_po
-	 * @param array $data
-	 * @param string $id (PurchID/order_no)
-	 * @return bool
-	 */
-	public function update_purchase_order_PO($data, $id)
-	{
-		$plant = $this->session->userdata('root_company');
-		$user = $this->session->userdata('staff_user_id');
-		$fy = $this->session->userdata('finacial_year');
 
-		// echo"";print_r($data);die;
-		// Helper: safely get scalar value (if array, take first element)
-		$scalar = function ($val, $default = '') {
-			if (is_array($val))
-				return isset($val[0]) ? $val[0] : $default;
-			return ($val !== null && $val !== '') ? $val : $default;
-		};
-		$scalarNum = function ($val, $default = 0) {
-			if (is_array($val))
-				return isset($val[0]) ? $val[0] : $default;
-			return ($val !== null && $val !== '') ? $val : $default;
-		};
+public function update_purchase_order_PO($data, $id)
+{
+    $plant = $this->session->userdata('root_company');
+    $user  = $this->session->userdata('staff_user_id');
+    $fy    = $this->session->userdata('finacial_year');
 
-			$vendor_id = $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : '');
+    // Helper: safely get scalar value (if array, take first element)
+    $scalar = function ($val, $default = '') {
+        if (is_array($val))
+            return isset($val[0]) ? $val[0] : $default;
+        return ($val !== null && $val !== '') ? $val : $default;
+    };
 
-			$tds_query = $this->db->select('TDSSection, TDSPer')
-								->where('AccountID', $vendor_id)
-								->get('tblclients')
-								->row();
+    $scalarNum = function ($val, $default = 0) {
+        if (is_array($val))
+            return isset($val[0]) ? $val[0] : $default;
+        return ($val !== null && $val !== '') ? $val : $default;
+    };
 
-			$tds_section = $tds_query ? $tds_query->TDSSection : '';
-			$tds_per     = $tds_query ? $tds_query->TDSPer : 0;
-			// echo"";print_r($tds_section);die;
+    $vendor_id = $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : '');
 
-		$update_data = [
-			'PlantID' => $plant,
-			'FY' => $fy,
-			'PurchaseLocation' => $scalar(isset($data['purchase_location']) ? $data['purchase_location'] : ''),
-			'TransDate' => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
-			'TransDate2' => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
-			'ItemType' => $scalar(isset($data['item_type']) ? $data['item_type'] : ''),
-			'ItemCategory' => $scalar(isset($data['item_category']) ? $data['item_category'] : (isset($data['order_category']) ? $data['order_category'] : '')),
-			'QuatationID' => $scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : ''),
-			'AccountID' => $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : (isset($data['vendor_name']) ? $data['vendor_name'] : '')),
-			'BrokerID' => $scalar(isset($data['broker']) ? $data['broker'] : ''),
-			'DeliveryLocation' => $scalar(isset($data['vendor_location']) ? $data['vendor_location'] : ''),
-			'DeliveryFrom' => isset($data['delivery_from']) ? $this->parse_date($scalar($data['delivery_from'])) : null,
-			'DeliveryTo' => isset($data['delivery_to']) ? $this->parse_date($scalar($data['delivery_to'])) : null,
-			'VendorDocNo' => $scalar(isset($data['vendor_doc_no']) ? $data['vendor_doc_no'] : ''),
-			'VendorDocDate' => isset($data['vendor_doc_date']) ? $this->parse_date($scalar($data['vendor_doc_date'])) : null,
-			'PaymentTerms' => $scalar(isset($data['payment_terms']) ? $data['payment_terms'] : ''),
-			'FreightTerms' => $scalar(isset($data['freight_terms']) ? $data['freight_terms'] : ''),
-			'GSTIN' => $scalar(isset($data['vendor_gst_no']) ? $data['vendor_gst_no'] : ''),
-			'TotalWeight' => $scalarNum(isset($data['total_weight']) ? $data['total_weight'] : 0, 0),
-			'TotalQuantity' => $scalarNum(isset($data['total_qty']) ? $data['total_qty'] : 0, 0),
-			'ItemAmt' => $scalarNum(isset($data['item_total_amt']) ? $data['item_total_amt'] : 0, 0),
-			'DiscAmt' => $scalarNum(isset($data['disc_amt']) ? $data['disc_amt'] : (isset($data['total_disc_amt']) ? $data['total_disc_amt'] : 0), 0),
-			'TaxableAmt' => $scalarNum(isset($data['taxable_amt']) ? $data['taxable_amt'] : 0, 0),
-			'CGSTAmt' => $scalarNum(isset($data['cgst_amt']) ? $data['cgst_amt'] : 0, 0),
-			'SGSTAmt' => $scalarNum(isset($data['sgst_amt']) ? $data['sgst_amt'] : 0, 0),
-			'IGSTAmt' => $scalarNum(isset($data['igst_amt']) ? $data['igst_amt'] : 0, 0),
-			'RoundOffAmt' => $scalarNum(isset($data['round_off_amt']) ? $data['round_off_amt'] : 0, 0),
-			'Internal_Remarks' => $scalar(isset($data['internal_remarks']) ? $data['internal_remarks'] : ''),
-			'Document_Remark' => $scalar(isset($data['document_remark']) ? $data['document_remark'] : ''),
-			'Attachment' => isset($data['attachment']) && !is_array($data['attachment']) ? $data['attachment'] : '',
-			'NetAmt' => $scalarNum(isset($data['net_amt']) ? $data['net_amt'] : 0, 0),
-			'UserID' => $user,
-			'TDSSection'=> $tds_section,
-			'TDSPercentage' => $tds_per,
-			'Lupdate' => date('Y-m-d H:i:s'),
-		];
+    $tds_query = $this->db->select('TDSSection, TDSPer')
+                          ->where('AccountID', $vendor_id)
+                          ->get('tblclients')
+                          ->row();
 
-		// Update master record
-		$this->db->where('PurchID', $data['PurchID']);
-		$this->db->update('tblPurchaseOrderMaster', $update_data);
+    $tds_section = $tds_query ? $tds_query->TDSSection : '';
+    $tds_per     = $tds_query ? $tds_query->TDSPer : 0;
 
-		// =====================
-		// ITEMS UPDATE/REPLACE
-		// =====================
-		// Remove old items
-		$this->db->where('OrderID', $data['PurchID']);
-		// $this->db->where('PlantID', $plant);
-		$this->db->delete('tblhistory');
+    $update_data = [
+        'PlantID'           => $plant,
+        'FY'                => $fy,
+        'PurchaseLocation'  => $scalar(isset($data['purchase_location']) ? $data['purchase_location'] : ''),
+        'TransDate'         => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
+        'TransDate2'        => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
+        'ItemType'          => $scalar(isset($data['item_type']) ? $data['item_type'] : ''),
+        'ItemCategory'      => $scalar(isset($data['item_category']) ? $data['item_category'] : (isset($data['order_category']) ? $data['order_category'] : '')),
+        'QuatationID'       => $scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : ''),
+        'AccountID'         => $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : (isset($data['vendor_name']) ? $data['vendor_name'] : '')),
+        'BrokerID'          => $scalar(isset($data['broker']) ? $data['broker'] : ''),
+        'DeliveryLocation'  => $scalar(isset($data['vendor_location']) ? $data['vendor_location'] : ''),
+        'DeliveryFrom'      => isset($data['delivery_from']) ? $this->parse_date($scalar($data['delivery_from'])) : null,
+        'DeliveryTo'        => isset($data['delivery_to']) ? $this->parse_date($scalar($data['delivery_to'])) : null,
+        'VendorDocNo'       => $scalar(isset($data['vendor_doc_no']) ? $data['vendor_doc_no'] : ''),
+        'VendorDocDate'     => isset($data['vendor_doc_date']) ? $this->parse_date($scalar($data['vendor_doc_date'])) : null,
+        'PaymentTerms'      => $scalar(isset($data['payment_terms']) ? $data['payment_terms'] : ''),
+        'FreightTerms'      => $scalar(isset($data['freight_terms']) ? $data['freight_terms'] : ''),
+        'GSTIN'             => $scalar(isset($data['vendor_gst_no']) ? $data['vendor_gst_no'] : ''),
+        'TotalWeight'       => $scalarNum(isset($data['total_weight']) ? $data['total_weight'] : 0, 0),
+        'TotalQuantity'     => $scalarNum(isset($data['total_qty']) ? $data['total_qty'] : 0, 0),
+        'ItemAmt'           => $scalarNum(isset($data['item_total_amt']) ? $data['item_total_amt'] : 0, 0),
+        'DiscAmt'           => $scalarNum(isset($data['disc_amt']) ? $data['disc_amt'] : (isset($data['total_disc_amt']) ? $data['total_disc_amt'] : 0), 0),
+        'TaxableAmt'        => $scalarNum(isset($data['taxable_amt']) ? $data['taxable_amt'] : 0, 0),
+        'CGSTAmt'           => $scalarNum(isset($data['cgst_amt']) ? $data['cgst_amt'] : 0, 0),
+        'SGSTAmt'           => $scalarNum(isset($data['sgst_amt']) ? $data['sgst_amt'] : 0, 0),
+        'IGSTAmt'           => $scalarNum(isset($data['igst_amt']) ? $data['igst_amt'] : 0, 0),
+        'RoundOffAmt'       => $scalarNum(isset($data['round_off_amt']) ? $data['round_off_amt'] : 0, 0),
+        'Internal_Remarks'  => $scalar(isset($data['internal_remarks']) ? $data['internal_remarks'] : ''),
+        'Document_Remark'   => $scalar(isset($data['document_remark']) ? $data['document_remark'] : ''),
+        'Attachment'        => isset($data['attachment']) && !is_array($data['attachment']) ? $data['attachment'] : '',
+        'NetAmt'            => $scalarNum(isset($data['net_amt']) ? $data['net_amt'] : 0, 0),
+        'UserID'            => $user,
+        'TDSSection'        => $tds_section,
+        'TDSPercentage'     => $tds_per,
+        'Lupdate'           => date('Y-m-d H:i:s'),
+        'Status'            => 4,
+    ];
 
-		// Build items array
-		$items = [];
-		if (isset($data['items_json']) && $data['items_json'] !== '[]' && !empty(trim($data['items_json']))) {
-			$decoded = json_decode($data['items_json'], true);
-			if (is_array($decoded) && count($decoded) > 0) {
-				$items = $decoded;
-			}
-		}
-		if (empty($items) && isset($data['item_id']) && is_array($data['item_id'])) {
-			foreach ($data['item_id'] as $index => $item_id) {
-				if (empty($item_id))
-					continue;
-				$items[] = [
-					'item_id' => $item_id,
-					'item_uid' => isset($data['item_uid'][$index]) ? $data['item_uid'][$index] : '0',
-					'uom' => isset($data['uom'][$index]) ? $data['uom'][$index] : '',
-					'unit_weight' => isset($data['unit_weight'][$index]) ? $data['unit_weight'][$index] : '0',
-					'min_qty' => isset($data['min_qty'][$index]) ? $data['min_qty'][$index] : '0',
-					'max_qty' => isset($data['max_qty'][$index]) ? $data['max_qty'][$index] : '0',
-					'disc_amt' => isset($data['disc_amt'][$index]) ? $data['disc_amt'][$index] : '0',
-					'unit_rate' => isset($data['unit_rate'][$index]) ? $data['unit_rate'][$index] : '0',
-					'gst' => isset($data['gst'][$index]) ? $data['gst'][$index] : '0',
-					'amount' => isset($data['amount'][$index]) ? $data['amount'][$index] : '0',
-				];
-			}
-		}
+    // Update master record
+    $this->db->where('PurchID', $data['PurchID']);
+    $this->db->update('tblPurchaseOrderMaster', $update_data);
 
-		// Insert new items
-		$ordinal = 1;
-		foreach ($items as $item) {
-			$qty = isset($item['min_qty']) ? (float) $item['min_qty'] : 0;
-			$rate = isset($item['unit_rate']) ? (float) $item['unit_rate'] : 0;
-			$discAmt = isset($item['disc_amt']) ? (float) $item['disc_amt'] : 0;
-			$gstPercent = isset($item['gst']) ? (float) $item['gst'] : (isset($item['gst_percent']) ? (float) $item['gst_percent'] : 0);
-			$amount = ($rate - $discAmt) * $qty;
-			$gstAmt = $amount * ($gstPercent / 100);
-			$cgst = $sgst = $igst = $cgstamt = $sgstamt = $igstamt = 0;
-			$vendorState = isset($data['vendor_state']) ? strtoupper($data['vendor_state']) : '';
-			$companyState = isset($data['company_state']) ? strtoupper($data['company_state']) : '';
-			if ($vendorState && $companyState && $vendorState === $companyState) {
-				$cgst = $sgst = $gstPercent / 2;
-				$cgstamt = $sgstamt = $gstAmt / 2;
-			} else {
-				$igst = $gstPercent;
-				$igstamt = $gstAmt;
-			}
-			$item_insert = [
-				'PlantID' => $plant,
-				'FY' => $fy,
-				'OrderID' => $id,
-				'BillID' => null,
-				'TransID' => null,
-				'TransDate' => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : date('Y-m-d H:i:s'),
-				'TransDate2' => date('Y-m-d H:i:s'),
-				'TType' => 'P',
-				'TType2' => 'Order',
-				'AccountID' => $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : ''),
-				'ItemID' => isset($item['item_id']) ? $item['item_id'] : '',
-				'GodownID' => null,
-				'Mrp' => 0,
-				'BasicRate' => $rate,
-				'SaleRate' => $rate,
-				'SuppliedIn' => isset($item['uom']) ? $item['uom'] : '',
-				'UnitWeight' => isset($item['unit_weight']) ? $item['unit_weight'] : 0,
-				'WeightUnit' => '',
-				'CaseQty' => 1.000,
-				'OrderQty' => $qty,
-				'eOrderQty' => null,
-				'ereason' => null,
-				'BilledQty' => $qty,
-				'Cases' => 0.000,
-				'DiscPerc' => 0,
-				'DiscAmt' => $discAmt,
-				'cgst' => $cgst,
-				'cgstamt' => $cgstamt,
-				'sgst' => $sgst,
-				'sgstamt' => $sgstamt,
-				'igst' => $igst,
-				'igstamt' => $igstamt,
-				'OrderAmt' => $amount,
-				'ChallanAmt' => $amount,
-				'NetOrderAmt' => $amount + $cgstamt + $sgstamt + $igstamt,
-				'NetChallanAmt' => $amount + $cgstamt + $sgstamt + $igstamt,
-				'Ordinalno' => $ordinal++,
-				'UserID' => $user,
-				'UserID2' => $user,
-				'Lupdate' => date('Y-m-d H:i:s'),
-				'batch_no' => '',
-				'expiry_date' => '',
-			];
-			$this->db->insert('tblhistory', $item_insert);
-		}
+    // =====================
+    // ITEMS UPDATE/REPLACE
+    // =====================
 
+    // Build items array (items_json  POST arrays )
+    $items = [];
+    if (isset($data['items_json']) && $data['items_json'] !== '[]' && !empty(trim($data['items_json']))) {
+        $decoded = json_decode($data['items_json'], true);
+        if (is_array($decoded) && count($decoded) > 0) {
+            $items = $decoded;
+        }
+    }
+    if (empty($items) && isset($data['item_id']) && is_array($data['item_id'])) {
+        foreach ($data['item_id'] as $index => $item_id) {
+            if (empty($item_id))
+                continue;
+            $items[] = [
+                'item_id'     => $item_id,
+                'item_uid'    => isset($data['item_uid'][$index]) ? $data['item_uid'][$index] : '0',
+                'uom'         => isset($data['uom'][$index]) ? $data['uom'][$index] : '',
+                'unit_weight' => isset($data['unit_weight'][$index]) ? $data['unit_weight'][$index] : '0',
+                'min_qty'     => isset($data['min_qty'][$index]) ? $data['min_qty'][$index] : '0',
+                'max_qty'     => isset($data['max_qty'][$index]) ? $data['max_qty'][$index] : '0',
+                'disc_amt'    => isset($data['disc_amt'][$index]) ? $data['disc_amt'][$index] : '0',
+                'unit_rate'   => isset($data['unit_rate'][$index]) ? $data['unit_rate'][$index] : '0',
+                'gst'         => isset($data['gst'][$index]) ? $data['gst'][$index] : '0',
+                'amount'      => isset($data['amount'][$index]) ? $data['amount'][$index] : '0',
+            ];
+        }
+    }
 
+    // =====================================================================
+    // QUOTATION MATCH CHECK (Save/Update )
+    // QuatationID  tblhistory  existing items fetch 
+    // =====================================================================
+    $quotation_status = 5; // default: match 
 
-		return true;
-	}
+    $quote_no = $scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : '');
 
-	public function add_pur_order_po($data)
-	{
+    if (!empty($quote_no) && !empty($items)) {
 
-		// $this->db->truncate('tblPurchaseOrderMaster');
-        //  $this->db->truncate('tblhistory');
-		// $this->db->truncate('tblcontacts');
-		// $this->db->truncate('tblclientwiseshippingdata');
-		// die;
-		$plant = $this->session->userdata('root_company');
-		$user = $this->session->userdata('staff_user_id');
+        // SELECT ItemID, OrderQty FROM tblhistory WHERE OrderID = QuatationID
+        $existing_history = $this->db->select('ItemID, OrderQty')
+                                     ->where('OrderID', $quote_no)
+                                     ->get('tblhistory')
+                                     ->result_array();
 
-		// Helper: safely get scalar value (if array, take first element)
-		$scalar = function ($val, $default = '') {
-			if (is_array($val))
-				return isset($val[0]) ? $val[0] : $default;
-			return ($val !== null && $val !== '') ? $val : $default;
-		};
+        // Existing items  key => value map  convert : [ItemID => OrderQty]
+        $existing_map = [];
+        foreach ($existing_history as $row) {
+            $existing_map[$row['ItemID']] = floatval($row['OrderQty']);
+        }
 
-		$scalarNum = function ($val, $default = 0) {
-			if (is_array($val))
-				return isset($val[0]) ? $val[0] : $default;
-			return ($val !== null && $val !== '') ? $val : $default;
-		};
+        //   item  match check 
+        $all_matched = true;
+        if (!empty($existing_map)) {
+            foreach ($items as $item) {
+                $new_item_id  = isset($item['item_id']) ? $item['item_id'] : '';
+                $new_item_qty = isset($item['min_qty']) ? floatval($item['min_qty']) : 0;
 
-		// TDS Details fetch karo vendor_id varun
-			$vendor_id = $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : '');
+                // ItemID  OrderQty  match  
+                if (
+                    !isset($existing_map[$new_item_id]) ||
+                    $existing_map[$new_item_id] != $new_item_qty
+                ) {
+                    $all_matched = false;
+                    break;
+                }
+            }
+        } else {
+            // Quotation   items  → match 
+            $all_matched = false;
+        }
 
-			$tds_query = $this->db->select('TDSSection, TDSPer')
-								->where('AccountID', $vendor_id)
-								->get('tblclients')
-								->row();
+        $quotation_status = $all_matched ? 4 : 5;
 
-			$tds_section = $tds_query ? $tds_query->TDSSection : '';
-			$tds_per     = $tds_query ? $tds_query->TDSPer : 0;
+        // tblPurchQuotationMaster  status update 
+        $this->db->where('QuotatioonID', $quote_no);
+        $this->db->update('tblPurchQuotationMaster', ['Status' => $quotation_status]);
+    }
 
-		$insert_data = [
-			'PlantID' => $plant,
-			'FY' => $this->session->userdata('finacial_year'),
-			'PurchaseLocation' => $scalar(isset($data['purchase_location']) ? $data['purchase_location'] : ''),
-			'PurchID' => $scalar(isset($data['order_no']) ? $data['order_no'] : ''),
-			'TransDate' => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
-			'TransDate2' => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
-			'ItemType' => $scalar(isset($data['item_type']) ? $data['item_type'] : ''),
-			'ItemCategory' => $scalar(isset($data['item_category']) ? $data['item_category'] : (isset($data['order_category']) ? $data['order_category'] : '')),
-			'QuatationID' => $scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : ''),
-			'AccountID' => $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : (isset($data['vendor_name']) ? $data['vendor_name'] : '')),
-			'BrokerID' => $scalar(isset($data['broker']) ? $data['broker'] : ''),
-			'DeliveryLocation' => $scalar(isset($data['vendor_location']) ? $data['vendor_location'] : ''),
-			'DeliveryFrom' => isset($data['delivery_from']) ? $this->parse_date($scalar($data['delivery_from'])) : null,
-			'DeliveryTo' => isset($data['delivery_to']) ? $this->parse_date($scalar($data['delivery_to'])) : null,
-			'VendorDocNo' => $scalar(isset($data['vendor_doc_no']) ? $data['vendor_doc_no'] : ''),
-			'VendorDocDate' => isset($data['vendor_doc_date']) ? $this->parse_date($scalar($data['vendor_doc_date'])) : null,
-			'PaymentTerms' => $scalar(isset($data['payment_terms']) ? $data['payment_terms'] : ''),
-			'FreightTerms' => $scalar(isset($data['freight_terms']) ? $data['freight_terms'] : ''),
-			'GSTIN' => $scalar(isset($data['vendor_gst_no']) ? $data['vendor_gst_no'] : ''),
-			'TotalWeight' => $scalarNum(isset($data['total_weight']) ? $data['total_weight'] : 0, 0),
-			'TotalQuantity' => $scalarNum(isset($data['total_qty']) ? $data['total_qty'] : 0, 0),
-			'ItemAmt' => $scalarNum(isset($data['item_total_amt']) ? $data['item_total_amt'] : 0, 0),
-			'DiscAmt' => $scalarNum(isset($data['disc_amt']) ? $data['disc_amt'] : (isset($data['total_disc_amt']) ? $data['total_disc_amt'] : 0), 0),
-			'TaxableAmt' => $scalarNum(isset($data['taxable_amt']) ? $data['taxable_amt'] : 0, 0),
-			'CGSTAmt' => $scalarNum(isset($data['cgst_amt']) ? $data['cgst_amt'] : 0, 0),
-			'SGSTAmt' => $scalarNum(isset($data['sgst_amt']) ? $data['sgst_amt'] : 0, 0),
-			'IGSTAmt' => $scalarNum(isset($data['igst_amt']) ? $data['igst_amt'] : 0, 0),
-			'RoundOffAmt' => $scalarNum(isset($data['round_off_amt']) ? $data['round_off_amt'] : 0, 0),
-			'Internal_Remarks' => $scalar(isset($data['internal_remarks']) ? $data['internal_remarks'] : ''),
-			'Document_Remark' => $scalar(isset($data['document_remark']) ? $data['document_remark'] : ''),
-			'Attachment' => isset($data['attachment']) && !is_array($data['attachment']) ? $data['attachment'] : '',
-			'NetAmt' => $scalarNum(isset($data['net_amt']) ? $data['net_amt'] : 0, 0),
-			'UserID' => $user,
-			'TDSSection'=> $tds_section,
-			'TDSPercentage' => $tds_per,
-			'Lupdate' => date('Y-m-d H:i:s'),
-		];
+    // Remove old items
+    $this->db->where('OrderID', $data['PurchID']);
+    $this->db->delete('tblhistory');
 
-		// Insert master record
-		$this->db->insert('tblPurchaseOrderMaster', $insert_data);
-		$insert_id = $this->db->insert_id();
+    // Insert new items
+    $ordinal = 1;
+    foreach ($items as $item) {
+        $qty        = isset($item['min_qty']) ? (float) $item['min_qty'] : 0;
+        $rate       = isset($item['unit_rate']) ? (float) $item['unit_rate'] : 0;
+        $discAmt    = isset($item['disc_amt']) ? (float) $item['disc_amt'] : 0;
+        $gstPercent = isset($item['gst']) ? (float) $item['gst'] : (isset($item['gst_percent']) ? (float) $item['gst_percent'] : 0);
+        $amount     = ($rate - $discAmt) * $qty;
+        $gstAmt     = $amount * ($gstPercent / 100);
 
+        $cgst = $sgst = $igst = $cgstamt = $sgstamt = $igstamt = 0;
+        $vendorState  = isset($data['vendor_state']) ? strtoupper($data['vendor_state']) : '';
+        $companyState = isset($data['company_state']) ? strtoupper($data['company_state']) : '';
 
-		if (!empty($scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : ''))) {
-			$quote_no = $scalar($data['vendor_quote_no']);
-			$this->db->where('QuotatioonID', $quote_no);
-			$this->db->update('tblPurchQuotationMaster', ['Status' => 6]);
-		}
-		// =====================================================
-		// ITEMS BUILD - items_json empty asel tar POST arrays varun build karo
-		// =====================================================
-		$items = [];
+        if ($vendorState && $companyState && $vendorState === $companyState) {
+            $cgst    = $sgst    = $gstPercent / 2;
+            $cgstamt = $sgstamt = $gstAmt / 2;
+        } else {
+            $igst    = $gstPercent;
+            $igstamt = $gstAmt;
+        }
 
-		// Pahile items_json try karo
-		if (isset($data['items_json']) && $data['items_json'] !== '[]' && !empty(trim($data['items_json']))) {
-			$decoded = json_decode($data['items_json'], true);
-			if (is_array($decoded) && count($decoded) > 0) {
-				$items = $decoded;
-			}
-		}
+        $item_insert = [
+            'PlantID'       => $plant,
+            'FY'            => $fy,
+            'OrderID'       => $id,
+            'BillID'        => null,
+            'TransID'       => null,
+            'TransDate'     => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : date('Y-m-d H:i:s'),
+            'TransDate2'    => date('Y-m-d H:i:s'),
+            'TType'         => 'P',
+            'TType2'        => 'Order',
+            'AccountID'     => $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : ''),
+            'ItemID'        => isset($item['item_id']) ? $item['item_id'] : '',
+            'GodownID'      => null,
+            'Mrp'           => 0,
+            'BasicRate'     => $rate,
+            'SaleRate'      => $rate,
+            'SuppliedIn'    => isset($item['uom']) ? $item['uom'] : '',
+            'UnitWeight'    => isset($item['unit_weight']) ? $item['unit_weight'] : 0,
+            'WeightUnit'    => '',
+            'CaseQty'       => 1.000,
+            'OrderQty'      => $qty,
+            'eOrderQty'     => null,
+            'ereason'       => null,
+            'BilledQty'     => $qty,
+            'Cases'         => 0.000,
+            'DiscPerc'      => 0,
+            'DiscAmt'       => $discAmt,
+            'cgst'          => $cgst,
+            'cgstamt'       => $cgstamt,
+            'sgst'          => $sgst,
+            'sgstamt'       => $sgstamt,
+            'igst'          => $igst,
+            'igstamt'       => $igstamt,
+            'OrderAmt'      => $amount,
+            'ChallanAmt'    => $amount,
+            'NetOrderAmt'   => $amount + $cgstamt + $sgstamt + $igstamt,
+            'NetChallanAmt' => $amount + $cgstamt + $sgstamt + $igstamt,
+            'Ordinalno'     => $ordinal++,
+            'UserID'        => $user,
+            'UserID2'       => $user,
+            'Lupdate'       => date('Y-m-d H:i:s'),
+            'batch_no'      => '',
+            'expiry_date'   => '',
+        ];
 
-		// items_json empty asel tar POST arrays varun items build karo
-		if (empty($items) && isset($data['item_id']) && is_array($data['item_id'])) {
-			foreach ($data['item_id'] as $index => $item_id) {
-				if (empty($item_id))
-					continue; // empty rows skip karo
+        $this->db->insert('tblhistory', $item_insert);
+    }
 
-				$items[] = [
-					'item_id' => $item_id,
-					'hsn_code' => isset($data['hsn_code'][$index]) ? $data['hsn_code'][$index] : '',
-					'uom' => isset($data['uom'][$index]) ? $data['uom'][$index] : '',
-					'unit_weight' => isset($data['unit_weight'][$index]) ? $data['unit_weight'][$index] : 0,
-					'min_qty' => isset($data['min_qty'][$index]) ? $data['min_qty'][$index] : 0,
-					'max_qty' => isset($data['max_qty'][$index]) ? $data['max_qty'][$index] : 0,
-					'disc_amt' => isset($data['disc_amt'][$index]) ? $data['disc_amt'][$index] : 0,
-					'disc_Amt' => isset($data['disc_amt'][$index]) ? $data['disc_amt'][$index] : 0,
-					'unit_rate' => isset($data['unit_rate'][$index]) ? $data['unit_rate'][$index] : 0,
-					'gst' => isset($data['gst'][$index]) ? $data['gst'][$index] : 0,
-					'gst_percent' => isset($data['gst'][$index]) ? $data['gst'][$index] : 0,
-					'amount' => isset($data['amount'][$index]) ? $data['amount'][$index] : 0,
-				];
-			}
-		}
+    return true;
+}
 
-		// =====================================================
-		// ITEMS INSERT INTO tblhistory
-		// =====================================================
-		$i = 1;
-		$all_history = [];
+// ============================================================
 
-		foreach ($items as $item) {
+public function add_pur_order_po($data)
+{
+    $plant = $this->session->userdata('root_company');
+    $user  = $this->session->userdata('staff_user_id');
 
-			$vendor_state = isset($data['vendor_state']) ? strtoupper(trim($data['vendor_state'])) : '';
+    // Helper: safely get scalar value (if array, take first element)
+    $scalar = function ($val, $default = '') {
+        if (is_array($val))
+            return isset($val[0]) ? $val[0] : $default;
+        return ($val !== null && $val !== '') ? $val : $default;
+    };
 
-			// GST Percent
-			$gst_percent = 0;
-			if (isset($item['gst_percent'])) {
-				$gst_percent = floatval($item['gst_percent']);
-			} elseif (isset($item['gst'])) {
-				$gst_percent = floatval($item['gst']);
-			}
+    $scalarNum = function ($val, $default = 0) {
+        if (is_array($val))
+            return isset($val[0]) ? $val[0] : $default;
+        return ($val !== null && $val !== '') ? $val : $default;
+    };
 
-			// Discount Amount
-			$disc_amt = 0;
-			if (isset($item['disc_Amt'])) {
-				$disc_amt = floatval($item['disc_Amt']);
-			} elseif (isset($item['disc_amt'])) {
-				$disc_amt = floatval($item['disc_amt']);
-			}
+    // TDS Details fetch  vendor_id 
+    $vendor_id = $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : '');
 
-			$unit_rate = isset($item['unit_rate']) ? floatval($item['unit_rate']) : 0;
-			$min_qty = isset($item['min_qty']) ? floatval($item['min_qty']) : 0;
-			$taxable_amt = ($unit_rate - $disc_amt) * $min_qty;
+    $tds_query = $this->db->select('TDSSection, TDSPer')
+                          ->where('AccountID', $vendor_id)
+                          ->get('tblclients')
+                          ->row();
 
-			$cgst = $sgst = $cgstamt = $sgstamt = $igst = $igstamt = 0;
+    $tds_section = $tds_query ? $tds_query->TDSSection : '';
+    $tds_per     = $tds_query ? $tds_query->TDSPer : 0;
 
-			if ($vendor_state === 'MAHARASHTRA') {
-				$cgst = $sgst = $gst_percent / 2;
-				$cgstamt = $sgstamt = ($taxable_amt * $cgst) / 100;
-			} else {
-				$igst = $gst_percent;
-				$igstamt = ($taxable_amt * $igst) / 100;
-			}
+    $insert_data = [
+        'PlantID'          => $plant,
+        'FY'               => $this->session->userdata('finacial_year'),
+        'PurchaseLocation' => $scalar(isset($data['purchase_location']) ? $data['purchase_location'] : ''),
+        'PurchID'          => $scalar(isset($data['order_no']) ? $data['order_no'] : ''),
+        'TransDate'        => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
+        'TransDate2'       => isset($data['quotation_date']) ? $this->parse_date($scalar($data['quotation_date'])) : null,
+        'ItemType'         => $scalar(isset($data['item_type']) ? $data['item_type'] : ''),
+        'ItemCategory'     => $scalar(isset($data['item_category']) ? $data['item_category'] : (isset($data['order_category']) ? $data['order_category'] : '')),
+        'QuatationID'      => $scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : ''),
+        'AccountID'        => $scalar(isset($data['vendor_id']) ? $data['vendor_id'] : (isset($data['vendor_name']) ? $data['vendor_name'] : '')),
+        'BrokerID'         => $scalar(isset($data['broker']) ? $data['broker'] : ''),
+        'DeliveryLocation' => $scalar(isset($data['vendor_location']) ? $data['vendor_location'] : ''),
+        'DeliveryFrom'     => isset($data['delivery_from']) ? $this->parse_date($scalar($data['delivery_from'])) : null,
+        'DeliveryTo'       => isset($data['delivery_to']) ? $this->parse_date($scalar($data['delivery_to'])) : null,
+        'VendorDocNo'      => $scalar(isset($data['vendor_doc_no']) ? $data['vendor_doc_no'] : ''),
+        'VendorDocDate'    => isset($data['vendor_doc_date']) ? $this->parse_date($scalar($data['vendor_doc_date'])) : null,
+        'PaymentTerms'     => $scalar(isset($data['payment_terms']) ? $data['payment_terms'] : ''),
+        'FreightTerms'     => $scalar(isset($data['freight_terms']) ? $data['freight_terms'] : ''),
+        'GSTIN'            => $scalar(isset($data['vendor_gst_no']) ? $data['vendor_gst_no'] : ''),
+        'TotalWeight'      => $scalarNum(isset($data['total_weight']) ? $data['total_weight'] : 0, 0),
+        'TotalQuantity'    => $scalarNum(isset($data['total_qty']) ? $data['total_qty'] : 0, 0),
+        'ItemAmt'          => $scalarNum(isset($data['item_total_amt']) ? $data['item_total_amt'] : 0, 0),
+        'DiscAmt'          => $scalarNum(isset($data['disc_amt']) ? $data['disc_amt'] : (isset($data['total_disc_amt']) ? $data['total_disc_amt'] : 0), 0),
+        'TaxableAmt'       => $scalarNum(isset($data['taxable_amt']) ? $data['taxable_amt'] : 0, 0),
+        'CGSTAmt'          => $scalarNum(isset($data['cgst_amt']) ? $data['cgst_amt'] : 0, 0),
+        'SGSTAmt'          => $scalarNum(isset($data['sgst_amt']) ? $data['sgst_amt'] : 0, 0),
+        'IGSTAmt'          => $scalarNum(isset($data['igst_amt']) ? $data['igst_amt'] : 0, 0),
+        'RoundOffAmt'      => $scalarNum(isset($data['round_off_amt']) ? $data['round_off_amt'] : 0, 0),
+        'Internal_Remarks' => $scalar(isset($data['internal_remarks']) ? $data['internal_remarks'] : ''),
+        'Document_Remark'  => $scalar(isset($data['document_remark']) ? $data['document_remark'] : ''),
+        'Attachment'       => isset($data['attachment']) && !is_array($data['attachment']) ? $data['attachment'] : '',
+        'NetAmt'           => $scalarNum(isset($data['net_amt']) ? $data['net_amt'] : 0, 0),
+        'UserID'           => $user,
+        'TDSSection'       => $tds_section,
+        'TDSPercentage'    => $tds_per,
+        'Lupdate'          => date('Y-m-d H:i:s'),
+        'Status'           => 4,
+    ];
 
-			$history_data = [
-				'OrderID' => isset($data['order_no']) ? $data['order_no'] : '',
-				'PlantID' => $plant,
-				'FY' => $this->session->userdata('finacial_year'),
-				'TransDate' => isset($data['quotation_date'])
-					? $this->parse_date($data['quotation_date'])
-					: (isset($data['delivery_from']) ? $this->parse_date($data['delivery_from']) : null),
-				'TransDate2' => date('Y-m-d H:i:s'),
-				'TType' => 'PO',
-				'TType2' => 'Order',
-				'AccountID' => isset($data['vendor_id']) ? $data['vendor_id'] : (isset($data['vendor_name']) ? $data['vendor_name'] : ''),
-				'ItemID' => isset($item['item_id']) ? $item['item_id'] : '',
-				'GodownID' => '',
-				'Mrp' => 0,
-				'BasicRate' => $unit_rate,
-				'SaleRate' => ($unit_rate * $gst_percent) / 100,
-				'SuppliedIn' => isset($item['uom']) ? $item['uom'] : '',
-				'UnitWeight' => isset($item['unit_weight']) ? $item['unit_weight'] : 0,
-				'WeightUnit' => isset($item['uom']) ? $item['uom'] : '',
-				'CaseQty' => 1.000,
-				'OrderQty' => $min_qty,
-				'eOrderQty' => $min_qty,
-				'ereason' => '',
-				'BilledQty' => 0,
-				'Cases' => 0.000,
-				'DiscPerc' => 0,
-				'DiscAmt' => $disc_amt,
-				'cgst' => $cgst,
-				'cgstamt' => $cgstamt,
-				'sgst' => $sgst,
-				'sgstamt' => $sgstamt,
-				'igst' => $igst,
-				'igstamt' => $igstamt,
-				'OrderAmt' => $min_qty * $unit_rate,
-				'ChallanAmt' => 0,
-				'NetOrderAmt' => isset($item['amount']) ? $item['amount'] : 0,
-				'NetChallanAmt' => 0,
-				'Ordinalno' => $i,
-				'UserID' => $user,
-				'UserID2' => '',
-				'Lupdate' => date('Y-m-d H:i:s'),
-				'batch_no' => '',
-				'expiry_date' => '',
-			];
+    // Insert master record
+    $this->db->insert('tblPurchaseOrderMaster', $insert_data);
+    $insert_id = $this->db->insert_id();
 
-			$this->db->insert('tblhistory', $history_data);
+    // =====================================================================
+    // ITEMS BUILD - items_json empty   POST arrays  build 
+    // =====================================================================
+    $items = [];
 
-			if ($this->db->affected_rows() == 0) {
-				log_message('error', 'tblhistory insert failed: ' . print_r($history_data, true) . ' DB Error: ' . print_r($this->db->error(), true));
-			}
+    if (isset($data['items_json']) && $data['items_json'] !== '[]' && !empty(trim($data['items_json']))) {
+        $decoded = json_decode($data['items_json'], true);
+        if (is_array($decoded) && count($decoded) > 0) {
+            $items = $decoded;
+        }
+    }
 
-			$all_history[] = $history_data;
-			$i++;
-		}
+    if (empty($items) && isset($data['item_id']) && is_array($data['item_id'])) {
+        foreach ($data['item_id'] as $index => $item_id) {
+            if (empty($item_id))
+                continue;
 
-		return $insert_id;
-	}
+            $items[] = [
+                'item_id'     => $item_id,
+                'hsn_code'    => isset($data['hsn_code'][$index]) ? $data['hsn_code'][$index] : '',
+                'uom'         => isset($data['uom'][$index]) ? $data['uom'][$index] : '',
+                'unit_weight' => isset($data['unit_weight'][$index]) ? $data['unit_weight'][$index] : 0,
+                'min_qty'     => isset($data['min_qty'][$index]) ? $data['min_qty'][$index] : 0,
+                'max_qty'     => isset($data['max_qty'][$index]) ? $data['max_qty'][$index] : 0,
+                'disc_amt'    => isset($data['disc_amt'][$index]) ? $data['disc_amt'][$index] : 0,
+                'disc_Amt'    => isset($data['disc_amt'][$index]) ? $data['disc_amt'][$index] : 0,
+                'unit_rate'   => isset($data['unit_rate'][$index]) ? $data['unit_rate'][$index] : 0,
+                'gst'         => isset($data['gst'][$index]) ? $data['gst'][$index] : 0,
+                'gst_percent' => isset($data['gst'][$index]) ? $data['gst'][$index] : 0,
+                'amount'      => isset($data['amount'][$index]) ? $data['amount'][$index] : 0,
+            ];
+        }
+    }
+
+    // =====================================================================
+    // QUOTATION MATCH CHECK (Insert )
+    // SELECT ItemID, OrderQty FROM tblhistory WHERE OrderID = QuatationID
+    // =====================================================================
+    $quote_no = $scalar(isset($data['vendor_quote_no']) ? $data['vendor_quote_no'] : '');
+
+    if (!empty($quote_no) && !empty($items)) {
+
+        // Quotation  OrderID  existing history items fetch 
+        $existing_history = $this->db->select('ItemID, OrderQty')
+                                     ->where('OrderID', $quote_no)
+                                     ->get('tblhistory')
+                                     ->result_array();
+
+        // Existing items  map  convert : [ItemID => OrderQty]
+        $existing_map = [];
+        foreach ($existing_history as $row) {
+            $existing_map[$row['ItemID']] = floatval($row['OrderQty']);
+        }
+
+        //   item  ItemID + OrderQty match check 
+        $all_matched = true;
+        if (!empty($existing_map)) {
+            foreach ($items as $item) {
+                $new_item_id  = isset($item['item_id']) ? $item['item_id'] : '';
+                $new_item_qty = isset($item['min_qty']) ? floatval($item['min_qty']) : 0;
+
+                // ItemID  map   Qty  → match 
+                if (
+                    !isset($existing_map[$new_item_id]) ||
+                    $existing_map[$new_item_id] != $new_item_qty
+                ) {
+                    $all_matched = false;
+                    break;
+                }
+            }
+        } else {
+            // Quotation history  → match 
+            $all_matched = false;
+        }
+
+        // Status set : Match → 4, No Match → 5
+        $quotation_status = $all_matched ? 4 : 5;
+
+        $this->db->where('QuotatioonID', $quote_no);
+        $this->db->update('tblPurchQuotationMaster', ['Status' => $quotation_status]);
+
+    } elseif (!empty($quote_no)) {
+        // vendor_quote_no   items  → status 5
+        $this->db->where('QuotatioonID', $quote_no);
+        $this->db->update('tblPurchQuotationMaster', ['Status' => 5]);
+    }
+
+    // =====================================================================
+    // ITEMS INSERT INTO tblhistory
+    // =====================================================================
+    $i = 1;
+    $all_history = [];
+
+    foreach ($items as $item) {
+
+        $vendor_state = isset($data['vendor_state']) ? strtoupper(trim($data['vendor_state'])) : '';
+
+        $gst_percent = 0;
+        if (isset($item['gst_percent'])) {
+            $gst_percent = floatval($item['gst_percent']);
+        } elseif (isset($item['gst'])) {
+            $gst_percent = floatval($item['gst']);
+        }
+
+        $disc_amt = 0;
+        if (isset($item['disc_Amt'])) {
+            $disc_amt = floatval($item['disc_Amt']);
+        } elseif (isset($item['disc_amt'])) {
+            $disc_amt = floatval($item['disc_amt']);
+        }
+
+        $unit_rate   = isset($item['unit_rate']) ? floatval($item['unit_rate']) : 0;
+        $min_qty     = isset($item['min_qty']) ? floatval($item['min_qty']) : 0;
+        $taxable_amt = ($unit_rate - $disc_amt) * $min_qty;
+
+        $cgst = $sgst = $cgstamt = $sgstamt = $igst = $igstamt = 0;
+
+        if ($vendor_state === 'MAHARASHTRA') {
+            $cgst    = $sgst    = $gst_percent / 2;
+            $cgstamt = $sgstamt = ($taxable_amt * $cgst) / 100;
+        } else {
+            $igst    = $gst_percent;
+            $igstamt = ($taxable_amt * $igst) / 100;
+        }
+
+        $history_data = [
+            'OrderID'       => isset($data['order_no']) ? $data['order_no'] : '',
+            'PlantID'       => $plant,
+            'FY'            => $this->session->userdata('finacial_year'),
+            'TransDate'     => isset($data['quotation_date'])
+                                ? $this->parse_date($data['quotation_date'])
+                                : (isset($data['delivery_from']) ? $this->parse_date($data['delivery_from']) : null),
+            'TransDate2'    => date('Y-m-d H:i:s'),
+            'TType'         => 'PO',
+            'TType2'        => 'Order',
+            'AccountID'     => isset($data['vendor_id']) ? $data['vendor_id'] : (isset($data['vendor_name']) ? $data['vendor_name'] : ''),
+            'ItemID'        => isset($item['item_id']) ? $item['item_id'] : '',
+            'GodownID'      => '',
+            'Mrp'           => 0,
+            'BasicRate'     => $unit_rate,
+            'SaleRate'      => ($unit_rate * $gst_percent) / 100,
+            'SuppliedIn'    => isset($item['uom']) ? $item['uom'] : '',
+            'UnitWeight'    => isset($item['unit_weight']) ? $item['unit_weight'] : 0,
+            'WeightUnit'    => isset($item['uom']) ? $item['uom'] : '',
+            'CaseQty'       => 1.000,
+            'OrderQty'      => $min_qty,
+            'eOrderQty'     => $min_qty,
+            'ereason'       => '',
+            'BilledQty'     => 0,
+            'Cases'         => 0.000,
+            'DiscPerc'      => 0,
+            'DiscAmt'       => $disc_amt,
+            'cgst'          => $cgst,
+            'cgstamt'       => $cgstamt,
+            'sgst'          => $sgst,
+            'sgstamt'       => $sgstamt,
+            'igst'          => $igst,
+            'igstamt'       => $igstamt,
+            'OrderAmt'      => $min_qty * $unit_rate,
+            'ChallanAmt'    => 0,
+            'NetOrderAmt'   => isset($item['amount']) ? $item['amount'] : 0,
+            'NetChallanAmt' => 0,
+            'Ordinalno'     => $i,
+            'UserID'        => $user,
+            'UserID2'       => '',
+            'Lupdate'       => date('Y-m-d H:i:s'),
+            'batch_no'      => '',
+            'expiry_date'   => '',
+        ];
+
+        $this->db->insert('tblhistory', $history_data);
+
+        if ($this->db->affected_rows() == 0) {
+            log_message('error', 'tblhistory insert failed: ' . print_r($history_data, true) . ' DB Error: ' . print_r($this->db->error(), true));
+        }
+
+        $all_history[] = $history_data;
+        $i++;
+    }
+
+    return $insert_id;
+}
 
 	// Helper to parse DD/MM/YYYY to Y-m-d
 	private function parse_date($date_str)

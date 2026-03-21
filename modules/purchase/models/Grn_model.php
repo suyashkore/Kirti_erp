@@ -13,22 +13,27 @@ class Grn_model extends App_Model
      */
     public function getpurchaseorder($AccountID, $purchaselocation)
     {
-        $this->db->select('tblPurchaseOrderMaster.PurchID');
-        $this->db->from('tblPurchaseOrderMaster');
-        $this->db->where('tblPurchaseOrderMaster.AccountID', $AccountID);
-        // if (!empty($purchaselocation)) {
-            $this->db->where('tblPurchaseOrderMaster.PurchaseLocation', $purchaselocation);
+        $this->db->select('tblPurchaseInvoiceMaster.PurchID');
+        $this->db->from('tblPurchaseInvoiceMaster');
+        $this->db->where('tblPurchaseInvoiceMaster.AccountID', $AccountID);
+        $this->db->where('tblPurchaseInvoiceMaster.FreightTerms', 1);
+       // if (!empty($purchaselocation)) {
+            $this->db->where('tblPurchaseInvoiceMaster.PurchaseLocation', $purchaselocation);
         // }
         return $this->db->get()->result_array();
     }
 
     public function getpurchaseorderheader($PurchID)
     {
-        $this->db->select('tblPurchaseOrderMaster.*,tblclients.Company,tblFreightTerms.FreightTerms as freight_terms');
-        $this->db->from('tblPurchaseOrderMaster');
-        $this->db->join('tblclients', 'tblPurchaseOrderMaster.BrokerID = tblclients.AccountID', 'LEFT');
-        $this->db->join('tblFreightTerms', 'tblPurchaseOrderMaster.FreightTerms = tblFreightTerms.Id', 'LEFT');
-        $this->db->where('tblPurchaseOrderMaster.PurchID', $PurchID);
+        $this->db->select('tblPurchaseInvoiceMaster.*,tblclients.Company,tblFreightTerms.FreightTerms as freight_terms,tblxx_citylist.city_name,tblItemCategoryMaster.CategoryName,tblGateMaster.VehicleNo,tblGateMaster.TransDate AS GateInDate');
+        $this->db->from('tblPurchaseInvoiceMaster');
+        $this->db->join('tblclients', 'tblPurchaseInvoiceMaster.BrokerID = tblclients.AccountID', 'LEFT');
+        $this->db->join('tblFreightTerms', 'tblPurchaseInvoiceMaster.FreightTerms = tblFreightTerms.Id', 'LEFT');
+        $this->db->join( db_prefix().'clientwiseshippingdata', 'tblclientwiseshippingdata.id = tblPurchaseInvoiceMaster.DeliveryLocation');
+		$this->db->join( db_prefix().'xx_citylist', 'tblxx_citylist.id = tblclientwiseshippingdata.ShippingCity',"LEFT");
+		$this->db->join( db_prefix().'ItemCategoryMaster', 'tblItemCategoryMaster.id = tblPurchaseInvoiceMaster.ItemCategory'); 
+		$this->db->join( db_prefix().'GateMaster', 'tblGateMaster.GateINID = tblPurchaseInvoiceMaster.GateINID');
+        $this->db->where('tblPurchaseInvoiceMaster.PurchID', $PurchID);
         return $this->db->get()->result_array();
     }
 
@@ -37,7 +42,7 @@ class Grn_model extends App_Model
         $this->db->select('tblhistory.*,tblitems.ItemName');
         $this->db->from('tblhistory');
         $this->db->join('tblitems', 'tblhistory.ItemID = tblitems.ItemID', 'LEFT');
-        $this->db->where('tblhistory.OrderID', $OrderID);
+        $this->db->where('tblhistory.BillID', $OrderID);
         return $this->db->get()->result_array();
     }
 
@@ -169,4 +174,33 @@ class Grn_model extends App_Model
         $this->db->where('tblhistory.TType', 'G');
         return $this->db->get()->result_array();
     }
+    
+    
+    /**
+ * GET VENDORS BY PURCHASE LOCATION
+ * @param  int|string $location_id
+ * @return array
+ */
+public function getVendorsByLocation($location_id)
+{
+    $location_id = $this->db->escape_str($location_id);
+
+    $sql = "SELECT 
+                tblPurchaseInvoiceMaster.`AccountID`,
+                tblclients.company
+            FROM `tblPurchaseInvoiceMaster`
+            JOIN tblclients 
+                ON tblclients.AccountID = tblPurchaseInvoiceMaster.AccountID
+            WHERE tblPurchaseInvoiceMaster.PurchaseLocation = '{$location_id}'
+            GROUP BY tblPurchaseInvoiceMaster.AccountID, tblclients.company
+            ORDER BY tblclients.company ASC";
+
+    $query = $this->db->query($sql);
+
+    if ($query && $query->num_rows() > 0) {
+        return $query->result_array();
+    }
+
+    return [];
+}
 }

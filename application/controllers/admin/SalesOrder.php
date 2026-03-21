@@ -8,63 +8,63 @@ class SalesOrder extends AdminController
 		parent::__construct();
 		$this->load->model('SalesQuotation_model');
 		$this->load->model('SalesOrder_model');
-
 	}
 
 	/* =========================
 	* View Sales Order Print
 	* ========================= */
 
-    public function SalesOrderPrint($OrderID)
+	public function SalesOrderPrint($OrderID)
 	{
 		if (!has_permission_new('salesOrder', '', 'print')) {
 			access_denied('Access Denied');
 		}
 
 		if (!$OrderID) {
-            redirect($this->load->view('admin/SalesOrder/SalesOrderAddEdit'));
-        }
-        
-        if (!has_permission_new('CashOrderList', '', 'view')) {
-            access_denied('Invoices');
-        }
-        $invoice = [];
-        $invoice1  = $this->SalesOrder_model->GetSalesOrderDetailsForPdf($OrderID);
-      	$history  = $this->SalesOrder_model->get_order_data($OrderID);
-    
-    	$invoice = [
-        	'invoice' => $invoice1,
-        	'history' => $history
-    	];
-        try {
-            $pdf = SalesOrder_pdf($invoice);
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            echo $message;
-            if (strpos($message, 'Unable to get the size of the image') !== false) {
-                show_pdf_unable_to_get_image_size_error();
-            }
-            die;
-        }
-        
-        $type = 'I';
-        
-        if ($this->input->get('output_type')) {
-            $type = $this->input->get('output_type');
-        }
-        
-        if ($this->input->get('print')) {
-            $type = 'I';
-        }
-		
-        $pdf->Output(mb_strtoupper(slug_it($OrderID)) . '-InwardSlip.pdf', $type);
-    }
+			redirect($this->load->view('admin/SalesOrder/SalesOrderAddEdit'));
+		}
+
+		if (!has_permission_new('CashOrderList', '', 'view')) {
+			access_denied('Invoices');
+		}
+		$invoice = [];
+		$invoice1  = $this->SalesOrder_model->GetSalesOrderDetailsForPdf($OrderID);
+		$history  = $this->SalesOrder_model->get_order_data($OrderID);
+
+		$invoice = [
+			'invoice' => $invoice1,
+			'history' => $history
+		];
+		try {
+			$pdf = SalesOrder_pdf($invoice);
+		} catch (Exception $e) {
+			$message = $e->getMessage();
+			echo $message;
+			if (strpos($message, 'Unable to get the size of the image') !== false) {
+				show_pdf_unable_to_get_image_size_error();
+			}
+			die;
+		}
+
+		$type = 'I';
+
+		if ($this->input->get('output_type')) {
+			$type = $this->input->get('output_type');
+		}
+
+		if ($this->input->get('print')) {
+			$type = 'I';
+		}
+
+		$pdf->Output(mb_strtoupper(slug_it($OrderID)) . '-InwardSlip.pdf', $type);
+	}
 
 
 	/* =========================
 	* ADD / EDIT PAGE
 	* ========================= */
-	public function index(){
+	public function index()
+	{
 		if (!has_permission_new('salesOrder', '', 'view')) {
 			access_denied('Access Denied');
 		}
@@ -75,11 +75,11 @@ class SalesOrder extends AdminController
 		$data['FreightTerms'] = $this->SalesQuotation_model->get_freight_terms();
 		$data['saleslocation'] = $this->SalesQuotation_model->get_sales_location();
 		$data['order_list'] = $this->SalesOrder_model->getOrderList();
-    	
-		$selected_company = $this->session->userdata('root_company');
-    	$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
 
-    
+		$selected_company = $this->session->userdata('root_company');
+		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
+
+
 		$this->load->view('admin/SalesOrder/SalesOrderAddEdit', $data);
 	}
 
@@ -96,7 +96,8 @@ class SalesOrder extends AdminController
 		echo json_encode(['success' => true, 'Order_no' => $order_no, 'item_list' => $item_list]);
 	}
 
-	public function getCustomerDetailsLocation(){
+	public function getCustomerDetailsLocation()
+	{
 		$customer_id = $this->input->post('customer_id');
 
 		if (!$customer_id) {
@@ -145,7 +146,8 @@ class SalesOrder extends AdminController
 	}
 
 
-	public function SaveSalesOrder(){
+	public function SaveSalesOrder()
+	{
 		if (empty($this->input->post())) {
 			echo json_encode(['success' => false, 'message' => 'No data received']);
 			return;
@@ -157,15 +159,15 @@ class SalesOrder extends AdminController
 		$data = $this->input->post(null, true);
 		$field_names = array_keys($data);
 		foreach ($field_names as $key => $value) {
-			if(!is_array($data[$value])) $data[$value] = trim($data[$value]);
+			if (!is_array($data[$value])) $data[$value] = trim($data[$value]);
 		}
 		$required_fields = ['item_type', 'item_category', 'OrderID', 'order_date', 'sales_location', 'customer_id', 'customer_location', 'broker_id', 'payment_terms', 'freight_terms'];
-		
+
 		foreach ($required_fields as $key => $value) {
 			if (empty($data[$value])) {
 				echo json_encode([
 					'success' => false,
-					'message' => 'Please fill '.$value.' fields'
+					'message' => 'Please fill ' . $value . ' fields'
 				]);
 				die;
 			}
@@ -174,19 +176,19 @@ class SalesOrder extends AdminController
 		$item_type = $data['item_type'] ?? '';
 		$item_category = $data['item_category'] ?? '';
 		$OrderID = $data['OrderID'] ?? '';
-		if($data['order_date']){
+		if ($data['order_date']) {
 			$order_date = date('Y-m-d', strtotime(str_replace('/', '-', $data['order_date'])));
-		}else{
+		} else {
 			$order_date = date('Y-m-d');
 		}
-		if($data['delivery_from']){
+		if ($data['delivery_from']) {
 			$delivery_from = date('Y-m-d', strtotime(str_replace('/', '-', $data['delivery_from'])));
-		}else{
+		} else {
 			$delivery_from = date('Y-m-d');
 		}
-		if($data['delivery_to']){
+		if ($data['delivery_to']) {
 			$delivery_to = date('Y-m-d', strtotime(str_replace('/', '-', $data['delivery_to'])));
-		}else{
+		} else {
 			$delivery_to = date('Y-m-d', strtotime('+10 days'));
 		}
 		$sales_location = $data['sales_location'] ?? '';
@@ -198,7 +200,7 @@ class SalesOrder extends AdminController
 		$customer_location = $data['customer_location'] ?? '';
 		$broker_id = $data['broker_id'] ?? '';
 		$quotation_id = $data['quotation_id'] ?? '';
-		
+
 		$payment_terms = $data['payment_terms'] ?? '';
 		$freight_terms = $data['freight_terms'] ?? '';
 		$total_weight = $data['total_weight'] ?? 0;
@@ -214,7 +216,7 @@ class SalesOrder extends AdminController
 		$form_mode = $data['form_mode'] ?? 'add';
 		$update_id = $data['update_id'] ?? '';
 
-		if($form_mode == 'add'){
+		if ($form_mode == 'add') {
 			$check = $this->SalesOrder_model->checkDuplicate('SalesOrderMaster', ['OrderID' => $OrderID]);
 			if ($check) {
 				echo json_encode([
@@ -222,6 +224,27 @@ class SalesOrder extends AdminController
 					'message' => 'Order number already exists.'
 				]);
 				die;
+			}
+		}
+		if ($form_mode == 'edit') {
+			$current_so = $this->db
+				->select('Status')
+				->where('id', $update_id)
+				->get(db_prefix() . 'SalesOrderMaster')
+				->row_array();
+
+			if (!empty($current_so) && in_array((int)$current_so['Status'], [2, 3, 5, 7])) {
+				$statusLabels = [
+					2 => 'Cancelled',
+					3 => 'Expired',
+					5 => 'Complete',
+					7 => 'Partially Complete',
+				];
+				echo json_encode([
+					'success' => false,
+					'message' => 'This Sales Order is ' . ($statusLabels[(int)$current_so['Status']] ?? 'locked') . ' and cannot be updated.'
+				]);
+				return;
 			}
 		}
 
@@ -313,6 +336,8 @@ class SalesOrder extends AdminController
 				access_denied('Access Denied');
 			}
 			$insertData['TransDate2'] = date('Y-m-d H:i:s');
+			$insertData['Status'] = 4;
+
 			$result = $this->SalesOrder_model->saveData('SalesOrderMaster', $insertData);
 			$details = $this->SalesOrder_model->getOrderDetails($result);
 		} else {
@@ -323,18 +348,13 @@ class SalesOrder extends AdminController
 			$details = $this->SalesOrder_model->getOrderDetails($update_id);
 		}
 
-		if (!empty((isset($quotation_id)))) {
-			$quote_no = $quotation_id;
-			$this->db->where('QuotationID', $quote_no);
-			$this->db->update('tblSalesQuotationMaster', ['Status' => 6]);
-		}
-
 		if ($result) {
 			$multi_insert_data = [
 				'plant_id' => $PlantID,
 				'fy' => $FY,
 				'user_id' => $UserID,
 				'OrderID' => $OrderID,
+				'QuotationID_ref' => $quotation_id,
 				'order_date' => $order_date,
 				'customer_id' => $customer_id,
 				'customer_state' => $customer_state,
@@ -345,7 +365,7 @@ class SalesOrder extends AdminController
 				'unit_weight' => $data['unit_weight'] ?? [],
 				'disc_amt' => $data['disc_amt'] ?? [],
 				'uom' => $data['uom'] ?? [],
-				'quantity' => $data['min_qty'] ?? [],
+				'quantity' => $data['sale_qty'] ?? [],
 				'amount' => $data['amount'] ?? [],
 				'gst' => $data['gst'] ?? []
 			];
@@ -359,6 +379,51 @@ class SalesOrder extends AdminController
 
 
 			$this->SalesOrder_model->saveMultiData($multi_insert_data);
+			if (!empty($quotation_id)) {
+
+				$quotation_rows = $this->db
+					->select('ItemID, OrderQty')
+					->where('OrderID', $quotation_id)
+					->where('TType2', 'Quotation')
+					->get(db_prefix() . 'history')
+					->result_array();
+
+				if (!empty($quotation_rows)) {
+					$total_items    = count($quotation_rows);
+					$complete_items = 0;
+
+					foreach ($quotation_rows as $row) {
+						$item_id         = $row['ItemID'];
+						$total_order_qty = floatval($row['OrderQty']);
+
+						$used_qty_row = $this->db
+							->select('SUM(h.OrderQty) as TotalUsedQty')
+							->from(db_prefix() . 'history h')
+							->join(db_prefix() . 'SalesOrderMaster som', 'som.OrderID = h.OrderID', 'inner')
+							->where('h.TType2', 'Order')
+							->where('h.ItemID', $item_id)
+							->where('som.QuotationID', $quotation_id)
+							->get()
+							->row_array();
+
+						$used_qty    = floatval($used_qty_row['TotalUsedQty'] ?? 0);
+						$balance_qty = $total_order_qty - $used_qty;
+
+						if ($balance_qty <= 0) {
+							$complete_items++;
+						}
+					}
+
+					if ($complete_items === $total_items) {
+						$new_status = 5;
+					} else {
+						$new_status = 6;
+					}
+
+					$this->db->where('QuotationID', $quotation_id);
+					$this->db->update(db_prefix() . 'SalesQuotationMaster', ['Status' => $new_status]);
+				}
+			}
 
 			echo json_encode([
 				'success' => true,
@@ -373,74 +438,72 @@ class SalesOrder extends AdminController
 		}
 	}
 
-// 	public function getQuotationDetails()
-// {
-//     $quotation_id = $this->input->post('quotation_id');
+	// 	public function getQuotationDetails()
+	// {
+	//     $quotation_id = $this->input->post('quotation_id');
 
-//     $this->load->model('SalesOrder_model');
+	//     $this->load->model('SalesOrder_model');
 
-//     $data = $this->SalesOrder_model->getQuotationFullDetails($quotation_id);
+	//     $data = $this->SalesOrder_model->getQuotationFullDetails($quotation_id);
 
-//     echo json_encode([
-//         'success'        => true,
-//         // 'item_type'      => $data['master']->ItemType,
-//         // 'item_category'  => $data['master']->CategoryID,
-//         'items'          => $data['master']
-//     ]);
-// }
+	//     echo json_encode([
+	//         'success'        => true,
+	//         // 'item_type'      => $data['master']->ItemType,
+	//         // 'item_category'  => $data['master']->CategoryID,
+	//         'items'          => $data['master']
+	//     ]);
+	// }
 
 
 
 	public function GetQuotationDetails()
-{
-    $quotation_id = $this->input->post('quotation_id');
+	{
+		$quotation_id = $this->input->post('quotation_id');
 
-    $quotation = $this->db
-        ->where('QuotationID', $quotation_id)
-        ->get('tblSalesQuotationMaster')
-        ->row_array();
+		$quotation = $this->db
+			->where('QuotationID', $quotation_id)
+			->get('tblSalesQuotationMaster')
+			->row_array();
 
-    if ($quotation) {
-        echo json_encode([
-            'success' => true,
-            'data' => $quotation
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Quotation not found'
-        ]);
-    }
-}
+		if ($quotation) {
+			echo json_encode([
+				'success' => true,
+				'data' => $quotation
+			]);
+		} else {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Quotation not found'
+			]);
+		}
+	}
 
-public function GetHistoryDetails()
-{
-    $OrderID = $this->input->post('OrderID');
+	public function GetHistoryDetails()
+	{
+		$OrderID = $this->input->post('OrderID');
 
-    $items = $this->db
-        ->where('OrderID', $OrderID)
-        ->get('tblhistory')
-        ->result_array();
+		$items = $this->SalesOrder_model->getHistoryDetails($OrderID);
 
-    if ($items) {
-        echo json_encode([
-            'success' => true,
-            'items' => $items
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Items not found'
-        ]);
-    }
-}
+		if ($items) {
+			echo json_encode([
+				'success' => true,
+				'items' => $items
+			]);
+		} else {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Items not found'
+			]);
+		}
+	}
 
 
 
-	public function GetSalesOrderDetails(){
+	public function GetSalesOrderDetails()
+	{
 		$id = $this->input->post('id');
 		$data = $this->SalesOrder_model->getOrderDetails($id);
-		if($data){
+		if ($data) {
 			echo json_encode([
 				'success' => true,
 				'data' => $data
@@ -456,17 +519,7 @@ public function GetHistoryDetails()
 	/* =========================
 	* LIST PAGE
 	* ========================= */
-	public function List()
-	{
-		$data['title'] = 'Sales Order List';
-		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
 
-		$selected_company = $this->session->userdata('root_company');
-		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
-
-		$this->load->view('admin/SalesOrder/SalesOrderList', $data);
-	}
-	
 	public function OrderList()
 	{
 		if (!$this->input->is_ajax_request()) {
@@ -484,205 +537,338 @@ public function GetHistoryDetails()
 	}
 
 
-	public function ListFilter(){
-    if ($this->input->post()) {
-			$data = $this->input->post(null, true);
-      
-      $limit  = $data['limit'] ?? 100;
-      $offset = $data['offset'] ?? 0;
-      
-      $result  = $this->SalesOrder_model->getListByFilter($data, $limit, $offset);
-      if (!empty($result['rows'])) {
-        echo json_encode([
-          'success' => true,
-          'message' => 'Data found',
-          'total'   => $result['total'],
-          'rows'    => $result['rows']
-        ]);
-      } else {
-        echo json_encode([
-          'success' => false,
-          'message' => 'No data found',
-          'total'   => 0,
-          'rows'    => []
-        ]);
-      }
-		}else{
-			echo json_encode([
-				'success' => false,
-				'message' => 'Invalid request',
-        'total'   => 0,
-        'rows'    => []
-			]);
+	/* =========================
+ * LIST PAGE
+ * ========================= */
+	public function List()
+	{
+		$data['title']         = 'Sales Order List';
+		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
+		$data['saleslocation'] = $this->SalesQuotation_model->get_sales_location();
+
+		$selected_company      = $this->session->userdata('root_company');
+		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
+
+		$this->load->view('admin/SalesOrder/SalesOrderList', $data);
+	}
+
+	public function ListFilter()
+	{
+		$from_date      = $this->input->post('from_date');
+		$to_date        = $this->input->post('to_date');
+		$customer_id    = $this->input->post('customer_id');
+		$broker_id      = $this->input->post('broker_id');
+		$sales_location = $this->input->post('SalesLocation');
+		$status         = $this->input->post('status');
+		$offset         = (int) $this->input->post('offset');
+		$limit          = (int) $this->input->post('limit') ?: 100;
+
+		$this->db->select('
+        o.*,
+        pld.LocationName  AS SalesLocationName,
+        c.billing_state,
+        c.company         AS customer_name,
+        IFNULL(b.billing_state, \'\') AS broker_state,
+        IFNULL(b.company, \'\')       AS broker_name,
+		
+    ');
+	
+		$this->db->from(db_prefix() . 'SalesOrderMaster o');
+		$this->db->join('tblclients c', 'c.AccountID = o.AccountID', 'left');
+		$this->db->join(
+			'tblclients b',
+			"TRIM(b.AccountID) = TRIM(o.BrokerID) AND o.BrokerID IS NOT NULL AND o.BrokerID != ''",
+			'left'
+		);
+		$this->db->join('tblPlantLocationDetails pld', 'pld.id = o.SalesLocation', 'left');
+
+		if ($from_date) {
+			$this->db->where('DATE(o.TransDate) >=', date('Y-m-d', strtotime(str_replace('/', '-', $from_date))));
 		}
-  }
+		if ($to_date) {
+			$this->db->where('DATE(o.TransDate) <=', date('Y-m-d', strtotime(str_replace('/', '-', $to_date))));
+		}
+		if ($customer_id)    $this->db->where('o.AccountID', $customer_id);
+		if ($broker_id)      $this->db->where('o.BrokerID', $broker_id);
+		if ($sales_location) $this->db->where('o.SalesLocation', $sales_location);
+		if ($status !== false && $status !== null && strlen((string)$status) > 0) {
+			$this->db->where('o.Status', (int)$status);
+		}
 
-  public function ListExportExcel(){
-    $this->output->enable_profiler(FALSE);
-    ob_end_clean();
+		$total = $this->db->count_all_results('', false);
 
-    if(!class_exists('XLSXReader_fin')){
-      require_once(module_dir_path(TIMESHEETS_MODULE_NAME).'/assets/plugins/XLSXReader/XLSXReader.php');
-    }
-    require_once(module_dir_path(TIMESHEETS_MODULE_NAME).'/assets/plugins/XLSXWriter/xlsxwriter.class.php');
+		$this->db->limit($limit, $offset);
+		$this->db->order_by('o.TransDate', 'DESC');
+		$rows = $this->db->get()->result_array();
 
-    if (!$this->input->post()) {
-      echo json_encode(['success'=>false,'message'=>'Invalid request']);
-      return;
-    }
+		if (!empty($rows)) {
+			echo json_encode(['success' => true, 'total' => $total, 'rows' => $rows]);
+		} else {
+			echo json_encode(['success' => false, 'total' => 0, 'rows' => []]);
+		}
+	}
 
-    $post = $this->input->post(NULL, TRUE);
+	/* =========================
+ * CANCEL ORDER
+ * Status 1 (Pending) or 4 (Approved) → set Status to 2 (Cancel)
+ * ========================= */
+	public function cancelOrder()
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+		}
 
-    $sheetName = 'Quotation List';
-    $writer = new XLSXWriter();
+		$order_id = $this->input->post('order_id');
 
-    $header = [
-      'Quotation Code'  => 'string',
-      'Quotation Date'  => 'string',
-      'Customer Name'     => 'string',
-      'Broker Name'     => 'string',
-      'Quotation Weight'=> 'string',
-      'Quotation Amount'=> 'string',
-      'Inward Weight'   => 'string',
-      'Status'          => 'string'
-    ];
+		if (empty($order_id)) {
+			echo json_encode(['success' => false, 'message' => 'Order ID is required.']);
+			return;
+		}
 
-    $writer->writeSheetHeader($sheetName, $header, ['suppress_row'=>true]);
+		// Safety: only cancel if currently Pending or Approved
+		$current = $this->db
+			->select('Status')
+			->where('OrderID', $order_id)
+			->get(db_prefix() . 'SalesOrderMaster')
+			->row_array();
 
-    $selected_company = $this->session->userdata('root_company');
-    $company_detail   = $this->SalesQuotation_model->get_company_detail($selected_company);
+		if (empty($current)) {
+			echo json_encode(['success' => false, 'message' => 'Order not found.']);
+			return;
+		}
 
-    // ===== COMPANY NAME ROW =====
-    $writer->markMergedCell($sheetName, 0, 0, 0, 12);
-    $writer->writeSheetRow($sheetName, [$company_detail->company_name]);
+		if (!in_array((int)$current['Status'], [1, 4])) {
+			echo json_encode(['success' => false, 'message' => 'Only Pending or Approved orders can be cancelled.']);
+			return;
+		}
 
-    // ===== COMPANY ADDRESS ROW =====
-    $writer->markMergedCell($sheetName, 1, 0, 1, 12);
-    $writer->writeSheetRow($sheetName, [$company_detail->address]);
+		$this->db->set('Status', 2);
+		$this->db->set('UserID2', $this->session->userdata('username'));
+		$this->db->set('Lupdate', date('Y-m-d H:i:s'));
+		$this->db->where('OrderID', $order_id);
+		$this->db->update(db_prefix() . 'SalesOrderMaster');
 
-    // ===== FILTER ROW =====
-    $reportedBy = "Filtered By : ";
-    $from_date  = $post['from_date'] ?? date('Y-m-01');
-    $to_date    = $post['to_date'] ?? date('Y-m-d');
-    $customer_id  = $post['customer_id'] ?? '';
-    $broker_id  = $post['broker_id'] ?? '';
-    $status     = $post['status'] ?? 1;
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['success' => true, 'message' => 'Order cancelled successfully.']);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to cancel order.']);
+		}
+	}
 
-    if($from_date != ''){
-      $reportedBy .= 'From Date : ' . $from_date . ', ';
-    }
+	/* =========================
+ * PARTIALLY COMPLETE ORDER
+ * Status 6 (In Progress) → set Status to 7 (Partially Complete)
+ * ========================= */
+	public function partiallyCompleteOrder()
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+		}
 
-    if($to_date != ''){
-      $reportedBy .= 'To Date : ' . $to_date . ', ';
-    }
+		$order_id = $this->input->post('order_id');
 
-    if($customer_id != ''){
-      $reportedBy .= 'Customer : ' .( $this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $customer_id])['company'] ?? '') . ', ';
-    }
+		if (empty($order_id)) {
+			echo json_encode(['success' => false, 'message' => 'Order ID is required.']);
+			return;
+		}
 
-    if($broker_id != ''){
-      $reportedBy .= 'Broker : ' .( $this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $broker_id])['company'] ?? '') . ', ';
-    }
+		// Safety: only allow if currently In Progress
+		$current = $this->db
+			->select('Status')
+			->where('OrderID', $order_id)
+			->get(db_prefix() . 'SalesOrderMaster')
+			->row_array();
 
-    if($status != ''){
-      $status_list = [1 => 'Pending', 2 =>'Cancel', 3 =>'Expired', 4 =>'Approved', 5 =>'Inprogress', 6 =>'Complete', 7 =>'Partially Complete'];
-      $reportedBy .= 'Status : ' .( $status_list[$status] ?? '') . ', ';
-    }
+		if (empty($current)) {
+			echo json_encode(['success' => false, 'message' => 'Order not found.']);
+			return;
+		}
 
-    $writer->markMergedCell($sheetName, 2, 0, 2, 12);
-    $writer->writeSheetRow($sheetName, [$reportedBy]);
-    $writer->writeSheetRow($sheetName, []);
+		if ((int)$current['Status'] !== 6) {
+			echo json_encode(['success' => false, 'message' => 'Only In Progress orders can be marked as Partially Complete.']);
+			return;
+		}
 
-    // ===== HEADER ROW =====
-    $writer->writeSheetRow($sheetName, array_keys($header));
+		$this->db->set('Status', 7);
+		$this->db->set('UserID2', $this->session->userdata('username'));
+		$this->db->set('Lupdate', date('Y-m-d H:i:s'));
+		$this->db->where('OrderID', $order_id);
+		$this->db->update(db_prefix() . 'SalesOrderMaster');
 
-    // ===== CHUNK FETCH START =====
-    $limit = 100;
-    $offset = 0;
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['success' => true, 'message' => 'Order marked as Partially Complete successfully.']);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to update order.']);
+		}
+	}
+	public function ListExportExcel()
+	{
+		$this->output->enable_profiler(FALSE);
+		ob_end_clean();
 
-    while(true){
-      $result = $this->SalesQuotation_model->getListByFilter($post, $limit, $offset);
-      if(empty($result['rows'])){
-        break;
-      }
+		if (!class_exists('XLSXReader_fin')) {
+			require_once(module_dir_path(TIMESHEETS_MODULE_NAME) . '/assets/plugins/XLSXReader/XLSXReader.php');
+		}
+		require_once(module_dir_path(TIMESHEETS_MODULE_NAME) . '/assets/plugins/XLSXWriter/xlsxwriter.class.php');
 
-      foreach($result['rows'] as $row){
-        $writer->writeSheetRow($sheetName, [
-          $row['QuotationID'] ?? '',
-          $row['TransDate'] ?? '',
-          $row['customer_name'] ?? '' . ' (' . $row['AccountID'] ?? '' . ')',
-          $row['broker_name'] ?? '' . ' (' . $row['BrokerID'] ?? '' . ')',
-          $row['TotalWeight'] ?? '',
-          $row['NetAmt'] ?? '',
-          '',
-          'Pending'
-        ]);
-      }
+		if (!$this->input->post()) {
+			echo json_encode(['success' => false, 'message' => 'Invalid request']);
+			return;
+		}
 
-      $offset += $limit;
-      unset($result);
-    }
+		$post = $this->input->post(NULL, TRUE);
 
-    // ===== SAVE FILE =====
-    $filename = 'QuotationList_'.date('YmdHis').'.xlsx';
-    $filepath = FCPATH.'uploads/exports/'.$filename;
+		$sheetName = 'Quotation List';
+		$writer = new XLSXWriter();
 
-    if(!is_dir(FCPATH.'uploads/exports')){
-      mkdir(FCPATH.'uploads/exports', 0777, true);
-    }
+		$header = [
+			'Quotation Code'  => 'string',
+			'Quotation Date'  => 'string',
+			'Customer Name'     => 'string',
+			'Broker Name'     => 'string',
+			'Quotation Weight' => 'string',
+			'Quotation Amount' => 'string',
+			'Inward Weight'   => 'string',
+			'Status'          => 'string'
+		];
 
-    $writer->writeToFile($filepath);
+		$writer->writeSheetHeader($sheetName, $header, ['suppress_row' => true]);
 
-    echo json_encode([
-        'success' => true,
-        'file_url' => base_url('uploads/exports/'.$filename)
-    ]);
-  }
-function GetCustomDropdownList(){
+		$selected_company = $this->session->userdata('root_company');
+		$company_detail   = $this->SalesQuotation_model->get_company_detail($selected_company);
+
+		// ===== COMPANY NAME ROW =====
+		$writer->markMergedCell($sheetName, 0, 0, 0, 12);
+		$writer->writeSheetRow($sheetName, [$company_detail->company_name]);
+
+		// ===== COMPANY ADDRESS ROW =====
+		$writer->markMergedCell($sheetName, 1, 0, 1, 12);
+		$writer->writeSheetRow($sheetName, [$company_detail->address]);
+
+		// ===== FILTER ROW =====
+		$reportedBy = "Filtered By : ";
+		$from_date  = $post['from_date'] ?? date('Y-m-01');
+		$to_date    = $post['to_date'] ?? date('Y-m-d');
+		$customer_id  = $post['customer_id'] ?? '';
+		$broker_id  = $post['broker_id'] ?? '';
+		$status     = $post['status'] ?? 1;
+
+		if ($from_date != '') {
+			$reportedBy .= 'From Date : ' . $from_date . ', ';
+		}
+
+		if ($to_date != '') {
+			$reportedBy .= 'To Date : ' . $to_date . ', ';
+		}
+
+		if ($customer_id != '') {
+			$reportedBy .= 'Customer : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $customer_id])['company'] ?? '') . ', ';
+		}
+
+		if ($broker_id != '') {
+			$reportedBy .= 'Broker : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $broker_id])['company'] ?? '') . ', ';
+		}
+
+		$status_list = [1 => 'Pending', 2 => 'Cancel', 3 => 'Expired', 4 => 'Approved', 5 => 'Complete', 6 => 'In Progress', 7 => 'Partially Complete'];
+		if ($status != '') {
+			$reportedBy .= 'Status : ' . ($status_list[$status] ?? '') . ', ';
+		}
+
+		$writer->markMergedCell($sheetName, 2, 0, 2, 12);
+		$writer->writeSheetRow($sheetName, [$reportedBy]);
+		$writer->writeSheetRow($sheetName, []);
+
+		// ===== HEADER ROW =====
+		$writer->writeSheetRow($sheetName, array_keys($header));
+
+		// ===== CHUNK FETCH START =====
+		$limit = 100;
+		$offset = 0;
+
+		while (true) {
+			$result = $this->SalesQuotation_model->getListByFilter($post, $limit, $offset);
+			if (empty($result['rows'])) {
+				break;
+			}
+
+			foreach ($result['rows'] as $row) {
+				$writer->writeSheetRow($sheetName, [
+					$row['QuotationID'] ?? '',
+					$row['TransDate'] ?? '',
+					$row['customer_name'] ?? '' . ' (' . $row['AccountID'] ?? '' . ')',
+					$row['broker_name'] ?? '' . ' (' . $row['BrokerID'] ?? '' . ')',
+					$row['TotalWeight'] ?? '',
+					$row['NetAmt'] ?? '',
+					'',
+					$status_list[$row['Status']] ?? ($row['Status'] ?? '')
+				]);
+			}
+
+			$offset += $limit;
+			unset($result);
+		}
+
+		// ===== SAVE FILE =====
+		$filename = 'QuotationList_' . date('YmdHis') . '.xlsx';
+		$filepath = FCPATH . 'uploads/exports/' . $filename;
+
+		if (!is_dir(FCPATH . 'uploads/exports')) {
+			mkdir(FCPATH . 'uploads/exports', 0777, true);
+		}
+
+		$writer->writeToFile($filepath);
+
+		echo json_encode([
+			'success' => true,
+			'file_url' => base_url('uploads/exports/' . $filename)
+		]);
+	}
+	function GetCustomDropdownList()
+	{
 		if ($this->input->post()) {
 			$parent_id 		= $this->input->post('parent_id');
 			$parent_value = $this->input->post('parent_value');
 			$child_id     = $this->input->post('child_id');
 
-			switch($parent_id){
+			switch ($parent_id) {
 				case 'item_type':
-          switch($child_id){
-            case 'item_category':
-              $data = $this->Items_model->getDropdown('ItemCategoryMaster', 'id, CategoryName as name', ['ItemType' => $parent_value], 'CategoryName', 'ASC');
-              break;
-            case 'item_main_group':
-              $data = $this->Items_model->getDropdown('items_main_groups', 'id, name', ['ItemTypeID' => $parent_value], 'name', 'ASC');
-              break;
-            default:
-              $data = [];
-              break;
-          }
+					switch ($child_id) {
+						case 'item_category':
+							$data = $this->Items_model->getDropdown('ItemCategoryMaster', 'id, CategoryName as name', ['ItemType' => $parent_value], 'CategoryName', 'ASC');
+							break;
+						case 'item_main_group':
+							$data = $this->Items_model->getDropdown('items_main_groups', 'id, name', ['ItemTypeID' => $parent_value], 'name', 'ASC');
+							break;
+						default:
+							$data = [];
+							break;
+					}
 					break;
-        case 'item_main_group':
-          $data = $this->Items_model->getDropdown('ItemsSubGroup1', 'id, name', ['main_group_id' => $parent_value], 'name', 'ASC');
-          break;
-        case 'item_sub_group1':
-          $data = $this->Items_model->getDropdown('ItemsSubGroup2', 'id, name', ['sub_group_id1' => $parent_value], 'name', 'ASC');
-          break;
+				case 'item_main_group':
+					$data = $this->Items_model->getDropdown('ItemsSubGroup1', 'id, name', ['main_group_id' => $parent_value], 'name', 'ASC');
+					break;
+				case 'item_sub_group1':
+					$data = $this->Items_model->getDropdown('ItemsSubGroup2', 'id, name', ['sub_group_id1' => $parent_value], 'name', 'ASC');
+					break;
 				default:
 					$data = [];
 					break;
 			}
-      if(empty($data)){
-        echo json_encode([
-          'success' => false,
-          'message' => 'No data found',
-          'data' => []
-        ]);
-      }else{
-        echo json_encode([
-          'success' => true,
-          'message' => 'Data found',
-          'data' => $data
-        ]);
-      }
+			if (empty($data)) {
+				echo json_encode([
+					'success' => false,
+					'message' => 'No data found',
+					'data' => []
+				]);
+			} else {
+				echo json_encode([
+					'success' => true,
+					'message' => 'Data found',
+					'data' => $data
+				]);
+			}
 			die;
-		}else{
+		} else {
 			echo json_encode([
 				'success' => false,
 				'message' => 'Invalid request'
@@ -690,5 +876,4 @@ function GetCustomDropdownList(){
 			die;
 		}
 	}
-  
 }

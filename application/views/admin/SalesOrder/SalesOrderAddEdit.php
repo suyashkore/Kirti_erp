@@ -57,6 +57,16 @@
     text-align: right;
     font-weight: 600;
   }
+
+  .text-truncate-custom {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+  }
 </style>
 <div id="wrapper">
   <div class="content">
@@ -103,12 +113,12 @@
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="OrderID">
                     <label for="OrderID" class="control-label"><small class="req text-danger">* </small> Order ID</label>
-                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly>
+                    <input type="text" name="OrderID" id="OrderID" class="form-control" app-field-label="Order ID" readonly placeholder="Auto Generated">
                   </div>
                 </div>
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="order_date">
-                    
+
                     <?= render_date_input('order_date', 'Order Date', date('d/m/Y'), []); ?>
                   </div>
                 </div>
@@ -136,7 +146,7 @@
                       <?php
                       if (!empty($customer_list)) :
                         foreach ($customer_list as $value) :
-                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] .' - '. $value['billing_state'] . ' (' . $value['AccountID'] . ')</option>';
+                          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' - ' . $value['billing_state'] . ' (' . $value['AccountID'] . ')</option>';
                         endforeach;
                       endif;
                       ?>
@@ -200,8 +210,8 @@
                         <th>HSN Code</th>
                         <th>UOM</th>
                         <th>Unit Weight</th>
-                        <th>Min Qty</th>
-                        <th>Max Qty</th>
+                        <th>Quotation Qty</th>
+                        <th>Sale Qty</th>
                         <th>Disc Amt</th>
                         <th>Unit Rate</th>
                         <th>GST %</th>
@@ -217,8 +227,8 @@
                         <td><input type="text" id="hsn_code" class="form-control fixed_row" readonly tabindex="-1"></td>
                         <td><input type="text" id="uom" class="form-control fixed_row" readonly tabindex="-1"></td>
                         <td><input type="tel" id="unit_weight" class="form-control fixed_row" min="0" step="0.01" readonly tabindex="-1"></td>
-                        <td><input type="tel" id="min_qty" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
-                        <td><input type="tel" id="max_qty" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
+                        <td><input type="tel" id="quotated_qty" class="form-control fixed_row" min="0" step="0.01" tabindex="-1" readonly></td>
+                        <td><input type="tel" id="sale_qty" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="disc_amt" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="unit_rate" class="form-control fixed_row" min="0" step="0.01" onchange="calculateAmount('');"></td>
                         <td><input type="tel" id="gst" class="form-control fixed_row" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -288,6 +298,13 @@
                       <div class="form-group" app-field-wrapper="delivery_to">
                         <?= render_date_input('delivery_to', 'Delivery To', date('d/m/Y', strtotime('+10 days')), []); ?>
                       </div>
+                    </div>
+
+                    <!-- SO Lock Warning -->
+                    <div class="col-md-12" style="margin-top: 8px;">
+                      <span id="so_lock_warning"
+                        style="display:none; color:#c0392b; font-size:13px; font-weight:600;">
+                      </span>
                     </div>
 
                   </div>
@@ -378,10 +395,10 @@
 
                 <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('salesOrder', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="button" class="btn btn-primary printBtn <?= (has_permission_new('salesOrder', '', 'print')) ? '' : 'disabled'; ?>" style="display: none;" onclick="printPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</button>
+                  <button type="button" class="btn btn-primary printBtn <?= (has_permission_new('salesOrder', '', 'print')) ? '' : 'disabled'; ?>" style="display: none;" onclick="printSalesOrderPdf();"><i class="fa fa-print"></i> Print PDF</button>
                   <script>
                     // Print PDF function
-                    function printPurchaseOrderPdf() {
+                    function printSalesOrderPdf() {
                       var OrderID = $('#OrderID').val();
                       if (!OrderID) {
                         alert_float('warning', 'Order ID not found!');
@@ -462,6 +479,36 @@
             </select>
           </div>
 
+          <div class="filter-group">
+            <label>Sales Location</label>
+            <select id="modal_location_filter" class="selectpicker" data-live-search="false" title="All Sales Location">
+              <option value="">All</option>
+              <?php
+              if (!empty($saleslocation)) :
+                foreach ($saleslocation as $value) :
+                  echo '<option value="' . $value['id'] . '">' . $value['LocationName'] . '</option>';
+                endforeach;
+              endif;
+              ?>
+            </select>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <div class="filter-group">
+            <label>Status</label>
+            <select id="modal_status_filter" class="selectpicker" data-live-search="false" title="All Status">
+              <option value="">All</option>
+              <option value="1">Pending</option>
+              <option value="2">Cancel</option>
+              <option value="3">Expired</option>
+              <option value="4">Approved</option>
+              <option value="5">Complete</option>
+              <option value="6">In Progress</option>
+              <option value="7">Partially Complete</option>
+            </select>
+          </div>
+
           <!-- Search Button -->
           <div class="filter-group" style="align-self:flex-end;">
             <button type="button" class="btn btn-success" id="searchBtn">
@@ -483,6 +530,8 @@
                 <th class="sortablePop">Order Date</th>
                 <th class="sortablePop">Item Category</th>
                 <th class="sortablePop">Customer</th>
+                <th class="sortablePop">Broker</th>
+                <th class="sortablePop">Sale Location</th>
                 <th class="sortablePop">Total Weight</th>
                 <th class="sortablePop">Total Qty</th>
                 <th class="sortablePop">Item Total</th>
@@ -491,30 +540,60 @@
                 <th class="sortablePop">CGST Amt</th>
                 <th class="sortablePop">SGST Amt</th>
                 <th class="sortablePop">IGST Amt</th>
-                <th class="sortablePop">Round Off</th>
                 <th class="sortablePop">Amount</th>
+                <th class="sortablePop">Status</th>
               </tr>
             </thead>
             <tbody>
               <?php
               if (!empty($order_list)):
+                $status_labels = [
+                  1 => ['label' => 'Pending'],
+                  2 => ['label' => 'Cancel'],
+                  3 => ['label' => 'Expired'],
+                  4 => ['label' => 'Approved'],
+                  5 => ['label' => 'Complete'],
+                  6 => ['label' => 'In Progress'],
+                  7 => ['label' => 'Partially Complete'],
+                ];
                 foreach ($order_list as $key => $value):
+                  $status_key   = (int)($value['Status'] ?? 1);
+                  $status_info  = $status_labels[$status_key] ?? ['label' => 'Pending'];
               ?>
-                  <tr class="get_Details" data-id="<?= $value["id"]; ?>" onclick="getDetails(<?= $value['id']; ?>)" data-category="<?= $value["ItemCategory"]; ?>">
+                  <tr class="get_Details" data-id="<?= $value["id"]; ?>" data-status="<?= (int)($value['Status'] ?? 1); ?>" data-location="<?= (int)($value['SalesLocation'] ?? 0); ?>" onclick="getDetails(<?= $value['id']; ?>)" data-category="<?= $value["ItemCategory"]; ?>">
                     <td><?= $value["OrderID"]; ?></td>
                     <td><?= date('d/m/Y', strtotime($value["TransDate"])); ?></td>
                     <td><?= $value["CategoryName"]; ?></td>
-                    <td><?= $value["company"]; ?></td>
-                    <td><?= number_format((float)$value["TotalWeight"], 2, '.', ''); ?></td>
-                    <td><?= number_format((float)$value["TotalQuantity"], 2, '.', ''); ?></td>
+                    <td>
+                      <?php
+                      $company = ($value['company'] ?? '') . ' - ' . ($value['billing_state'] ?? '') . ' (' . ($value['AccountID'] ?? '') . ')';
+                      $display = (strlen($company) > 50) ? substr($company, 0, 50) . '...' : $company;
+                      ?>
+                      <span class="text-truncate-custom" title="<?= htmlspecialchars($company, ENT_QUOTES); ?>">
+                        <?= htmlspecialchars($display, ENT_QUOTES); ?>
+                      </span>
+                    </td>
+                    <td>
+                      <?php
+                      $broker = ($value['broker_name'] ?? '');
+                      $broker_full = $broker ? $broker . ' - ' . ($value['broker_state'] ?? '') . ' (' . ($value['BrokerID'] ?? '') . ')' : '-';
+                      $broker_display = (strlen($broker_full) > 50) ? substr($broker_full, 0, 50) . '...' : $broker_full;
+                      ?>
+                      <span class="text-truncate-custom" title="<?= htmlspecialchars($broker_full, ENT_QUOTES); ?>">
+                        <?= htmlspecialchars($broker_display, ENT_QUOTES); ?>
+                      </span>
+                    </td>
+                    <td><?= $value["LocationName"]; ?></td>
+                    <td><?= number_format((float)$value["TotalWeight"], 0, '.', ''); ?></td>
+                    <td><?= number_format((float)$value["TotalQuantity"], 0, '.', ''); ?></td>
                     <td><?= number_format((float)$value["ItemAmt"], 2, '.', ''); ?></td>
                     <td><?= number_format((float)$value["DiscAmt"], 2, '.', ''); ?></td>
                     <td><?= number_format((float)$value["TaxableAmt"], 2, '.', ''); ?></td>
                     <td><?= number_format((float)$value["CGSTAmt"], 2, '.', ''); ?></td>
                     <td><?= number_format((float)$value["SGSTAmt"], 2, '.', ''); ?></td>
                     <td><?= number_format((float)$value["IGSTAmt"], 2, '.', ''); ?></td>
-                    <td><?= number_format((float)$value["RoundOffAmt"], 2, '.', ''); ?></td>
                     <td><?= number_format((float)$value["NetAmt"], 2, '.', ''); ?></td>
+                    <td style="text-align:center;"><?= $status_info['label']; ?></td>
                   </tr>
               <?php
                 endforeach;
@@ -532,25 +611,40 @@
 </div>
 
 <?php
-    $fy = $this->session->userdata('finacial_year');
-    $fy_new = $fy + 1;
-    $lastdate_date = '20'.$fy_new.'-03-31';
-    $curr_date = date('Y-m-d');
-    $curr_date_new = new DateTime($curr_date);
-    $last_date_yr = new DateTime($lastdate_date);
-    if($last_date_yr < $curr_date_new){
-        $max_date_php = $lastdate_date;
-    } else {
-        $max_date_php = $curr_date;
-    }
+$fy = $this->session->userdata('finacial_year');
+$fy_new = $fy + 1;
+$lastdate_date = '20' . $fy_new . '-03-31';
+$curr_date = date('Y-m-d');
+$curr_date_new = new DateTime($curr_date);
+$last_date_yr = new DateTime($lastdate_date);
+if ($last_date_yr < $curr_date_new) {
+  $max_date_php = $lastdate_date;
+} else {
+  $max_date_php = $curr_date;
+}
 ?>
 <?php init_tail(); ?>
 <script>
+  function refreshItemDropdownState() {
+    var itemType = $('#item_type').val();
+    var itemCategory = $('#item_category').val();
+    var customerId = $('#customer_id').val();
+    var allFilled = itemType && itemCategory && customerId;
 
-$(document).ready(function(){
-    var fin_y   = "<?php echo $this->session->userdata('finacial_year'); ?>";
-    var year    = "20" + fin_y;
-    var cur_y   = new Date().getFullYear().toString().substr(-2);
+    $('#item_id').prop('disabled', !allFilled);
+    $('.selectpicker').selectpicker('refresh');
+  }
+  $(document).ready(function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var editId = urlParams.get('id');
+    if (editId) {
+      getDetails(editId);
+    }
+    $('#item_id').prop('disabled', true);
+    $('.selectpicker').selectpicker('refresh');
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
 
     // Min date: April 1st of FY start year
     var minStartDate = new Date(year, 3, 1); // month index 3 = April
@@ -558,40 +652,40 @@ $(document).ready(function(){
     // Max date: March 31 of FY end year, OR today if still within FY
     var maxEndDate;
     if (parseInt(cur_y) > parseInt(fin_y)) {
-        var fy_new   = parseInt(fin_y) + 1;
-        var fy_new_s = "20" + fy_new;
-        maxEndDate   = new Date(fy_new_s + '/03/31');
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
     } else {
-        maxEndDate = new Date();
+      maxEndDate = new Date();
     }
 
     // Order Date — restricted within FY, up to today or March 31
     $('#order_date').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,
-        maxDate: maxEndDate,
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
 
     // Delivery From — same FY restriction
     $('#delivery_from').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,
-        maxDate: maxEndDate,
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
 
     // Delivery To — min is today, max is March 31 of FY end
     var fy_end_year = "20" + (parseInt(fin_y) + 1);
-    var fyEndDate   = new Date(fy_end_year + '/03/31');
+    var fyEndDate = new Date(fy_end_year + '/03/31');
 
     $('#delivery_to').datetimepicker({
-        format: 'd/m/Y',
-        minDate: minStartDate,    // can't go before FY start
-        maxDate: fyEndDate,       // always allows up to March 31 for delivery planning
-        timepicker: false
+      format: 'd/m/Y',
+      minDate: minStartDate, // can't go before FY start
+      maxDate: fyEndDate, // always allows up to March 31 for delivery planning
+      timepicker: false
     });
-});
+  });
 
 
   // Helper: safely format a number to 2 decimal places
@@ -608,7 +702,8 @@ $(document).ready(function(){
 
     var fromDate = $('#from_date').val();
     var toDate = $('#to_date').val();
-    var categoryId = $('#filter_category').val();
+    var statusFilter = $('#modal_status_filter').val();
+    var locationFilter = $('#modal_location_filter').val();
 
     if (!fromDate || !toDate) {
       alert_float('warning', 'Please select both From Date and To Date');
@@ -623,16 +718,32 @@ $(document).ready(function(){
     var from = parseDate(fromDate);
     var to = parseDate(toDate);
 
+    // Remove any existing "No Data" row
+    $('#table_ListModal tbody tr.no-data-row').remove();
+
+    var visibleCount = 0;
+
     $('#table_ListModal tbody tr').each(function() {
       var rowDateText = $(this).find('td').eq(1).text().trim();
       var rowDate = parseDate(rowDateText);
-      var rowCategoryId = $(this).data('category');
+      var rowStatusVal = String($(this).data('status') || '');
+      var rowLocationVal = String($(this).data('location') || '');
 
       var dateMatch = (rowDate >= from && rowDate <= to);
-      var categoryMatch = (!categoryId || categoryId == rowCategoryId);
+      var statusMatch = !statusFilter || rowStatusVal === statusFilter;
+      var locationMatch = !locationFilter || rowLocationVal === locationFilter;
 
-      $(this).toggle(dateMatch && categoryMatch);
+      var show = dateMatch && statusMatch && locationMatch;
+      $(this).toggle(show);
+      if (show) visibleCount++;
     });
+
+    if (visibleCount === 0) {
+      var colspan = $('#table_ListModal thead tr th').length;
+      $('#table_ListModal tbody').append(
+        '<tr class="no-data-row"><td colspan="' + colspan + '" style="text-align:center; padding:12px !important; color:#888; font-style:italic;">No data found</td></tr>'
+      );
+    }
   });
 
 
@@ -649,6 +760,19 @@ $(document).ready(function(){
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
+
+    // ── Clear lock state ──
+    $('#so_lock_warning').text('').hide();
+    $('#main_save_form input:not([type="hidden"])').prop('readonly', false);
+    $('#main_save_form select').prop('disabled', false).selectpicker('refresh');
+    $('#main_save_form textarea').prop('readonly', false);
+    $('#items_body input, #items_body select').prop('readonly', false).prop('disabled', false);
+    $('.saveBtn').show();
+    $('#main_save_form .bootstrap-select button').prop('disabled', false).css({
+      'background-color': '',
+      'cursor': '',
+      'pointer-events': ''
+    });
   }
 
   $(document).on('input', 'input[type="tel"]', function() {
@@ -679,7 +803,7 @@ $(document).ready(function(){
     var row_id = $('#row_id').val();
     var next_id = parseInt(row_id) + 1;
     if (row == null) {
-      let fields = ['item_id', 'min_qty', 'max_qty', 'disc_amt', 'unit_rate'];
+      let fields = ['item_id', 'sale_qty', 'quotated_qty', 'disc_amt', 'unit_rate'];
       let data = validate_fields(fields);
       if (data === false) {
         return false;
@@ -699,8 +823,8 @@ $(document).ready(function(){
         <td><input type="text" name="hsn_code[]" id="hsn_code${next_id}" class="form-control dynamic_row${next_id}" readonly tabindex="-1"></td>
         <td><input type="text" name="uom[]" id="uom${next_id}" class="form-control dynamic_row${next_id}" readonly tabindex="-1"></td>
         <td><input type="tel" name="unit_weight[]" id="unit_weight${next_id}" class="form-control unit-weight dynamic_row${next_id}" min="0" step="0.01" readonly tabindex="-1"></td>
-        <td><input type="tel" name="min_qty[]" id="min_qty${next_id}" class="form-control min-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="max_qty[]" id="max_qty${next_id}" class="form-control max-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
+        <td><input type="tel" name="quotated_qty[]" id="quotated_qty${next_id}" class="form-control max-qty dynamic_row${next_id}" min="0" step="0.01" readonly tabindex="-1"></td>
+        <td><input type="tel" name="sale_qty[]" id="sale_qty${next_id}" class="form-control min-qty dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="disc_amt[]" id="disc_amt${next_id}" class="form-control disc-amt dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="unit_rate[]" id="unit_rate${next_id}" class="form-control unit-rate dynamic_row${next_id}" min="0" step="0.01" onchange="calculateAmount(${next_id})"></td>
         <td><input type="tel" name="gst[]" id="gst${next_id}" class="form-control gst-percent dynamic_row${next_id}" min="0" max="100" step="0.01" readonly tabindex="-1"></td>
@@ -713,8 +837,8 @@ $(document).ready(function(){
       $('#hsn_code' + next_id).val($('#hsn_code').val());
       $('#uom' + next_id).val($('#uom').val());
       $('#unit_weight' + next_id).val($('#unit_weight').val());
-      $('#min_qty' + next_id).val($('#min_qty').val());
-      $('#max_qty' + next_id).val($('#max_qty').val());
+      $('#sale_qty' + next_id).val($('#sale_qty').val());
+      $('#quotated_qty' + next_id).val($('#quotated_qty').val());
       $('#disc_amt' + next_id).val($('#disc_amt').val());
       $('#unit_rate' + next_id).val($('#unit_rate').val());
       $('#gst' + next_id).val($('#gst').val());
@@ -727,52 +851,62 @@ $(document).ready(function(){
   }
 
   function calculateAmount(row) {
-    var minQty    = parseFloat($('#min_qty' + row).val()) || 0;
-    var unitRate  = parseFloat($('#unit_rate' + row).val()) || 0;
-    var discAmt   = parseFloat($('#disc_amt' + row).val()) || 0;
+    var saleQty = parseFloat($('#sale_qty' + row).val()) || 0;
+    var unitRate = parseFloat($('#unit_rate' + row).val()) || 0;
+    var discAmt = parseFloat($('#disc_amt' + row).val()) || 0;
     var gstPercent = parseFloat($('#gst' + row).val()) || 0;
+    //   var quotatedQty = parseFloat($('#quotated_qty' + row).data('balance')) ||
+    //     parseFloat($('#quotated_qty' + row).val()) || 0;
 
-    $('#max_qty' + row).val(minQty + 2);
+    //   if (saleQty > quotatedQty && quotatedQty > 0) {
+    //     alert_float('warning', 'Sale Qty cannot be greater than Quotation Qty!');
+    //     $('#sale_qty' + row).val(quotatedQty);
+    //     saleQty = quotatedQty;
+    //   }
 
-    var taxableAmt = (unitRate - discAmt) * minQty;
-    var gstAmt     = taxableAmt * (gstPercent / 100);
-    var netAmt     = taxableAmt + gstAmt;
+    //   // Update remaining balance display
+    //   var newBalance = quotatedQty - saleQty;
+    //  $('#quotated_qty' + row).val(newBalance >= 0 ? newBalance.toFixed(0) : '0');
+
+    var taxableAmt = (unitRate - discAmt) * saleQty;
+    var gstAmt = taxableAmt * (gstPercent / 100);
+    var netAmt = taxableAmt + gstAmt;
     if (isNaN(netAmt) || netAmt < 0) netAmt = 0;
 
     $('#amount' + row).val(fmt(netAmt));
     calculateTotals();
 
-    if ((row == '' || row == null) && minQty > 0 && unitRate > 0 && discAmt >= 0 && gstPercent >= 0) {
+    if ((row == '' || row == null) && saleQty > 0 && unitRate > 0 && discAmt >= 0 && gstPercent >= 0) {
       addRow();
     }
   }
 
   function calculateTotals() {
-    var totalWeight     = 0;
-    var totalQty        = 0;
-    var itemTotalAmt    = 0;
-    var totalDiscAmt    = 0;
+    var totalWeight = 0;
+    var totalQty = 0;
+    var itemTotalAmt = 0;
+    var totalDiscAmt = 0;
     var totalTaxableAmt = 0;
-    var totalGstAmt     = 0;
+    var totalGstAmt = 0;
 
     $('#items_body tr').each(function() {
-      var row       = $(this);
-      var qty       = parseFloat(row.find('.min-qty').val()) || 0;
-      var weight    = parseFloat(row.find('.unit-weight').val()) || 0;
-      var rate      = parseFloat(row.find('.unit-rate').val()) || 0;
-      var discAmt   = parseFloat(row.find('.disc-amt').val()) || 0;
+      var row = $(this);
+      var qty = parseFloat(row.find('.min-qty').val()) || 0;
+      var weight = parseFloat(row.find('.unit-weight').val()) || 0;
+      var rate = parseFloat(row.find('.unit-rate').val()) || 0;
+      var discAmt = parseFloat(row.find('.disc-amt').val()) || 0;
       var gstPercent = parseFloat(row.find('.gst-percent').val()) || 0;
 
-      var rowNetRate     = rate - discAmt;
-      var rowTaxableAmt  = rowNetRate * qty;
-      var rowGstAmt      = rowTaxableAmt * (gstPercent / 100);
+      var rowNetRate = rate - discAmt;
+      var rowTaxableAmt = rowNetRate * qty;
+      var rowGstAmt = rowTaxableAmt * (gstPercent / 100);
 
-      totalWeight     += weight * qty;
-      totalQty        += qty;
-      itemTotalAmt    += rate * qty;
-      totalDiscAmt    += discAmt * qty;
+      totalWeight += weight * qty;
+      totalQty += qty;
+      itemTotalAmt += rate * qty;
+      totalDiscAmt += discAmt * qty;
       totalTaxableAmt += rowTaxableAmt;
-      totalGstAmt     += rowGstAmt;
+      totalGstAmt += rowGstAmt;
     });
 
     $('#total_weight_display').text(fmt(totalWeight));
@@ -783,19 +917,21 @@ $(document).ready(function(){
 
     // GST split by state
     var customerState = $('#customer_state').val();
-    var cgstAmt = 0, sgstAmt = 0, igstAmt = 0;
+    var cgstAmt = 0,
+      sgstAmt = 0,
+      igstAmt = 0;
     var totalGstPercent = 0;
 
     if (totalTaxableAmt > 0) {
       $('#items_body tr').each(function() {
-        var row        = $(this);
-        var qty        = parseFloat(row.find('.min-qty').val()) || 0;
-        var rate       = parseFloat(row.find('.unit-rate').val()) || 0;
-        var discAmt    = parseFloat(row.find('.disc-amt').val()) || 0;
+        var row = $(this);
+        var qty = parseFloat(row.find('.min-qty').val()) || 0;
+        var rate = parseFloat(row.find('.unit-rate').val()) || 0;
+        var discAmt = parseFloat(row.find('.disc-amt').val()) || 0;
         var gstPercent = parseFloat(row.find('.gst-percent').val()) || 0;
-        var rowNetRate    = rate - discAmt;
+        var rowNetRate = rate - discAmt;
         var rowTaxableAmt = rowNetRate * qty;
-        totalGstPercent  += (rowTaxableAmt / totalTaxableAmt) * gstPercent;
+        totalGstPercent += (rowTaxableAmt / totalTaxableAmt) * gstPercent;
       });
     }
     totalGstPercent = Math.round(totalGstPercent * 100) / 100;
@@ -812,8 +948,8 @@ $(document).ready(function(){
     $('#igst_amt_display').text(fmt(igstAmt));
 
     var netAmtBeforeRound = totalTaxableAmt + totalGstAmt;
-    var netAmtRounded     = Math.round(netAmtBeforeRound);
-    var roundOffAmt       = netAmtRounded - netAmtBeforeRound;
+    var netAmtRounded = Math.round(netAmtBeforeRound);
+    var roundOffAmt = netAmtRounded - netAmtBeforeRound;
 
     $('#round_off_amt_display').text(fmt(roundOffAmt));
     $('#net_amt_display').text(fmt(netAmtRounded));
@@ -877,7 +1013,9 @@ $(document).ready(function(){
     $.ajax({
       url: '<?= admin_url('SalesOrder/getNextSalesOrderNo'); ?>',
       type: 'POST',
-      data: { category_id: categoryId },
+      data: {
+        category_id: categoryId
+      },
       dataType: 'json',
       success: function(response) {
         if (response.success == true) {
@@ -895,6 +1033,7 @@ $(document).ready(function(){
           $('#OrderID').val('');
         }
         if (callback) callback();
+        refreshItemDropdownState();
       },
       error: function() {
         $('#OrderID').val('');
@@ -912,7 +1051,9 @@ $(document).ready(function(){
     $.ajax({
       url: '<?= admin_url('SalesOrder/getCustomerDetailsLocation'); ?>',
       type: 'POST',
-      data: { customer_id: CustomerId },
+      data: {
+        customer_id: CustomerId
+      },
       dataType: 'json',
       success: function(response) {
         if (response.success == true) {
@@ -946,6 +1087,7 @@ $(document).ready(function(){
 
           $('.selectpicker').selectpicker('refresh');
           calculateTotals();
+          refreshItemDropdownState();
           if (callback) callback();
         }
       }
@@ -957,7 +1099,9 @@ $(document).ready(function(){
     $.ajax({
       url: "<?= admin_url(); ?>SalesOrder/getQuotationDetails",
       type: "POST",
-      data: { quotation_id: quotation_id },
+      data: {
+        quotation_id: quotation_id
+      },
       dataType: "json",
       success: function(response) {
         if (!response.success) return;
@@ -975,7 +1119,9 @@ $(document).ready(function(){
               url: "<?= admin_url(); ?>SalesOrder/GetHistoryDetails",
               method: "POST",
               dataType: "JSON",
-              data: { OrderID: OrderID },
+              data: {
+                OrderID: OrderID
+              },
               success: function(response) {
                 if (response.success === true) {
                   let items = response.items;
@@ -985,13 +1131,52 @@ $(document).ready(function(){
                   for (let i = 0; i < items.length; i++) {
                     addRow(2);
                     let row = i + 1;
+                    var balQty = parseFloat(items[i].BalanceQty || 0);
+                    var isSoldOut = balQty <= 0;
+
                     $('#item_id' + row).val(items[i].ItemID);
                     getItemDetails(items[i].ItemID, row);
-                    $('#min_qty' + row).val(parseFloat(items[i].OrderQty || 0).toFixed(0));
-                    $('#max_qty' + row).val(items[i].OrderQty);
+                    $('#quotated_qty' + row).val(isSoldOut ? 'Sold Out' : balQty.toFixed(0));
                     $('#unit_rate' + row).val(parseFloat(items[i].BasicRate || 0).toFixed(0));
                     $('#disc_amt' + row).val(parseFloat(items[i].DiscAmt || 0).toFixed(0));
                     calculateAmount(row);
+
+                    if (isSoldOut) {
+                      // Show balance as 0 (readonly, normal styling)
+                      $('#quotated_qty' + row)
+                        .val('0')
+                        .prop('readonly', true);
+
+                      // Show "Sold Out" in sale_qty with red color
+                      $('#sale_qty' + row)
+                        .val('Sold Out')
+                        .prop('readonly', true)
+                        .css({
+                          'background-color': '#f5f5f5',
+                          'cursor': 'not-allowed',
+                          'color': '#c0392b',
+                          'font-weight': '600',
+                          'text-align': 'center'
+                        })
+                        .off('change keyup');
+
+                      $('#disc_amt' + row).prop('readonly', true).css({
+                        'background-color': '#f5f5f5',
+                        'cursor': 'not-allowed'
+                      });
+                      $('#unit_rate' + row).prop('readonly', true).css({
+                        'background-color': '#f5f5f5',
+                        'cursor': 'not-allowed'
+                      });
+
+                      $('#item_id' + row).closest('tr')
+                        .css({
+                          'border-left': '3px solid #e74c3c',
+                          'background-color': '#fff8f8'
+                        });
+
+                      $('#item_id' + row).closest('tr').find('.btn-danger').remove();
+                    }
                   }
 
                   $('.selectpicker').selectpicker('refresh');
@@ -1003,10 +1188,13 @@ $(document).ready(function(){
             });
           });
         });
-                  $('#delivery_to').val(moment(d.DeliveryTo).format('DD/MM/YYYY'));
-          $('#delivery_from').val(moment(d.DeliveryFrom).format('DD/MM/YYYY'));
-          $('#payment_terms').val(d.PaymentTerms);
-          $('#freight_terms').val(d.FreightTerms);
+        $('#sales_location').val(d.SalesLocation).selectpicker('refresh');
+        $('#customer_location').val(d.CustomerLocation).selectpicker('refresh');
+        $('#broker_id').val(d.BrokerID).selectpicker('refresh');
+        $('#delivery_to').val(moment(d.DeliveryTo).format('DD/MM/YYYY'));
+        $('#delivery_from').val(moment(d.DeliveryFrom).format('DD/MM/YYYY'));
+        $('#payment_terms').val(d.PaymentTerms);
+        $('#freight_terms').val(d.FreightTerms);
 
       }
     });
@@ -1032,7 +1220,9 @@ $(document).ready(function(){
     $.ajax({
       url: '<?= admin_url('SalesOrder/GetItemDetails'); ?>',
       type: 'POST',
-      data: { item_id: itemId },
+      data: {
+        item_id: itemId
+      },
       dataType: 'json',
       success: function(response) {
         if (response.status === 'success' && response.data) {
@@ -1041,7 +1231,7 @@ $(document).ready(function(){
           $('#uom' + id).val(data.unit || '');
           $('#unit_weight' + id).val(parseFloat(data.UnitWeight || 0).toFixed(0));
           $('#gst' + id).val(parseFloat(data.tax || 0).toFixed(0));
-          $('#min_qty' + id).focus();
+          $('#sale_qty' + id).focus();
         } else {
           $('.fixed_row').val('');
           $('.selectpicker').selectpicker('refresh');
@@ -1089,13 +1279,34 @@ $(document).ready(function(){
         if (response.success == true) {
           alert_float('success', response.message);
           ResetForm();
+          let statusLabels = {
+            1: { label: 'Pending' },
+            2: { label: 'Cancel' },
+            3: { label: 'Expired' },
+            4: { label: 'Approved' },
+            5: { label: 'Complete' },
+            6: { label: 'In Progress' },
+            7: { label: 'Partially Complete' },
+          };
+          let brokerFull = (response.data.broker_name || '') ?
+            (response.data.broker_name || '') + ' - ' + (response.data.broker_state || '') + ' (' + (response.data.BrokerID || '') + ')' :
+            '-';
+          let brokerDisp = brokerFull.length > 50 ? brokerFull.substring(0, 50) + '...' : brokerFull;
+          let statusKey = parseInt(response.data.Status) || 1;
+          let statusInfo = statusLabels[statusKey] || statusLabels[1];
           let d = response.data;
           let html = `<tr class="get_Details" data-id="${d.id}" onclick="getDetails(${d.id})" data-category="${d.ItemCategory || ''}">
             <td>${d.OrderID}</td>
             <td>${moment(d.TransDate).format('DD/MM/YYYY')}</td>
             <td>${d.CategoryName}</td>
-            <td>${d.company}</td>
-            <td>${fmt(d.TotalWeight)}</td>
+            <td>${(() => { 
+        const full = (response.data.company || '') + ' - ' + (response.data.billing_state || '') + ' (' + (response.data.AccountID || '') + ')';
+        const disp = full.length > 50 ? full.substring(0, 50) + '...' : full;
+        return `<span class="text-truncate-custom" title="${full}">${disp}</span>`;
+    })()}</td>
+    <td><span class="text-truncate-custom" title="${brokerFull}">${brokerDisp}</span></td>
+    <td>${response.data.LocationName}</td>        
+    <td>${fmt(d.TotalWeight)}</td>
             <td>${fmt(d.TotalQuantity)}</td>
             <td>${fmt(d.ItemAmt)}</td>
             <td>${fmt(d.DiscAmt)}</td>
@@ -1103,8 +1314,8 @@ $(document).ready(function(){
             <td>${fmt(d.CGSTAmt)}</td>
             <td>${fmt(d.SGSTAmt)}</td>
             <td>${fmt(d.IGSTAmt)}</td>
-            <td>${fmt(d.RoundOffAmt)}</td>
             <td>${fmt(d.NetAmt)}</td>
+            <td style="text-align:center;">${statusInfo.label}</td>
           </tr>`;
           if (form_mode == 'edit') {
             $('.get_Details[data-id="' + d.id + '"]').replaceWith(html);
@@ -1124,7 +1335,9 @@ $(document).ready(function(){
       url: "<?= admin_url(); ?>SalesOrder/GetSalesOrderDetails",
       method: "POST",
       dataType: "JSON",
-      data: { id: id },
+      data: {
+        id: id
+      },
       success: function(response) {
         if (response.success == true) {
           let d = response.data;
@@ -1132,20 +1345,75 @@ $(document).ready(function(){
           $('#item_type').val(d.ItemType);
           getCustomDropdownList('item_type', d.ItemType, 'item_category', d.ItemCategory, function() {
             getNextSalesOrderNo(function() {
+              // let history = response.data.history;
+              // for (var i = 0; i < history.length; i++) {
+              //   addRow(2);
+              //   $('#item_uid' + (i + 1)).val(history[i].id);
+              //   $('#item_id' + (i + 1)).val(history[i].ItemID);
+              //   getItemDetails(history[i].ItemID, (i + 1));
+              //   var saleQty = parseFloat(history[i].SaleQty || 0);
+              //   var balanceQty = parseFloat(history[i].BalanceQty || 0);
+              //   // Original balance = remaining balance + what this SO itself consumed
+              //   var originalBal = balanceQty + saleQty;
+
+              //   $('#quotated_qty' + (i + 1)).val(fmt(balanceQty));
+              //   $('#quotated_qty' + (i + 1)).data('balance', originalBal); // store for live countdown validation
+              //   $('#sale_qty' + (i + 1)).val(fmt(saleQty));
+              //   $('#unit_rate' + (i + 1)).val(fmt(history[i].BasicRate));
+              //   $('#disc_amt' + (i + 1)).val(fmt(history[i].DiscAmt));
+              //   $('#amount' + (i + 1)).val(fmt(history[i].NetOrderAmt));
+              //   $('.selectpicker').selectpicker('refresh');
+              //   calculateAmount(i + 1);
+              // }
+
               let history = response.data.history;
               for (var i = 0; i < history.length; i++) {
                 addRow(2);
-                $('#item_uid' + (i + 1)).val(history[i].id);
-                $('#item_id' + (i + 1)).val(history[i].ItemID);
-                getItemDetails(history[i].ItemID, (i + 1));
-                $('#min_qty' + (i + 1)).val(fmt(history[i].OrderQty));
-                $('#max_qty' + (i + 1)).val(fmt(history[i].OrderQty));
-                $('#unit_rate' + (i + 1)).val(fmt(history[i].BasicRate));
-                $('#disc_amt' + (i + 1)).val(fmt(history[i].DiscAmt));
-                $('#amount' + (i + 1)).val(fmt(history[i].NetOrderAmt));
-                $('.selectpicker').selectpicker('refresh');
-                calculateAmount(i + 1);
+                var rowNum = i + 1;
+                var isLocked = history[i].is_locked == 1;
+
+                var saleQty = parseFloat(history[i].SaleQty || 0);
+                var balanceQty = parseFloat(history[i].BalanceQty || 0);
+                var originalBal = balanceQty + saleQty;
+
+                $('#item_uid' + rowNum).val(history[i].id);
+                $('#item_id' + rowNum).val(history[i].ItemID);
+                getItemDetails(history[i].ItemID, rowNum);
+                $('#quotated_qty' + rowNum).val(fmt(balanceQty));
+                $('#quotated_qty' + rowNum).data('balance', originalBal);
+                $('#sale_qty' + rowNum).val(fmt(saleQty));
+                $('#unit_rate' + rowNum).val(fmt(history[i].BasicRate || 0));
+                $('#disc_amt' + rowNum).val(fmt(history[i].DiscAmt || 0));
+                $('#amount' + rowNum).val(fmt(history[i].NetOrderAmt || 0));
+                calculateAmount(rowNum);
+
+                if (isLocked) {
+                  $('#sale_qty' + rowNum).prop('readonly', true).css({
+                    'background-color': '#f5f5f5',
+                    'cursor': 'not-allowed'
+                  }).off('change keyup');
+                  $('#disc_amt' + rowNum).prop('readonly', true).css({
+                    'background-color': '#f5f5f5',
+                    'cursor': 'not-allowed'
+                  });
+                  $('#unit_rate' + rowNum).prop('readonly', true).css({
+                    'background-color': '#f5f5f5',
+                    'cursor': 'not-allowed'
+                  });
+                  $('#item_id' + rowNum).prop('disabled', true).selectpicker('refresh');
+
+                  $('#item_id' + rowNum).closest('tr')
+                    .css({
+                      'border-left': '3px solid #e74c3c',
+                      'background-color': '#fff8f8'
+                    })
+                    .data('locked', 1);
+
+                  $('#item_id' + rowNum).closest('tr').find('.btn-danger').remove();
+                }
               }
+              $('.selectpicker').selectpicker('refresh');
+              calculateTotals();
             });
           });
 
@@ -1172,11 +1440,41 @@ $(document).ready(function(){
           $('.selectpicker').selectpicker('refresh');
           $('#form_mode').val('edit');
           $('.saveBtn').hide();
-          $('.updateBtn').show();
           $('.printBtn').show();
+
+          // ── FORM-LEVEL LOCK: Status 2 / 3 / 5 / 7 ──
+          if (d.is_so_locked == 1) {
+            var lockMsg = d.lock_reason || 'This Sales Order is locked and cannot be updated.';
+            $('#so_lock_warning').text('⚠ ' + lockMsg).show();
+
+            $('#main_save_form input:not([type="hidden"])').prop('readonly', true);
+            $('#main_save_form select').prop('disabled', true).selectpicker('refresh');
+            $('#main_save_form textarea').prop('readonly', true);
+            $('#items_body input').prop('readonly', true).css({
+              'background-color': '#f5f5f5',
+              'cursor': 'not-allowed'
+            });
+            $('#items_body select').prop('disabled', true);
+            $('#items_body .bootstrap-select button').prop('disabled', true).css({
+              'background-color': '#f5f5f5',
+              'cursor': 'not-allowed',
+              'pointer-events': 'none'
+            });
+            $('#items_body .btn-danger').remove();
+
+            $('.updateBtn').show().prop('disabled', true).addClass('disabled');
+
+          } else {
+            $('#so_lock_warning').hide();
+            $('.updateBtn').show().prop('disabled', false).removeClass('disabled');
+          }
+
           $('#ListModal').modal('hide');
         } else {
           alert_float('warning', response.message);
+        }
+        if (window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
       }
     });
@@ -1255,7 +1553,8 @@ $(document).ready(function(){
     padding: 10px;
     display: flex;
     align-items: flex-end;
-    gap: 25px;
+    gap: 10px;
+    width: 100%;
   }
 
   .filter-group {
@@ -1268,6 +1567,7 @@ $(document).ready(function(){
     font-weight: 600;
     margin-bottom: 5px;
     color: #333;
+    
   }
 
   .filter-group .form-control {
@@ -1291,6 +1591,7 @@ $(document).ready(function(){
   #table_ListModal tbody tr {
     cursor: pointer;
   }
+
   #table_ListModal tbody tr:hover {
     background-color: rgb(171, 174, 176);
   }

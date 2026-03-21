@@ -289,6 +289,14 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 25,
 		]);
 	}
+	if (has_permission_new('Conveyor', '', 'view')) {
+		$CI->app_menu->add_sidebar_children_item('master', [
+			'slug' => 'Conveyor',
+			'name' => 'Conveyor Master',
+			'href' => admin_url('Conveyor'),
+			'position' => 26,
+		]);
+	}
 
 
 	/*if (has_permission('salesperassign', '', 'update')) {

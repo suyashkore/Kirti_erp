@@ -164,26 +164,59 @@ class Quotation_model extends App_Model
     return $this->db->get()->result_array();
   }
 
-  public function getQuoteDetails($id)
+  public function getQuoteDetails($quotation_no)
   {
-    $this->db->select('pm.*, c.company, icm.CategoryName as category_name,icm.prefix as category_prefix');
+    $this->db->select('pm.*, c.company, icm.CategoryName as category_name,icm.prefix as category_prefix, ft.FreightTerms as FreightTermsname, itm.ItemTypeName as ItemTypeName');
     $this->db->from(db_prefix().'PurchQuotationMaster pm');
     $this->db->join(db_prefix().'clients c', 'c.AccountID = pm.AccountID', 'left');
     $this->db->join( db_prefix().'ItemCategoryMaster icm', 'icm.id = pm.ItemCategory', 'left' );
-    if(is_numeric($id)){
-      $this->db->where('pm.id', $id);
-    }else{
-      $this->db->where('pm.QuotatioonID', $id);
-    }
+    $this->db->join( db_prefix().'FreightTerms ft', 'ft.id = pm.FreightTerms', 'left' );
+    $this->db->join( db_prefix().'ItemTypeMaster itm', 'itm.id = pm.ItemType', 'left' );
+    // if(is_numeric($id)){
+    //   $this->db->where('pm.id', $id);
+    // }else{
+      $this->db->where('pm.QuotatioonID', $quotation_no);
+    // }
     
     $master = $this->db->get()->row_array();
 
     if (!$master) {
       return [];
     }
-
+  $this->db->select('history.*, tblitems.ItemName'); // ðŸ‘ˆ ItemName add kela
     $this->db->from(db_prefix().'history');
-    $this->db->where('OrderID', $master['QuotatioonID']);
+    $this->db->join( db_prefix().'items ', 'tblitems.ItemID  = history.ItemID', 'left' );
+    $this->db->where('OrderID', $quotation_no);
+    $history = $this->db->get()->result_array();
+    $master['history'] = $history;
+
+    return $master;
+  }
+  
+  
+   public function GetQuotationDetailsitem($quotation_no)
+  {
+    $this->db->select('pm.*, c.company, icm.CategoryName as category_name,icm.prefix as category_prefix, ft.FreightTerms as FreightTermsname, itm.ItemTypeName as ItemTypeName');
+    $this->db->from(db_prefix().'PurchQuotationMaster pm');
+    $this->db->join(db_prefix().'clients c', 'c.AccountID = pm.AccountID', 'left');
+    $this->db->join( db_prefix().'ItemCategoryMaster icm', 'icm.id = pm.ItemCategory', 'left' );
+    $this->db->join( db_prefix().'FreightTerms ft', 'ft.id = pm.FreightTerms', 'left' );
+    $this->db->join( db_prefix().'ItemTypeMaster itm', 'itm.id = pm.ItemType', 'left' );
+    // if(is_numeric($id)){
+    //   $this->db->where('pm.id', $id);
+    // }else{
+      $this->db->where('pm.QuotatioonID', $quotation_no);
+    // }
+    
+    $master = $this->db->get()->row_array();
+
+    if (!$master) {
+      return [];
+    }
+  $this->db->select('history.*, tblitems.ItemName'); // ðŸ‘ˆ ItemName add kela
+    $this->db->from(db_prefix().'history');
+    $this->db->join( db_prefix().'items ', 'tblitems.ItemID  = history.ItemID', 'left' );
+    $this->db->where('OrderID', $quotation_no);
     $history = $this->db->get()->result_array();
     $master['history'] = $history;
 
@@ -264,12 +297,17 @@ class Quotation_model extends App_Model
     $vendor_id    = $data['vendor_id'] ?? '';
     $broker_id    = $data['broker_id'] ?? '';
     $status       = $data['status'] ?? 1;
+    $filter_location_id       = $data['filter_location_id'] ?? '';
+    // echo"";print_r($filter_location_id);die();
 
     $this->db->from(db_prefix().$this->table);
 
     $this->db->join(db_prefix().'ItemCategoryMaster cat', 'cat.id = '.db_prefix().$this->table.'.ItemCategory', 'left');
     $this->db->join(db_prefix().'clients vendor', 'vendor.AccountID = '.db_prefix().$this->table.'.AccountID', 'left');
     $this->db->join(db_prefix().'clients broker', 'broker.AccountID = '.db_prefix().$this->table.'.BrokerID', 'left');
+    $this->db->join(db_prefix().'PlantLocationDetails', 'tblPlantLocationDetails.id = '.db_prefix().$this->table.'.PurchaseLocation', 'left');
+    // $this->db->join(db_prefix().'PurchaseOrderMaster', 'tblPurchaseOrderMaster.QuatationID = '.db_prefix().$this->table.'.QuotatioonID', 'left');
+  
     $this->db->join(
       '(SELECT QuatationID, SUM(TotalWeight) as po_total_weight 
         FROM '.db_prefix().'PurchaseOrderMaster 
@@ -285,6 +323,7 @@ class Quotation_model extends App_Model
     if($status != '')          $this->db->where(db_prefix().$this->table.'.Status', $status);
     if($from_date != '')       $this->db->where(db_prefix().$this->table.'.TransDate >=', $from_date);
     if($to_date != '')         $this->db->where(db_prefix().$this->table.'.TransDate <=', $to_date);
+    if($filter_location_id != '')         $this->db->where(db_prefix().$this->table.'.PurchaseLocation', $filter_location_id);
 
     $total = $this->db->count_all_results('', FALSE);
 
@@ -293,11 +332,16 @@ class Quotation_model extends App_Model
       'cat.CategoryName as category_name',
       'vendor.company as vendor_name',
       'broker.company as broker_name',
-      'IFNULL(pom.po_total_weight,0) as po_total_weight'
+      'IFNULL(pom.po_total_weight,0) as po_total_weight','tblPlantLocationDetails.LocationName as location_name'
     ]);
+    
 
     // $this->db->order_by($this->primaryKey, 'desc');
     $this->db->limit($limit, $offset);
+     // ✅ ORDER BY DESC (IMPORTANT)
+  $this->db->order_by(db_prefix().$this->table.'.QuotatioonID', 'DESC');
+//   $this->db->group_by(db_prefix().$this->table.'.QuotatioonID');
+  
 
     $rows = $this->db->get()->result_array();
 
@@ -352,7 +396,7 @@ public function createPOFromQuotations($data)
 
         // echo"";
         // print_r("Generated PO Number: " . $po_no);die;
-        // ── tblPurchaseOrderMaster Insert ──
+        // â”€â”€ tblPurchaseOrderMaster Insert â”€â”€
         $master = [
             'PlantID'          => $quot['PlantID'],
             'FY'               => $quot['FY'],
@@ -385,12 +429,12 @@ public function createPOFromQuotations($data)
             'RoundOffAmt'      => $quot['RoundOffAmt'],
             'NetAmt'           => $quot['NetAmt'],
             'UserID'           => $user_id,
-            'Status'           => 6,
+            'Status'           => 4,
         ];
 
         $this->db->insert('tblPurchaseOrderMaster', $master);
 
-        // ── tblhistory Insert ──
+        // â”€â”€ tblhistory Insert â”€â”€
         if (!empty($quot['history'])) {
             foreach ($quot['history'] as $item) {
                 $history_row = [
@@ -440,7 +484,7 @@ public function createPOFromQuotations($data)
             }
         }
 
-        // ── Quotation Status → Approved (6) ──
+        // â”€â”€ Quotation Status â†’ Approved (6) â”€â”€
         $this->db->where('QuotatioonID', value: $quot['QuotatioonID'])
                  ->update('PurchQuotationMaster', [
                      'Status'  => 6,
@@ -457,5 +501,35 @@ public function createPOFromQuotations($data)
     }
 
     return ['success' => true];
+}
+
+// ========================================
+// Quotation Model madhe ha method add kara
+// File: application/models/purchase/Quotation_model.php
+// ========================================
+ 
+public function cancelQuotation($quotation_id)
+{
+    $this->db->set('Status', '2');
+    $this->db->where('QuotatioonID', $quotation_id);
+    $this->db->update('tblPurchQuotationMaster');
+ 
+    if ($this->db->affected_rows() > 0) {
+        return true;
+    }
+    return false;
+}
+
+
+public function partiallyCompleteQuotation($quotation_id)
+{
+    $this->db->set('Status', '7');
+    $this->db->where('QuotatioonID', $quotation_id);
+    $this->db->update('tblPurchQuotationMaster');
+ 
+    if ($this->db->affected_rows() > 0) {
+        return true;
+    }
+    return false;
 }
 }

@@ -379,6 +379,58 @@ class DeliveryOrder extends AdminController
 
 			$this->DO_model->saveMultiData($multi_insert_data);
 
+			// =============================================
+			// Sales Order Status Update
+			// =============================================
+			$so_ids = array_unique(array_filter($data['so_no'] ?? []));
+
+			foreach ($so_ids as $so_order_id) {
+
+				$so_rows = $this->db
+					->select('h.ItemID, h.OrderQty')
+					->from(db_prefix() . 'history h')
+					->where('h.OrderID', $so_order_id)
+					->where('h.TType2', 'Order')
+					->where('h.TransID IS NULL', null, false)
+					->get()
+					->result_array();
+
+				if (empty($so_rows)) continue;
+
+				$total_items    = count($so_rows);
+				$complete_items = 0;
+
+				foreach ($so_rows as $row) {
+
+					$used = $this->db
+						->select('SUM(h2.OrderQty) as TotalUsedQty')
+						->from(db_prefix() . 'history h2')
+						->where('h2.TType2', 'Delivery')
+						->where('h2.OrderID', $so_order_id)
+						->where('h2.ItemID', $row['ItemID'])
+						->where('h2.TransID IS NOT NULL', null, false)
+						->get()
+						->row_array();
+
+					$dispatched_qty = floatval($used['TotalUsedQty'] ?? 0);
+					$so_qty         = floatval($row['OrderQty']);
+
+					if ($dispatched_qty >= $so_qty) {
+						$complete_items++;
+					}
+				}
+
+				$new_status = ($complete_items === $total_items) ? 5 : 6;
+
+				$this->db
+					->set('Status', $new_status)
+					->where('OrderID', $so_order_id)
+					->update(db_prefix() . 'SalesOrderMaster');
+			}
+			// =============================================
+			// End Sales Order Status Update
+			// =============================================
+
 			echo json_encode([
 				'success' => true,
 				'message' => 'Delivery Order ' . ($form_mode == 'add' ? 'created' : 'updated') . ' successfully',

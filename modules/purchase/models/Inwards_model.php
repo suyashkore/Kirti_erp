@@ -329,8 +329,8 @@ class Inwards_model extends App_Model
     if($vendor_id != '')       $this->db->where(db_prefix().$this->table.'.AccountID', $vendor_id);
     if($broker_id != '')       $this->db->where(db_prefix().$this->table.'.BrokerID', $broker_id);
     if($status != '')          $this->db->where(db_prefix().$this->table.'.Status', $status);
-    if($from_date != '')       $this->db->where(db_prefix().$this->table.'.TransDate >=', $from_date);
-    if($to_date != '')         $this->db->where(db_prefix().$this->table.'.TransDate <=', $to_date);
+    if($from_date != '')       $this->db->where(db_prefix().$this->table.'.TransDate >=', $from_date.' 00:00:00');
+    if($to_date != '')         $this->db->where(db_prefix().$this->table.'.TransDate <=', $to_date.' 23:59:59');
 
     $total = $this->db->count_all_results('', FALSE);
 
@@ -343,7 +343,7 @@ class Inwards_model extends App_Model
       'gm.VehicleNo'
     ]);
 
-    // $this->db->order_by($this->primaryKey, 'desc');
+    $this->db->order_by($this->primaryKey, 'desc');
     $this->db->limit($limit, $offset);
 
     $rows = $this->db->get()->result_array();

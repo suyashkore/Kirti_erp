@@ -159,19 +159,20 @@
                             <select class="selectpicker form-control" id="organisation_type" name="organisation_type"
                                 data-width="100%" data-live-search="true" data-none-selected-text="None selected">
                                 <option value=""></option>
-                                <option value="Proprietorship">Proprietorship</option>
-                                <option value="Partnership">Partnership</option>
-                                <option value="Partnership Firm">Partnership Firm</option>
-                                <option value="Limited Liability Partnership (LLP)">Limited Liability
-                                    Partnership (LLP)</option>
-                                <option value="Private Limited">Private Limited</option>
-                                <option value="Public Limited">Public Limited</option>
-                                <option value="One Person Company (OPC)">One Person Company (OPC)</option>
-                                <option value="Hindu Undivided Family (HUF)">Hindu Undivided Family (HUF)
-                                </option>
-                                <option value="Society / Trust / Club">Society / Trust / Club</option>
-                                <option value="Government Department/Body">Government Department/Body</option>
-                                <option value="Local Authority">Local Authority</option>
+                                <?php
+                                $orgType = [
+                                    'P' => 'Proprietorship',
+                                    'F' => 'Partnership',
+                                    'C' => 'Private Limited',
+                                    'T' => 'Society / Trust / Club',
+                                    'G' => 'Government Department/Body',
+                                    'L' => 'Local Authority',
+                                    'H' => 'Hindu Undivided Family (HUF)'
+                                ];
+                                foreach ($orgType as $key => $value) {
+                                    echo "<option value='" . $key . "'>" . $value . "</option>";
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -2014,19 +2015,19 @@ $(document).ready(function() {
         // Map 4th PAN character to organisation type and set default
         if (panNo && panNo.length >= 4) {
             let ch = panNo.charAt(3).toUpperCase();
-            const panMap = {
-                'P': 'Proprietorship',
-                'F': 'Partnership',
-                'C': 'Private Limited',
-                'H': 'Hindu Undivided Family (HUF)',
-                'T': 'Society / Trust / Club',
-                'G': 'Government Department/Body',
-                'L': 'Local Authority'
-            };
-            if (panMap[ch]) {
-                $('#organisation_type').val(panMap[ch]);
+            // const panMap = {
+            //     'P': 'Proprietorship',
+            //     'F': 'Partnership',
+            //     'C': 'Private Limited',
+            //     'H': 'Hindu Undivided Family (HUF)',
+            //     'T': 'Society / Trust / Club',
+            //     'G': 'Government Department/Body',
+            //     'L': 'Local Authority'
+            // };
+            // if (panMap[ch]) {
+                $('#organisation_type').val(ch);
                 $('.selectpicker').selectpicker('refresh');
-            }
+            // }
         }
         if (panNo === "") {
             $(".pan_denger").text("");

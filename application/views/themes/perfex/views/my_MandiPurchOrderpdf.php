@@ -17,12 +17,16 @@ foreach ($history as $index => $item) {
     $pdf->SetMargins(5, 15, 5, 0);
     $pdf->Ln(0);
 
+    // ================= CALCULATED VALUES =================
+    $brokerageTotal   = $item['Brokerage']   * $item['QtyQuintal'];
+    $marketLevyTotal  = $item['MarketLevy']  * $item['QtyQuintal'];
+
     $html = '<table width="100%" border="1" cellpadding="4" cellspacing="0" style="font-size:11px;">';
 
     /* ================= HEADER ================= */
     $html .= '<thead>
     <tr>
-        <td colspan="10" align="center" style="font-size:14px;">
+        <td colspan="8" align="center" style="font-size:14px;">
             <b>' . $PlantDetail->company_name . '<br>'
                 . $PlantDetail->address . '<br>
                 GSTIN: ' . $PlantDetail->gst . ' | Contact: ' . $PlantDetail->mobile1 . '<br>
@@ -30,7 +34,7 @@ foreach ($history as $index => $item) {
         </td>
     </tr>
     <tr>
-        <td colspan="10" align="center" style="font-size:13px;"><b>Mandi Purchase Order</b></td>
+        <td colspan="8" align="center" style="font-size:13px;"><b>Mandi Purchase Order</b></td>
     </tr>
     </thead>';
 
@@ -38,103 +42,83 @@ foreach ($history as $index => $item) {
 
     /* ================= BASIC INFO ================= */
     $html .= '<tr>
-        <td colspan="3"><b>PO No :</b> '       . $inv['OrderID']                                      . '</td>
-        <td colspan="3"><b>PO Date :</b> '     . date('d/m/Y', strtotime($inv['OrderDate']))          . '</td>
-        <td colspan="2"><b>Vehicle No :</b> '  . $inv['VehicleNo']                                    . '</td>
-        <td colspan="2"><b>Trans Date :</b> '  . date('d/m/Y', strtotime($inv['TransDate']))          . '</td>
+        <td colspan="2"><b>PO No :</b> '      . $inv['OrderID']                                 . '</td>
+        <td colspan="2"><b>PO Date :</b> '    . date('d/m/Y', strtotime($inv['OrderDate']))     . '</td>
+        <td colspan="2"><b>Vehicle No :</b> ' . $inv['VehicleNo']                               . '</td>
+        <td colspan="2"><b>Trans Date :</b> ' . date('d/m/Y', strtotime($inv['TransDate']))     . '</td>
     </tr>';
 
     $html .= '<tr>
-        <td colspan="3"><b>Warehouse :</b> '   . $inv['WarehouseID']                                  . '</td>
-        <td colspan="3"><b>Item Name :</b> '   . $inv['ItemID']                                       . '</td>
-        <td colspan="2"><b>TDS Name :</b> '    . $inv['TDSCode']                                      . '</td>
-        <td colspan="2"><b>Center Loc :</b> '  . $inv['CenterLocation']                               . '</td>
+        <td colspan="2"><b>Warehouse :</b> '  . $inv['WarehouseID']                             . '</td>
+        <td colspan="2"><b>Item Name :</b> '  . $inv['ItemID']                                  . '</td>
+        <td colspan="4"><b>Center Loc :</b> ' . $inv['CenterLocation']                          . '</td>
+    </tr>';
+
+    $html .= '<tr>
+        <td colspan="8"><b>Vendor Name :</b> ' . htmlspecialchars($item['VendorID']) . '</td>
     </tr>';
 
     /* ================= HISTORY HEADER ================= */
     $html .= '<tr style="background-color:#f2f2f2;">
-        <td width="4%"  align="center"><b>Sr.</b></td>
-        <td width="30%" align="center"><b>Vendor ID</b></td>
-        <td width="7%"  align="center"><b>Doc No</b></td>
-        <td width="11%" align="center"><b>Payment Term</b></td>
-        <td width="8%"  align="center"><b>Bag Qty</b></td>
-        <td width="8%"  align="center"><b>Wt/Bag (kg)</b></td>
-        <td width="8%"  align="center"><b>Loose KG</b></td>
-        <td width="8%"  align="center"><b>Qty (Qtl)</b></td>
-        <td width="8%"  align="center"><b>Rate/Qtl</b></td>
-        <td width="8%"  align="center"><b>Net Amt</b></td>
+        <td width="6%"  align="center"><b>Sr.</b></td>
+        <td width="16%" align="center"><b>Doc No</b></td>
+        <td width="11%" align="center"><b>Bag</b></td>
+        <td width="11%" align="center"><b>Wt/Bag</b></td>
+        <td width="11%" align="center"><b>Loose</b></td>
+        <td width="11%" align="center"><b>Qty</b></td>
+        <td width="11%" align="center"><b>Rate</b></td>
+        <td width="23%" align="center"><b>Amount</b></td>
     </tr>';
 
     /* ================= SINGLE HISTORY ROW ================= */
     $html .= '<tr>
-        <td width="4%"  align="center">'  . (1)                                                       . '</td>
-        <td width="30%" align="center">'  . htmlspecialchars($item['VendorID'])                        . '</td>
-        <td width="7%"  align="center">'  . htmlspecialchars($item['DocumentNo'])                      . '</td>
-        <td width="11%" align="center">'  . htmlspecialchars($item['PaymentTerm'])                     . '</td>
-        <td width="8%"  align="center">'  . number_format($item['BagQty'], 2)                         . '</td>
-        <td width="8%"  align="center">'  . number_format($item['WeightPerBag'], 2)                   . '</td>
-        <td width="8%"  align="center">'  . number_format($item['LooseKG'], 2)                        . '</td>
-        <td width="8%"  align="center">'  . number_format($item['QtyQuintal'], 2)                     . '</td>
-        <td width="8%"  align="right">'   . number_format($item['RatePerQuintal'], 2)                 . '</td>
-        <td width="8%"  align="right">'   . number_format($item['NetAmt'], 2)                         . '</td>
-    </tr>';
-
-    /* ================= SUMMARY ================= */
-    $html .= '<tr>
-        <td colspan="10" style="padding:0;">
-            <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <!-- LEFT SIDE: Table format summary -->
-                    <td width="70%" valign="top" style="padding:0;">
-                        <table border="1" cellpadding="4" cellspacing="0" width="100%" style="font-size:11px; border-collapse:collapse;">
-                            <tr style="background-color:#f2f2f2;">
-                                <td align="center"><b>Bag Qty</b></td>
-                                <td align="center"><b>Qty (Qtl)</b></td>
-                                <td align="center"><b>Value</b></td>
-                                <td align="center"><b>Brokerage</b></td>
-                                <td align="center"><b>Market Levy</b></td>
-                                <td align="center"><b>Round Off</b></td>
-                            </tr>
-                            <tr>
-                                <td align="right">' . number_format($item['BagQty'], 2)     . '</td>
-                                <td align="right">' . number_format($item['QtyQuintal'], 2) . '</td>
-                                <td align="right">' . number_format($item['Value'], 2)      . '</td>
-                                <td align="right">' . number_format($item['Brokerage'], 2)  . '</td>
-                                <td align="right">' . number_format($item['MarketLevy'], 2) . '</td>
-                                <td align="right">' . number_format($item['RoundOff'], 2)   . '</td>
-                            </tr>
-                        </table>
-                    </td>
-
-                    <!-- RIGHT SIDE: Gross / TDS / Final -->
-                    <td width="30%" valign="top" style="padding:0;">
-                        <table border="1" cellpadding="5" cellspacing="0" width="100%" style="font-size:11px; border-collapse:collapse;">
-                            <tr>
-                                <td align="right">Gross Amount</td>
-                                <td align="right">' . number_format($item['Gross'], 2)         . '</td>
-                            </tr>
-                            <tr>
-                                <td align="right">TDS Amount</td>
-                                <td align="right">' . number_format($item['HistoryTDSAmt'], 2) . '</td>
-                            </tr>
-                            <tr>
-                                <td align="right"><b>Final Amount</b></td>
-                                <td align="right"><b>' . number_format($item['NetAmt'], 2) . '</b></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>';
-
-    /* ================= FOOTER ================= */
-    $html .= '<tr>
-        <td colspan="5" style="height:30px; vertical-align:bottom;"><b>Prepared By :</b><br></td>
-        <td colspan="5" style="height:30px; vertical-align:bottom;"><b>Authorized Sign :</b><br></td>
+        <td width="6%"  align="center">' . (1)                                              . '</td>
+        <td width="16%" align="center">' . htmlspecialchars($item['DocumentNo'])             . '</td>
+        <td width="11%" align="center">' . number_format($item['BagQty'], 2)                . '</td>
+        <td width="11%" align="center">' . number_format($item['WeightPerBag'], 2)          . '</td>
+        <td width="11%" align="center">' . number_format($item['LooseKG'], 2)               . '</td>
+        <td width="11%" align="center">' . number_format($item['QtyQuintal'], 2)            . '</td>
+        <td width="11%" align="right">'  . number_format($item['RatePerQuintal'], 2)        . '</td>
+        <td width="23%" align="right">'  . number_format($item['NetAmt'], 2)                . '</td>
     </tr>';
 
     $html .= '</tbody></table>';
+
+    /* ================= SUMMARY ================= */
+    $html .= '<table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:11px;">
+        <tr>
+            <td width="55%" style="border-left:1px solid #000; border-bottom:1px solid #000;"></td>
+            <td width="45%" style="padding:0;">
+                <table border="1" cellpadding="5" cellspacing="0" width="100%"
+                       style="font-size:11px; border-collapse:collapse;">
+                    <tr>
+                        <td align="right">Gross Amount</td>
+                        <td align="right">' . number_format($item['Gross'], 2) . '</td>
+                    </tr>
+                    <tr>
+                        <td align="right">Brokerage</td>
+                        <td align="right">' . number_format($brokerageTotal, 2) . '</td>
+                    </tr>
+                    <tr>
+                        <td align="right">Market Levy</td>
+                        <td align="right">' . number_format($marketLevyTotal, 2) . '</td>
+                    </tr>
+                    <tr>
+                        <td align="right"><b>Net Amount</b></td>
+                        <td align="right"><b>' . number_format($item['NetAmt'], 2) . '</b></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>';
+
+    /* ================= FOOTER ================= */
+    $html .= '<table width="100%" border="1" cellpadding="4" cellspacing="0" style="font-size:11px;">
+        <tr>
+            <td width="50%" style="height:30px; vertical-align:bottom;"><b>Prepared By :</b><br></td>
+            <td width="50%" style="height:30px; vertical-align:bottom;"><b>Authorized Sign :</b><br></td>
+        </tr>
+    </table>';
 
     $pdf->writeHTML($html, true, false, false, false, '');
 

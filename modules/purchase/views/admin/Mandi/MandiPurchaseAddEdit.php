@@ -1,99 +1,229 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <style>
-/* ===== TABLE SCROLL FIX ===== */
-.table-list { overflow: auto; max-height: 55vh; width:100%; position:relative; top: 0px; }
-.table-list thead th { position: sticky; top: 0; z-index: 1; }
-.table-list tbody th { position: sticky; left: 0; }
+  /* ===== TABLE SCROLL FIX ===== */
+  .table-list {
+    overflow: auto;
+    max-height: 55vh;
+    width: 100%;
+    position: relative;
+    top: 0px;
+  }
 
-.items-table-wrapper {
-  overflow-x: auto;
-  overflow-y: visible;
-  width: 100%;
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-}
+  .table-list thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
 
-table { border-collapse: collapse; width: 100%; }
-th, td { padding: 3px 5px !important; white-space: nowrap; border:1px solid #ccc !important; font-size:11px; line-height:1.42857143 !important; vertical-align: middle !important;}
-th { background: #50607b; color: #fff !important; }
+  .table-list tbody th {
+    position: sticky;
+    left: 0;
+  }
 
-#items_table { min-width: 1600px; width: 100%; table-layout: fixed; }
+  .items-table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
 
-#items_table th:nth-child(1),  #items_table td:nth-child(1)  { width: 90px;  min-width: 90px;  }
-#items_table th:nth-child(2),  #items_table td:nth-child(2)  { width: 200px; min-width: 200px; }
-#items_table th:nth-child(3),  #items_table td:nth-child(3)  { width: 110px; min-width: 110px; }
-#items_table th:nth-child(4),  #items_table td:nth-child(4)  { width: 70px;  min-width: 70px;  }
-#items_table th:nth-child(5),  #items_table td:nth-child(5)  { width: 95px;  min-width: 95px;  }
-#items_table th:nth-child(6),  #items_table td:nth-child(6)  { width: 90px;  min-width: 90px;  }
-#items_table th:nth-child(7),  #items_table td:nth-child(7)  { width: 100px; min-width: 100px; }
-#items_table th:nth-child(8),  #items_table td:nth-child(8)  { width: 110px; min-width: 110px; }
-#items_table th:nth-child(9),  #items_table td:nth-child(9)  { width: 100px; min-width: 100px; }
-#items_table th:nth-child(10), #items_table td:nth-child(10) { width: 90px;  min-width: 90px;  }
-#items_table th:nth-child(11), #items_table td:nth-child(11) { width: 100px; min-width: 100px; }
-#items_table th:nth-child(12), #items_table td:nth-child(12) { width: 85px;  min-width: 85px;  }
-#items_table th:nth-child(13), #items_table td:nth-child(13) { width: 90px;  min-width: 90px;  }
-#items_table th:nth-child(14), #items_table td:nth-child(14) { width: 75px;  min-width: 75px;  }
-#items_table th:nth-child(15), #items_table td:nth-child(15) { width: 90px;  min-width: 90px;  }
-#items_table th:nth-child(16), #items_table td:nth-child(16) { width: 90px;  min-width: 90px;  }
-#items_table th:nth-child(17), #items_table td:nth-child(17) { width: 60px;  min-width: 60px;  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
 
-#items_table input.form-control,
-#items_table select.form-control {
-  width: 100% !important;
-  box-sizing: border-box;
-  padding: 2px 4px !important;
-  font-size: 11px !important;
-  height: 26px !important;
-}
+  th,
+  td {
+    padding: 3px 5px !important;
+    white-space: nowrap;
+    border: 1px solid #ccc !important;
+    font-size: 11px;
+    line-height: 1.42857143 !important;
+    vertical-align: middle !important;
+  }
 
-#items_table .bootstrap-select { width: 100% !important; }
-#items_table .bootstrap-select > .dropdown-toggle {
-  width: 100% !important;
-  height: 26px !important;
-  padding: 2px 24px 2px 4px !important;
-  font-size: 11px !important;
-  line-height: 1.4 !important;
-}
+  th {
+    background: #50607b;
+    color: #fff !important;
+  }
 
-.tableFixHead2 { overflow: auto; max-height: 50vh; }
-.sortable, .get_Details { cursor: pointer; }
-.total-label-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
-.total-label-row .total-display { flex: 1; padding: 0; text-align: right; font-weight: 600; }
-.fixed-td { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.get_Details.processing { pointer-events: none; opacity: 0.9; }
+  #items_table {
+    min-width: 1600px;
+    width: 100%;
+    table-layout: fixed;
+  }
 
-/* Loading overlay for auto-load */
-#autoLoadOverlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.85);
-  z-index: 9999;
-  text-align: center;
-  padding-top: 200px;
-  font-size: 18px;
-  color: #50607b;
-}
+  #items_table th:nth-child(1),
+  #items_table td:nth-child(1) {
+    width: 90px;
+    min-width: 90px;
+  }
 
-@media only screen and (max-width: 600px) { #header ul { display: none !important; } }
+  #items_table th:nth-child(2),
+  #items_table td:nth-child(2) {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  #items_table th:nth-child(3),
+  #items_table td:nth-child(3) {
+    width: 110px;
+    min-width: 110px;
+  }
+
+  #items_table th:nth-child(4),
+  #items_table td:nth-child(4) {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  #items_table th:nth-child(5),
+  #items_table td:nth-child(5) {
+    width: 95px;
+    min-width: 95px;
+  }
+
+  #items_table th:nth-child(6),
+  #items_table td:nth-child(6) {
+    width: 90px;
+    min-width: 90px;
+  }
+
+  #items_table th:nth-child(7),
+  #items_table td:nth-child(7) {
+    width: 100px;
+    min-width: 100px;
+  }
+
+  #items_table th:nth-child(8),
+  #items_table td:nth-child(8) {
+    width: 110px;
+    min-width: 110px;
+  }
+
+  #items_table th:nth-child(9),
+  #items_table td:nth-child(9) {
+    width: 100px;
+    min-width: 100px;
+  }
+
+  #items_table th:nth-child(10),
+  #items_table td:nth-child(10) {
+    width: 90px;
+    min-width: 90px;
+  }
+
+  #items_table th:nth-child(11),
+  #items_table td:nth-child(11) {
+    width: 100px;
+    min-width: 100px;
+  }
+
+  #items_table th:nth-child(12),
+  #items_table td:nth-child(12) {
+    width: 85px;
+    min-width: 85px;
+  }
+
+  #items_table th:nth-child(13),
+  #items_table td:nth-child(13) {
+    width: 90px;
+    min-width: 90px;
+  }
+
+  #items_table th:nth-child(14),
+  #items_table td:nth-child(14) {
+    width: 90px;
+    min-width: 90px;
+  }
+
+  #items_table th:nth-child(15),
+  #items_table td:nth-child(15) {
+    width: 60px;
+    min-width: 60px;
+  }
+
+  #items_table input.form-control,
+  #items_table select.form-control {
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 2px 4px !important;
+    font-size: 11px !important;
+    height: 26px !important;
+  }
+
+  #items_table .bootstrap-select {
+    width: 100% !important;
+  }
+
+  #items_table .bootstrap-select>.dropdown-toggle {
+    width: 100% !important;
+    height: 26px !important;
+    padding: 2px 24px 2px 4px !important;
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .tableFixHead2 {
+    overflow: auto;
+    max-height: 50vh;
+  }
+
+  .sortable,
+  .get_Details {
+    cursor: pointer;
+  }
+
+  .total-label-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .total-label-row .total-display {
+    flex: 1;
+    padding: 0;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .fixed-td {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .get_Details.processing {
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  /* Loading overlay for auto-load */
+  #autoLoadOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    z-index: 9999;
+    text-align: center;
+    padding-top: 200px;
+    font-size: 18px;
+    color: #50607b;
+  }
+
+  @media only screen and (max-width: 600px) {
+    #header ul {
+      display: none !important;
+    }
+  }
 </style>
-
-<!-- PHP TDS rates JS embed - HEAD -->
-<script>
-  var tdsRateMap = {};
-  <?php
-  $tds_map_built = [];
-  if (!empty($tds_code_list)) :
-    foreach ($tds_code_list as $v) :
-      if (!isset($tds_map_built[$v['TDSCode']])) :
-        $tds_map_built[$v['TDSCode']] = $v['rate'] ?? 0;
-        echo 'tdsRateMap["' . addslashes($v['TDSCode']) . '"] = ' . (floatval($v['rate'] ?? 0)) . ';' . "\n";
-      endif;
-    endforeach;
-  endif;
-  ?>
-</script>
 
 <!-- Auto Load Overlay -->
 <div id="autoLoadOverlay">
@@ -110,8 +240,10 @@ th { background: #50607b; color: #fff !important; }
         <div class="panel_s">
           <div class="panel-body">
             <nav aria-label="breadcrumb">
-              <ol class="breadcrumb custombreadcrumb" style="background-color:#fff !important; margin-Bottom:0px !important;">
-                <li class="breadcrumb-item"><a href="<?= admin_url();?>"><b><i class="fa fa-home fa-fw fa-lg"></i></b></a></li>
+              <ol class="breadcrumb custombreadcrumb"
+                style="background-color:#fff !important; margin-Bottom:0px !important;">
+                <li class="breadcrumb-item"><a href="<?= admin_url(); ?>"><b><i
+                        class="fa fa-home fa-fw fa-lg"></i></b></a></li>
                 <li class="breadcrumb-item active text-capitalize"><b>Purchase</b></li>
                 <li class="breadcrumb-item active" aria-current="page"><b>Mandi Purchase</b></li>
               </ol>
@@ -126,25 +258,28 @@ th { background: #50607b; color: #fff !important; }
                 <!-- * PO No. -->
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="purchase_order">
-                    <label for="purchase_order" class="control-label"><small class="req text-danger">* </small> PO No.</label>
-                    <input type="text" name="purchase_order" id="purchase_order" class="form-control" value="<?php echo $PurchID; ?>" app-field-label="PO No." required readonly>
+                    <label for="purchase_order" class="control-label"><small class="req text-danger">* </small> PO
+                      No.</label>
+                    <input type="text" name="purchase_order" id="purchase_order" class="form-control"
+                      value="<?php echo $PurchID; ?>" app-field-label="PO No." required readonly>
                   </div>
                 </div>
 
                 <!-- * Document Date -->
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="inwards_date">
-                    <?= render_date_input('inwards_date','Document Date', date('d/m/Y'), []); ?>
+                    <?= render_date_input('inwards_date', 'Document Date', date('d/m/Y'), []); ?>
                   </div>
                 </div>
 
                 <!-- * Center/Location -->
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="location_id">
-                    <label for="location_id" class="control-label"><small class="req text-danger">* </small>Center/Location</label>
+                    <label for="location_id" class="control-label"><small class="req text-danger">*
+                      </small>Center/Location</label>
                     <select name="location_id" id="location_id" class="form-control selectpicker"
-                        data-live-search="true" app-field-label="Center" required
-                        onchange="getGodownByLocation(this.value);">
+                      data-live-search="true" app-field-label="Center" required
+                      onchange="getGodownByLocation(this.value);">
                       <option value="" selected>None selected</option>
                       <?php
                       if (!empty($purchaselocation)):
@@ -161,7 +296,8 @@ th { background: #50607b; color: #fff !important; }
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="godown_id">
                     <label for="godown_id" class="control-label"><small class="req text-danger">* </small>Godown</label>
-                    <select name="godown_id" id="godown_id" class="form-control selectpicker" data-live-search="true" app-field-label="Warehouse" required>
+                    <select name="godown_id" id="godown_id" class="form-control selectpicker" data-live-search="true"
+                      app-field-label="Warehouse" required>
                       <option value="" selected>None selected</option>
                     </select>
                   </div>
@@ -170,8 +306,10 @@ th { background: #50607b; color: #fff !important; }
                 <!-- * Item ID -->
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="item_id_header">
-                    <label for="item_id_header" class="control-label"><small class="req text-danger">* </small> Item ID</label>
-                    <select name="item_id_header" id="item_id_header" class="form-control selectpicker" data-live-search="true" app-field-label="Item ID" required>
+                    <label for="item_id_header" class="control-label"><small class="req text-danger">* </small> Item
+                      ID</label>
+                    <select name="item_id_header" id="item_id_header" class="form-control selectpicker"
+                      data-live-search="true" app-field-label="Item ID" required>
                       <option value="" selected>None selected</option>
                       <?php
                       if (!empty($Items)):
@@ -184,38 +322,15 @@ th { background: #50607b; color: #fff !important; }
                   </div>
                 </div>
 
-                <!-- TDS Code + TDS Rate -->
-                <div class="col-md-2 mbot5">
-                  <div class="form-group" app-field-wrapper="tds_code">
-                    <label for="tds_code" class="control-label">TDS Code</label>
-                    <select name="tds_code" id="tds_code" class="form-control selectpicker" data-live-search="true" app-field-label="TDS Code" onchange="onTdsCodeChange(this.value);">
-                      <option value="" selected>None selected</option>
-                      <?php
-                      $shown_tds = [];
-                      if (!empty($tds_code_list)) :
-                        foreach ($tds_code_list as $value) :
-                          if (!in_array($value['TDSCode'], $shown_tds)) :
-                            $shown_tds[] = $value['TDSCode'];
-                            echo '<option value="' . $value['TDSCode'] . '">' . $value['TDSName'] . ' (' . $value['TDSCode'] . ')</option>';
-                          endif;
-                        endforeach;
-                      endif;
-                      ?>
-                    </select>
-                    <input type="hidden" id="tds_per_h" name="tds_per_h" class="form-control" value="0" placeholder="TDS Rate %" readonly style="margin-top:4px; background:#f5f5f5; font-weight:bold;">
-                  </div>
-                </div>
-
                 <!-- Vehicle No. -->
                 <div class="col-md-2 mbot5">
                   <div class="form-group" app-field-wrapper="vehicle_no">
                     <label for="vehicle_no" class="control-label">Vehicle No.</label>
-                    <input type="text" name="vehicle_no" id="vehicle_no" class="form-control" placeholder="MH12AB3432" app-field-label="Vehicle No.">
+                    <input type="text" name="vehicle_no" id="vehicle_no" class="form-control" placeholder="MH12AB3432"
+                      app-field-label="Vehicle No.">
                   </div>
                 </div>
 
-                <!-- Hidden: TDS Per for header row -->
-                <input type="hidden" id="tds_per_header" value="0">
 
                 <div class="col-md-12 mbot5">
                   <h4 class="bold p_style">Purchase order detail:</h4>
@@ -231,52 +346,63 @@ th { background: #50607b; color: #fff !important; }
                         <tr style="text-align: center;">
                           <th>Doc No.</th>
                           <th>Vendor Code &amp; Name</th>
-                          <th>Payment Term</th>
+                          <th style="display: none;">Payment Term</th>
                           <th>Bag</th>
-                          <th>Weight / Bag</th>
-                          <th>Loose (kg)</th>
-                          <th>Qty (Quintal)</th>
-                          <th>Rate / Quintal</th>
+                          <th>Weight (KG)</th>
+                          <th>Loose (KG)</th>
+                          <th>Qty (Quintal) </th>
+                          <th>Rate </th>
                           <th>Value</th>
-                          <th>Brokerage</th>
-                          <th>Market Levy</th>
+                          <th>Brokerage (Quintal)</th>
+                          <th>Market Levy (Quintal)</th>
                           <th>Round Off</th>
-                          <th>Gross</th>
-                          <th>TDS %</th>
-                          <th>TDS Amt</th>
+                          <th style="display: none;">Gross</th>
                           <th>Net Amt</th>
                           <th>Action</th>
                         </tr>
                         <tr>
                           <td><input type="text" id="doc_no" class="form-control fixed_row" placeholder="Doc No."></td>
                           <td>
-                            <select id="vendor_id" class="form-control fixed_row dynamic_row dynamic_item selectpicker" data-live-search="true" data-container="body" app-field-label="Vendor Code & Name" onchange="getItemDetails(this.value, '');">
+                            <select id="vendor_id" class="fixed_row dynamic_row dynamic_item selectpicker"
+                              data-live-search="true" data-container="body" app-field-label="Vendor Code & Name"
+                              onchange="getItemDetails(this.value, '');" disabled>
                               <option value="" selected disabled>Select Vendor</option>
                               <?php
                               if (!empty($vendor_list)):
-                                  foreach ($vendor_list as $value):
-                                      echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . '- ' . $value['billing_state'] . '- (' . $value['AccountID'] . ')</option>';
-                                  endforeach;
+                                foreach ($vendor_list as $value):
+                                  echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . '- ' . $value['billing_state'] . '- (' . $value['AccountID'] . ')</option>';
+                                endforeach;
                               endif;
                               ?>
                             </select>
                           </td>
-                          <td><input type="text" id="payment_term" class="form-control fixed_row" placeholder="Payment Term" readonly></td>
-                          <td><input type="tel" id="bag" class="form-control fixed_row" min="0" step="1" placeholder="Bag" oninput="calculateAmountHeader()"></td>
-                          <td><input type="tel" id="weight_per_bag" class="form-control fixed_row" min="0" step="0.01" placeholder="Wt./Bag (kg)" oninput="calculateAmountHeader()"></td>
-                          <td><input type="tel" id="loose_kg" class="form-control fixed_row" min="0" step="0.01" placeholder="Loose (kg)" oninput="calculateAmountHeader()"></td>
-                          <td><input type="tel" id="qty_quintal" class="form-control fixed_row" min="0" step="0.01" placeholder="Qty (Qtl)" readonly tabindex="-1"></td>
-                          <td><input type="tel" id="rate_quintal" class="form-control fixed_row" min="0" step="0.01" placeholder="Rate/Qtl" oninput="calculateAmountHeader()"></td>
-                          <td><input type="tel" id="value" class="form-control fixed_row" placeholder="Value" readonly tabindex="-1"></td>
-                          <td><input type="tel" id="brokerage" class="form-control fixed_row" min="0" step="0.01" placeholder="Brokerage" oninput="calculateAmountHeader()"></td>
-                          <td><input type="tel" id="market_levy" class="form-control fixed_row" min="0" step="0.01" placeholder="Market Levy" oninput="calculateAmountHeader()"></td>
-                          <td><input type="tel" id="round_off" class="form-control fixed_row" placeholder="Round Off" readonly tabindex="-1"></td>
-                          <td><input type="tel" id="gross" class="form-control fixed_row" placeholder="Gross" readonly tabindex="-1"></td>
-                          <td><input type="tel" id="tds_per_input" class="form-control fixed_row" min="0" step="0.01" placeholder="TDS %" oninput="calculateAmountHeader()" readonly></td>
-                          <td><input type="tel" id="tds_amt" class="form-control fixed_row" placeholder="TDS Amt" readonly tabindex="-1"></td>
-                          <td><input type="tel" id="net_amt_row" class="form-control fixed_row" placeholder="Net Amt" readonly tabindex="-1"></td>
+                          <td style="display: none;"><input type="text" id="payment_term" class="form-control fixed_row"
+                              placeholder="Payment Term" readonly style="display: none;"></td>
+                          <td><input type="tel" id="bag" class="form-control fixed_row" min="0" step="1"
+                              placeholder="Bag" oninput="calculateAmountHeader()"></td>
+                          <td><input type="tel" id="weight_per_bag" class="form-control fixed_row" min="0" step="0.01"
+                              placeholder="Wt./Bag " oninput="calculateAmountHeader()"></td>
+                          <td><input type="tel" id="loose_kg" class="form-control fixed_row" min="0" step="0.01"
+                              placeholder="Loose " oninput="calculateAmountHeader()"></td>
+                          <td><input type="tel" id="qty_quintal" class="form-control fixed_row" min="0" step="0.01"
+                              placeholder="Qty " tabindex="-1" readonly></td>
+                          <td><input type="tel" id="rate_quintal" class="form-control fixed_row" min="0" step="0.01"
+                              placeholder="Rate " oninput="calculateAmountHeader()"></td>
+                          <td><input type="tel" id="value" class="form-control fixed_row" placeholder="Value" readonly
+                              tabindex="-1"></td>
+                          <td><input type="tel" id="brokerage" class="form-control fixed_row" min="0" step="0.01"
+                              placeholder="Brokerage" oninput="calculateAmountHeader()"></td>
+                          <td><input type="tel" id="market_levy" class="form-control fixed_row" min="0" step="0.01"
+                              placeholder="Market Levy" oninput="calculateAmountHeader()"></td>
+                          <td><input type="tel" id="round_off" class="form-control fixed_row" placeholder="Round Off"
+                              readonly tabindex="-1"></td>
+                          <td style="display: none;"><input type="tel" id="gross" class="form-control fixed_row"
+                              placeholder="Gross" readonly tabindex="-1"></td>
+                          <td><input type="tel" id="net_amt_row" class="form-control fixed_row" placeholder="Net Amt"
+                              readonly tabindex="-1"></td>
                           <td>
-                            <button type="button" class="btn btn-success btn-sm" onclick="addRow();"><i class="fa fa-plus"></i></button>
+                            <button type="button" class="btn btn-success btn-sm" onclick="addRow();"><i
+                                class="fa fa-plus"></i></button>
                           </td>
                         </tr>
                       </thead>
@@ -299,7 +425,6 @@ th { background: #50607b; color: #fff !important; }
                     <input type="hidden" name="total_brokerage" id="total_brokerage_hidden" value="0">
                     <input type="hidden" name="total_market_levy" id="total_market_levy_hidden" value="0">
                     <input type="hidden" name="total_gross_value" id="total_gross_value_hidden" value="0">
-                    <input type="hidden" name="tds" id="tds_hidden" value="0">
                     <input type="hidden" name="total_net_value" id="total_net_value_hidden" value="0">
 
                     <div class="col-md-6 col-sm-6 col-xs-6">
@@ -327,10 +452,6 @@ th { background: #50607b; color: #fff !important; }
                         <div class="total-display" id="total_gross_value_display">0.00</div>
                       </div>
                       <div class="total-label-row">
-                        <label>TDS:</label>
-                        <div class="total-display" id="tds_display">0.00</div>
-                      </div>
-                      <div class="total-label-row">
                         <label>Total Net Value:</label>
                         <div class="total-display" id="total_net_value_display">0.00</div>
                       </div>
@@ -339,16 +460,25 @@ th { background: #50607b; color: #fff !important; }
                 </div>
 
                 <!-- Fixed Bottom Buttons -->
-                <div class="col-md-12" style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
+                <div class="col-md-12"
+                  style="position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 10px 20px 10px 0px; margin-top: 10px; box-shadow: 0 -2px 0px rgba(0,0,0,0.1); z-index: 2; text-align: right;">
                   <!-- Back to List button - only show when redirected from list page -->
-                  <a href="<?= admin_url('purchase/Mandi/list'); ?>" class="btn btn-default" id="backToListBtn" style="display:none;">
+                  <a href="<?= admin_url('purchase/Mandi/list'); ?>" class="btn btn-default" id="backToListBtn"
+                    style="display:none;">
                     <i class="fa fa-arrow-left"></i> Back to List
                   </a>
-                  <a href="#" class="btn btn-primary updateBtn" id="print_pdf" style="display: none;" target="_blank" onclick="printMandiPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</a>
-                  <button type="submit" class="btn btn-success saveBtn <?= (has_permission_new('MandiPurchase', '', 'create')) ? '' : 'disabled'; ?>"><i class="fa fa-save"></i> Save</button>
-                  <button type="submit" class="btn btn-success updateBtn <?= (has_permission_new('MandiPurchase', '', 'edit')) ? '' : 'disabled'; ?>" style="display: none;"><i class="fa fa-save"></i> Update</button>
-                  <button type="button" class="btn btn-danger" onclick="ResetForm();"><i class="fa fa-refresh"></i> Reset</button>
-                  <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i class="fa fa-list"></i> Show List</button>
+                  <a href="#" class="btn btn-primary updateBtn" id="print_pdf" style="display: none;" target="_blank"
+                    onclick="printMandiPurchaseOrderPdf();"><i class="fa fa-print"></i> Print PDF</a>
+                  <button type="submit"
+                    class="btn btn-success saveBtn <?= (has_permission_new('MandiPurchase', '', 'create')) ? '' : 'disabled'; ?>"><i
+                      class="fa fa-save"></i> Save</button>
+                  <button type="submit"
+                    class="btn btn-success updateBtn <?= (has_permission_new('MandiPurchase', '', 'edit')) ? '' : 'disabled'; ?>"
+                    style="display: none;"><i class="fa fa-save"></i> Update</button>
+                  <button type="button" class="btn btn-danger" onclick="ResetForm();"><i class="fa fa-refresh"></i>
+                    Reset</button>
+                  <button type="button" class="btn btn-info" onclick="$('#ListModal').modal('show');"><i
+                      class="fa fa-list"></i> Show List</button>
                 </div>
 
               </div>
@@ -365,7 +495,8 @@ th { background: #50607b; color: #fff !important; }
   <div class="modal-dialog" role="document" style="width: 90vw;">
     <div class="modal-content">
       <div class="modal-header" style="padding:5px 10px;">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Mandi Purchase List</h4>
       </div>
       <div class="modal-body" style="padding:5px 5px !important">
@@ -373,33 +504,34 @@ th { background: #50607b; color: #fff !important; }
           <div class="row">
             <div class="col-md-2 mbot5">
               <div class="form-group" app-field-wrapper="from_date">
-                    <?= render_date_input('from_date','From Date', date('01/m/Y'), []); ?>
-                  </div>
+                <?= render_date_input('from_date', 'From Date', date('01/m/Y'), []); ?>
+              </div>
               <!-- <div class="form-group">
-                <label class="control-label">From Date</label>
-                <div class="input-group date">
-                  <input type="text" id="from_date" name="from_date" class="form-control datepicker" value="<?= date("01/m/Y") ?>">
-                  <div class="input-group-addon"><i class="fa-regular fa-calendar calendar-icon"></i></div>
-                </div>
-              </div> -->
+                      <label class="control-label">From Date</label>
+                      <div class="input-group date">
+                        <input type="text" id="from_date" name="from_date" class="form-control datepicker" value="<?= date("01/m/Y") ?>">
+                        <div class="input-group-addon"><i class="fa-regular fa-calendar calendar-icon"></i></div>
+                      </div>
+                    </div> -->
             </div>
             <div class="col-md-2 mbot5">
               <div class="form-group" app-field-wrapper="to_date">
-                    <?= render_date_input('to_date','To Date', date('d/m/Y'), []); ?>
-                  </div>
+                <?= render_date_input('to_date', 'To Date', date('d/m/Y'), []); ?>
+              </div>
               <!-- <div class="form-group">
-                <label class="control-label">To Date</label>
-                <div class="input-group date">
-                  <input type="text" id="to_date" name="to_date" class="form-control datepicker" value="<?= date("d/m/Y") ?>">
-                  <div class="input-group-addon"><i class="fa-regular fa-calendar calendar-icon"></i></div>
-                </div>
-              </div> -->
+                      <label class="control-label">To Date</label>
+                      <div class="input-group date">
+                        <input type="text" id="to_date" name="to_date" class="form-control datepicker" value="<?= date("d/m/Y") ?>">
+                        <div class="input-group-addon"><i class="fa-regular fa-calendar calendar-icon"></i></div>
+                      </div>
+                    </div> -->
             </div>
             <div class="col-md-5 mbot5" style="padding-top:20px;">
               <button type="submit" class="btn btn-success" id="searchBtn"><i class="fa fa-list"></i> Show</button>
             </div>
             <div class="col-md-3 mbot5" style="padding-top:20px;">
-              <input type="search" class="form-control" id="myInput1" onkeyup="myFunction2()" placeholder="Search..." title="Type in a table">
+              <input type="search" class="form-control" id="myInput1" onkeyup="myFunction2()" placeholder="Search..."
+                title="Type in a table">
             </div>
           </div>
         </form>
@@ -440,51 +572,51 @@ $curr_date = date('Y-m-d');
 $curr_date_new = new DateTime($curr_date);
 $last_date_yr = new DateTime($lastdate_date);
 if ($last_date_yr < $curr_date_new) {
-    $max_date_php = $lastdate_date;
+  $max_date_php = $lastdate_date;
 } else {
-    $max_date_php = $curr_date;
+  $max_date_php = $curr_date;
 }
 ?>
 
 <?php init_tail(); ?>
 <script>
-    $(document).ready(function() {
-        var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
-        var year = "20" + fin_y;
-        var cur_y = new Date().getFullYear().toString().substr(-2);
+  $(document).ready(function () {
+    var fin_y = "<?php echo $this->session->userdata('finacial_year'); ?>";
+    var year = "20" + fin_y;
+    var cur_y = new Date().getFullYear().toString().substr(-2);
 
-        // Min date: April 1st of FY start year
-        var minStartDate = new Date(year, 3, 1); // month index 3 = April
+    // Min date: April 1st of FY start year
+    var minStartDate = new Date(year, 3, 1); // month index 3 = April
 
-        // Max date: March 31 of FY end year, OR today if still within FY
-        var maxEndDate;
-        if (parseInt(cur_y) > parseInt(fin_y)) {
-            var fy_new = parseInt(fin_y) + 1;
-            var fy_new_s = "20" + fy_new;
-            maxEndDate = new Date(fy_new_s + '/03/31');
-        } else {
-            maxEndDate = new Date();
-        }
+    // Max date: March 31 of FY end year, OR today if still within FY
+    var maxEndDate;
+    if (parseInt(cur_y) > parseInt(fin_y)) {
+      var fy_new = parseInt(fin_y) + 1;
+      var fy_new_s = "20" + fy_new;
+      maxEndDate = new Date(fy_new_s + '/03/31');
+    } else {
+      maxEndDate = new Date();
+    }
 
-        $('#inwards_date').datetimepicker({
-            format: 'd/m/Y',
-            minDate: minStartDate,
-            maxDate: maxEndDate,
-            timepicker: false
-        });
-        $('#from_date').datetimepicker({
-            format: 'd/m/Y',
-            minDate: minStartDate,
-            maxDate: maxEndDate,
-            timepicker: false
-        });
-        $('#to_date').datetimepicker({
-            format: 'd/m/Y',
-            minDate: minStartDate,
-            maxDate: maxEndDate,
-            timepicker: false
-        });
+    $('#inwards_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
     });
+    $('#from_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+    $('#to_date').datetimepicker({
+      format: 'd/m/Y',
+      minDate: minStartDate,
+      maxDate: maxEndDate,
+      timepicker: false
+    });
+  });
 
   // =============================================
   // PRINT PDF
@@ -499,14 +631,13 @@ if ($last_date_yr < $curr_date_new) {
   // =============================================
   // INITIALIZE SELECTPICKERS + AUTO LOAD FROM URL
   // =============================================
-  $(document).ready(function() {
+  $(document).ready(function () {
     $('#vendor_id').selectpicker({ container: 'body', liveSearch: true });
-    $('#tds_code').selectpicker({ liveSearch: true });
 
     // ✅ Check if URL has order_id & id (redirect from List page)
-    var urlParams  = new URLSearchParams(window.location.search);
+    var urlParams = new URLSearchParams(window.location.search);
     var orderIdUrl = urlParams.get('order_id');
-    var idUrl      = urlParams.get('id');
+    var idUrl = urlParams.get('id');
 
     if (orderIdUrl && idUrl) {
       // Show Back to List button only when redirected from list page
@@ -523,8 +654,7 @@ if ($last_date_yr < $curr_date_new) {
   // =============================================
   function refreshSelectpickers() {
     $('#vendor_id').selectpicker('refresh');
-    $('#tds_code').selectpicker('refresh');
-    $('#items_body .selectpicker').each(function() {
+    $('#items_body .selectpicker').each(function () {
       var $el = $(this);
       if (!$el.data('selectpicker')) {
         $el.selectpicker({ container: 'body', liveSearch: true });
@@ -535,17 +665,6 @@ if ($last_date_yr < $curr_date_new) {
     $('.selectpicker').not('#items_table .selectpicker').selectpicker('refresh');
   }
 
-  // =============================================
-  // TDS CODE SELECT → tds_per_h rate show
-  // =============================================
-  function onTdsCodeChange(tdsCode) {
-    if (tdsCode && tdsRateMap.hasOwnProperty(tdsCode)) {
-      $('#tds_per_h').val(tdsRateMap[tdsCode]);
-    } else {
-      $('#tds_per_h').val('0');
-    }
-    calculateTotals();
-  }
 
   // =============================================
   // RESET FORM
@@ -559,40 +678,37 @@ if ($last_date_yr < $curr_date_new) {
     $('#items_body').html('');
     $('.total-display').text('0.00');
     $('#row_id').val(0);
-    $('#tds_per_header').val(0);
-    $('#tds_per_h').val('0');
 
     // ✅ Hide Back to List button on reset
     $('#backToListBtn').hide();
 
     $('#vendor_id').html(`
-      <option value="" selected>None selected</option>
-      <?php
-      if (!empty($vendor_list)) :
-        foreach ($vendor_list as $value) :
-          echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' ('.$value['AccountID'].')</option>';
-        endforeach;
-      endif;
-      ?>
-    `);
+            <option value="" selected>None selected</option>
+            <?php
+            if (!empty($vendor_list)):
+              foreach ($vendor_list as $value):
+                echo '<option value="' . $value['AccountID'] . '">' . $value['company'] . ' (' . $value['AccountID'] . ')</option>';
+              endforeach;
+            endif;
+            ?>
+          `);
 
     $('#location_id').val('');
     $('#godown_id').html('<option value="" selected>None selected</option>');
 
     $('#item_id_header').selectpicker('destroy');
     $('#item_id_header').html(`
-      <option value="" selected>None selected</option>
-      <?php
-      if (!empty($Items)):
-        foreach ($Items as $value):
-          echo '<option value="' . $value['ItemID'] . '">' . $value['ItemName'] . '</option>';
-        endforeach;
-      endif;
-      ?>
-    `);
+            <option value="" selected>None selected</option>
+            <?php
+            if (!empty($Items)):
+              foreach ($Items as $value):
+                echo '<option value="' . $value['ItemID'] . '">' . $value['ItemName'] . '</option>';
+              endforeach;
+            endif;
+            ?>
+          `);
     $('#item_id_header').selectpicker();
 
-    $('#tds_code').val('');
     $('#vehicle_no').val('');
     $('#payment_term').val('');
     refreshSelectpickers();
@@ -609,7 +725,7 @@ if ($last_date_yr < $curr_date_new) {
         type: 'POST',
         dataType: 'json',
         data: { '<?= $this->security->get_csrf_token_name(); ?>': $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val() },
-        success: function(response) {
+        success: function (response) {
           if (response.success == true) { $('#purchase_order').val(response.PurchID); }
         }
       });
@@ -640,29 +756,29 @@ if ($last_date_yr < $curr_date_new) {
   // HEADER ROW - CALCULATION
   // =============================================
   function calculateAmountHeader() {
-    var bag        = parseFloat($('#bag').val()) || 0;
-    var wtPerBag   = parseFloat($('#weight_per_bag').val()) || 0;
-    var looseKg    = parseFloat($('#loose_kg').val()) || 0;
-    var rateQ      = parseFloat($('#rate_quintal').val()) || 0;
-    var brokerage  = parseFloat($('#brokerage').val()) || 0;
+    var bag = parseFloat($('#bag').val()) || 0;
+    var weightPerBag = parseFloat($('#weight_per_bag').val()) || 0;
+    var looseKg = parseFloat($('#loose_kg').val()) || 0;
+    var rateQ = parseFloat($('#rate_quintal').val()) || 0;
+    var brokerage = parseFloat($('#brokerage').val()) || 0;
     var marketLevy = parseFloat($('#market_levy').val()) || 0;
-    var tdsPer     = parseFloat($('#tds_per_input').val()) || 0;
 
-    var totalKg      = (bag * wtPerBag) + looseKg;
-    var qtyQ         = totalKg / 100;
-    var value        = qtyQ * rateQ;
-    var gross        = value + brokerage + marketLevy;
-    var grossRounded = Math.round(gross);
-    var roundOff     = grossRounded - gross;
-    var tdsAmt       = (grossRounded * tdsPer) / 100;
-    var netAmt       = grossRounded - tdsAmt;
+    var qtyQ = ((bag * weightPerBag) + looseKg) / 100;
+    $('#qty_quintal').val(qtyQ.toFixed(3));
 
-    $('#qty_quintal').val(qtyQ.toFixed(4));
+    var value = qtyQ * rateQ;
+
+    // ✅ NEW CALCULATION
+    var btotal = brokerage * qtyQ;
+    var mtotal = marketLevy * qtyQ;
+
+    var netAmt = value - btotal - mtotal;
+
     $('#value').val(value.toFixed(2));
-    $('#round_off').val(roundOff.toFixed(2));
-    $('#gross').val(grossRounded.toFixed(2));
-    $('#tds_amt').val(tdsAmt.toFixed(2));
+    $('#gross').val(value.toFixed(2)); // optional same as value
+    $('#round_off').val('0.00');
     $('#net_amt_row').val(netAmt.toFixed(2));
+
     calculateTotals();
   }
 
@@ -683,9 +799,9 @@ if ($last_date_yr < $curr_date_new) {
 
     if (vendorId === '' || vendorId === null) {
       if (id === '' || id === 0) {
-        $('#payment_term').val(''); $('#tds_per_input').val(''); $('#tds_amt').val(''); $('#tds_per_header').val(0);
+        $('#payment_term').val('');
       } else {
-        $('#payment_term' + id).val(''); $('#tds_per_input' + id).val(''); $('#tds_amt' + id).val('');
+        $('#payment_term' + id).val('');
       }
       calculateTotals();
       return;
@@ -702,17 +818,15 @@ if ($last_date_yr < $curr_date_new) {
       success: function (response) {
         if (response.success == true) {
           var payTerm = response.data.PaymentTerms || '';
-          var tdsPer  = parseFloat(response.data.TDSPer) || 0;
           if (id === '' || id === 0) {
-            $('#payment_term').val(payTerm); $('#tds_per_input').val(tdsPer); $('#tds_per_header').val(tdsPer);
+            $('#payment_term').val(payTerm);
             calculateAmountHeader();
           } else {
-            $('#payment_term' + id).val(payTerm); $('#tds_per_input' + id).val(tdsPer);
+            $('#payment_term' + id).val(payTerm);
             calculateAmount(id);
           }
         } else {
-          if (id === '' || id === 0) { $('#payment_term').val(''); $('#tds_per_input').val(''); $('#tds_amt').val(''); }
-          else { $('#payment_term' + id).val(''); $('#tds_per_input' + id).val(''); $('#tds_amt' + id).val(''); }
+          if (id === '' || id === 0) { $('#payment_term').val(''); } else { $('#payment_term' + id).val(''); }
           alert_float('warning', response.message || 'Vendor details not found.');
           calculateTotals();
         }
@@ -723,7 +837,7 @@ if ($last_date_yr < $curr_date_new) {
 
   function addRow(row) {
     $('#vendor_id').focus();
-    var row_id  = $('#row_id').val();
+    var row_id = $('#row_id').val();
     var next_id = parseInt(row_id) + 1;
 
     if (row == null || row === undefined) {
@@ -732,33 +846,31 @@ if ($last_date_yr < $curr_date_new) {
       if (data === false) return false;
     }
 
-    var row_btn    = `<button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove(); calculateTotals();" style="padding: 2px 6px;"><i class="fa fa-xmark"></i></button>`;
+    var row_btn = `<button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove(); calculateTotals();" style="padding: 2px 6px;"><i class="fa fa-xmark"></i></button>`;
     let item_option = $('#vendor_id').html();
 
     $('#items_body').append(`
-      <tr>
-        <td><input type="text" name="doc_no[]" id="doc_no${next_id}" class="form-control" placeholder="Doc No." value="${$('#doc_no').val()}"></td>
-        <td>
-          <input type="hidden" name="item_uid[]" id="item_uid${next_id}" value="0">
-          <select id="vendor_id${next_id}" name="vendor_id[]" class="form-control dynamic_item selectpicker" data-live-search="true" data-container="body" onchange="getItemDetails(this.value, '${next_id}');">${item_option}</select>
-        </td>
-        <td><input type="text" name="payment_term[]" id="payment_term${next_id}" class="form-control" placeholder="Payment Term" readonly value="${$('#payment_term').val()}"></td>
-        <td><input type="tel" name="bag[]" id="bag${next_id}" class="form-control bag" min="0" step="1" placeholder="Bag" oninput="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="weight_per_bag[]" id="weight_per_bag${next_id}" class="form-control weight-per-bag" min="0" step="0.01" placeholder="Wt./Bag (kg)" oninput="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="loose_kg[]" id="loose_kg${next_id}" class="form-control loose-kg" min="0" step="0.01" placeholder="Loose (kg)" oninput="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="qty_quintal[]" id="qty_quintal${next_id}" class="form-control qty-quintal" placeholder="Qty (Qtl)" readonly tabindex="-1"></td>
-        <td><input type="tel" name="rate_quintal[]" id="rate_quintal${next_id}" class="form-control rate-quintal" min="0" step="0.01" placeholder="Rate/Qtl" oninput="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="value[]" id="value${next_id}" class="form-control row-value" placeholder="Value" readonly tabindex="-1"></td>
-        <td><input type="tel" name="brokerage[]" id="brokerage${next_id}" class="form-control row-brokerage" min="0" step="0.01" placeholder="Brokerage" oninput="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="market_levy[]" id="market_levy${next_id}" class="form-control row-market-levy" min="0" step="0.01" placeholder="Market Levy" oninput="calculateAmount(${next_id})"></td>
-        <td><input type="tel" name="round_off[]" id="round_off${next_id}" class="form-control row-round-off" placeholder="Round Off" readonly tabindex="-1"></td>
-        <td><input type="tel" name="gross[]" id="gross${next_id}" class="form-control row-gross" placeholder="Gross" readonly tabindex="-1"></td>
-        <td><input type="tel" name="tds_per_input[]" id="tds_per_input${next_id}" class="form-control row-tds-per" min="0" step="0.01" placeholder="TDS %" oninput="calculateAmount(${next_id})" readonly></td>
-        <td><input type="tel" name="tds_amt[]" id="tds_amt${next_id}" class="form-control row-tds" placeholder="TDS Amt" readonly tabindex="-1"></td>
-        <td><input type="tel" name="net_amt_row[]" id="net_amt_row${next_id}" class="form-control row-net-amt" placeholder="Net Amt" readonly tabindex="-1"></td>
-        <td>${row_btn}</td>
-      </tr>
-    `);
+            <tr>
+              <td><input type="text" name="doc_no[]" id="doc_no${next_id}" class="form-control" placeholder="Doc No." value="${$('#doc_no').val()}"></td>
+              <td>
+                <input type="hidden" name="item_uid[]" id="item_uid${next_id}" value="0">
+                <select id="vendor_id${next_id}" name="vendor_id[]" class="dynamic_item selectpicker" data-live-search="true" data-container="body" onchange="getItemDetails(this.value, '${next_id}');">${item_option}</select>
+              </td>
+              <td style="display: none;"><input type="text" name="payment_term[]" id="payment_term${next_id}" class="form-control" placeholder="Payment Term" readonly value="${$('#payment_term').val()}" style="display: none;"></td>
+              <td><input type="tel" name="bag[]" id="bag${next_id}" class="form-control bag" min="0" step="1" placeholder="Bag" oninput="calculateAmount(${next_id})"></td>
+              <td><input type="tel" name="weight_per_bag[]" id="weight_per_bag${next_id}" class="form-control weight-per-bag" min="0" step="0.01" placeholder="Wt./Bag " oninput="calculateAmount(${next_id})"></td>
+              <td><input type="tel" name="loose_kg[]" id="loose_kg${next_id}" class="form-control loose-kg" min="0" step="0.01" placeholder="Loose " oninput="calculateAmount(${next_id})"></td>
+              <td><input type="tel" name="qty_quintal[]" id="qty_quintal${next_id}" class="form-control qty-quintal" placeholder="Qty "  tabindex="-1" readonly></td>
+              <td><input type="tel" name="rate_quintal[]" id="rate_quintal${next_id}" class="form-control rate-quintal" min="0" step="0.01" placeholder="Rate " oninput="calculateAmount(${next_id})"></td>
+              <td><input type="tel" name="value[]" id="value${next_id}" class="form-control row-value" placeholder="Value" readonly tabindex="-1"></td>
+              <td><input type="tel" name="brokerage[]" id="brokerage${next_id}" class="form-control row-brokerage" min="0" step="0.01" placeholder="Brokerage" oninput="calculateAmount(${next_id})"></td>
+              <td><input type="tel" name="market_levy[]" id="market_levy${next_id}" class="form-control row-market-levy" min="0" step="0.01" placeholder="Market Levy" oninput="calculateAmount(${next_id})"></td>
+              <td><input type="tel" name="round_off[]" id="round_off${next_id}" class="form-control row-round-off" placeholder="Round Off" readonly tabindex="-1"></td>
+              <td style="display: none;"><input type="tel" name="gross[]" id="gross${next_id}" class="form-control row-gross" placeholder="Gross" readonly tabindex="-1"></td>
+              <td><input type="tel" name="net_amt_row[]" id="net_amt_row${next_id}" class="form-control row-net-amt" placeholder="Net Amt" readonly tabindex="-1"></td>
+              <td>${row_btn}</td>
+            </tr>
+          `);
 
     $('#vendor_id' + next_id).selectpicker({ container: 'body', liveSearch: true });
 
@@ -770,7 +882,6 @@ if ($last_date_yr < $curr_date_new) {
       $(`#rate_quintal${next_id}`).val($('#rate_quintal').val());
       $(`#brokerage${next_id}`).val($('#brokerage').val());
       $(`#market_levy${next_id}`).val($('#market_levy').val());
-      $(`#tds_per_input${next_id}`).val($('#tds_per_input').val());
       $(`#payment_term${next_id}`).val($('#payment_term').val());
       $('.fixed_row').val('');
       calculateAmount(next_id);
@@ -778,81 +889,86 @@ if ($last_date_yr < $curr_date_new) {
 
     $('#vendor_id' + next_id).selectpicker('refresh');
     $('#row_id').val(next_id);
+    setTimeout(function () {
+      checkHeaderFields();
+    }, 100)
   }
 
   // =============================================
   // DYNAMIC ROWS - CALCULATION
   // =============================================
   function calculateAmount(row) {
-    var bag        = parseFloat($('#bag'+row).val()) || 0;
-    var wtPerBag   = parseFloat($('#weight_per_bag'+row).val()) || 0;
-    var looseKg    = parseFloat($('#loose_kg'+row).val()) || 0;
-    var rateQ      = parseFloat($('#rate_quintal'+row).val()) || 0;
-    var brokerage  = parseFloat($('#brokerage'+row).val()) || 0;
-    var marketLevy = parseFloat($('#market_levy'+row).val()) || 0;
-    var tdsPer     = parseFloat($('#tds_per_input'+row).val()) || 0;
+    var bag = parseFloat($('#bag' + row).val()) || 0;
+    var weightPerBag = parseFloat($('#weight_per_bag' + row).val()) || 0;
+    var looseKg = parseFloat($('#loose_kg' + row).val()) || 0;
+    var rateQ = parseFloat($('#rate_quintal' + row).val()) || 0;
+    var brokerage = parseFloat($('#brokerage' + row).val()) || 0;
+    var marketLevy = parseFloat($('#market_levy' + row).val()) || 0;
 
-    var totalKg      = (bag * wtPerBag) + looseKg;
-    var qtyQ         = totalKg / 100;
-    var value        = qtyQ * rateQ;
-    var gross        = value + brokerage + marketLevy;
-    var grossRounded = Math.round(gross);
-    var roundOff     = grossRounded - gross;
-    var tdsAmt       = (grossRounded * tdsPer) / 100;
-    var netAmt       = grossRounded - tdsAmt;
+    var qtyQ = ((bag * weightPerBag) + looseKg) / 100;
+    $('#qty_quintal' + row).val(qtyQ.toFixed(4));
 
-    $('#qty_quintal'+row).val(qtyQ.toFixed(4));
-    $('#value'+row).val(value.toFixed(2));
-    $('#round_off'+row).val(roundOff.toFixed(2));
-    $('#gross'+row).val(grossRounded.toFixed(2));
-    $('#tds_amt'+row).val(tdsAmt.toFixed(2));
-    $('#net_amt_row'+row).val(netAmt.toFixed(2));
+    var value = qtyQ * rateQ;
+
+    // ✅ NEW CALCULATION
+    var btotal = brokerage * qtyQ;
+    var mtotal = marketLevy * qtyQ;
+
+    var netAmt = value - btotal - mtotal;
+
+    $('#value' + row).val(value.toFixed(2));
+    $('#gross' + row).val(value.toFixed(2)); // optional
+    $('#round_off' + row).val('0.00');
+    $('#net_amt_row' + row).val(netAmt.toFixed(2));
+
     calculateTotals();
   }
 
   // =============================================
   // TOTALS
   // =============================================
-  function calculateTotals() {
-    var totalQtyQ       = parseFloat($('#qty_quintal').val())  || 0;
-    var totalValue      = parseFloat($('#value').val())        || 0;
-    var totalBrokerage  = parseFloat($('#brokerage').val())    || 0;
-    var totalMarketLevy = parseFloat($('#market_levy').val())  || 0;
-    var totalGross      = parseFloat($('#gross').val())        || 0;
+      function calculateTotals() {
+      var totalQtyQ       = parseFloat($('#qty_quintal').val())  || 0;
+      var totalValue      = parseFloat($('#value').val())        || 0;
+      var totalNetAmt     = parseFloat($('#net_amt_row').val())  || 0;
+      var totalGross      = parseFloat($('#gross').val())        || 0;
 
-    $('#items_body tr').each(function () {
-      var row = $(this);
-      totalQtyQ       += parseFloat(row.find('.qty-quintal').val())     || 0;
-      totalValue      += parseFloat(row.find('.row-value').val())       || 0;
-      totalBrokerage  += parseFloat(row.find('.row-brokerage').val())   || 0;
-      totalMarketLevy += parseFloat(row.find('.row-market-levy').val()) || 0;
-      totalGross      += parseFloat(row.find('.row-gross').val())       || 0;
-    });
+      // ✅ Header row: Brokerage * Qty  &  MarketLevy * Qty
+      var headerQty       = parseFloat($('#qty_quintal').val())  || 0;
+      var totalBrokerage  = (parseFloat($('#brokerage').val())   || 0) * headerQty;
+      var totalMarketLevy = (parseFloat($('#market_levy').val()) || 0) * headerQty;
 
-    var tdsPerH  = parseFloat($('#tds_per_h').val()) || 0;
-    var tdsAmtH  = (totalGross * tdsPerH) / 100;
-    var netAmtH  = totalGross - tdsAmtH;
+      $('#items_body tr').each(function () {
+        var row     = $(this);
+        var rowQty  = parseFloat(row.find('.qty-quintal').val())     || 0;
+        var rowBrok = parseFloat(row.find('.row-brokerage').val())   || 0;
+        var rowML   = parseFloat(row.find('.row-market-levy').val()) || 0;
 
-    $('#total_qty_quintal_display').text(totalQtyQ.toFixed(4));
-    $('#total_value_display').text(totalValue.toFixed(2));
-    $('#total_brokerage_display').text(totalBrokerage.toFixed(2));
-    $('#total_market_levy_display').text(totalMarketLevy.toFixed(2));
-    $('#total_gross_value_display').text(totalGross.toFixed(2));
-    $('#tds_display').text(tdsAmtH.toFixed(2));
-    $('#total_net_value_display').text(netAmtH.toFixed(2));
+        totalQtyQ       += rowQty;
+        totalValue      += parseFloat(row.find('.row-value').val())   || 0;
+        totalBrokerage  += rowBrok * rowQty;   // ✅ Brokerage * Qty
+        totalMarketLevy += rowML   * rowQty;   // ✅ Market Levy * Qty
+        totalGross      += parseFloat(row.find('.row-gross').val())   || 0;
+        totalNetAmt     += parseFloat(row.find('.row-net-amt').val()) || 0;
+      });
 
-    $('#total_qty_quintal_hidden').val(totalQtyQ.toFixed(4));
-    $('#total_value_hidden').val(totalValue.toFixed(2));
-    $('#total_brokerage_hidden').val(totalBrokerage.toFixed(2));
-    $('#total_market_levy_hidden').val(totalMarketLevy.toFixed(2));
-    $('#total_gross_value_hidden').val(totalGross.toFixed(2));
-    $('#tds_hidden').val(tdsAmtH.toFixed(2));
-    $('#total_net_value_hidden').val(netAmtH.toFixed(2));
-  }
+      $('#total_qty_quintal_display').text(totalQtyQ.toFixed(4));
+      $('#total_value_display').text(totalValue.toFixed(2));
+      $('#total_brokerage_display').text(totalBrokerage.toFixed(2));      // ✅ Brokerage * Qty Total
+      $('#total_market_levy_display').text(totalMarketLevy.toFixed(2));   // ✅ Market Levy * Qty Total
+      $('#total_gross_value_display').text(totalGross.toFixed(2));
+      $('#total_net_value_display').text(totalNetAmt.toFixed(2));
 
+      $('#total_qty_quintal_hidden').val(totalQtyQ.toFixed(4));
+      $('#total_value_hidden').val(totalValue.toFixed(2));
+      $('#total_brokerage_hidden').val(totalBrokerage.toFixed(2));
+      $('#total_market_levy_hidden').val(totalMarketLevy.toFixed(2));
+      $('#total_gross_value_hidden').val(totalGross.toFixed(2));
+      $('#total_net_value_hidden').val(totalNetAmt.toFixed(2));
+      }
   function get_required_fields(form_id) {
     let fields = [];
-    $('#' + form_id + ' [required]').each(function(){ fields.push($(this).attr('id')); });
+    $('#' + form_id + ' [required]').each(function () { fields.push($(this).attr('id')); });
     return fields;
   }
 
@@ -870,11 +986,10 @@ if ($last_date_yr < $curr_date_new) {
         rate_quintal: parseFloat($('#rate_quintal').val()) || 0, value: parseFloat($('#value').val()) || 0,
         brokerage: parseFloat($('#brokerage').val()) || 0, market_levy: parseFloat($('#market_levy').val()) || 0,
         round_off: parseFloat($('#round_off').val()) || 0, gross: parseFloat($('#gross').val()) || 0,
-        tds_per: parseFloat($('#tds_per_input').val()) || 0, tds_amt: parseFloat($('#tds_amt').val()) || 0,
         net_amt: parseFloat($('#net_amt_row').val()) || 0
       });
     }
-    $('#items_body tr').each(function() {
+    $('#items_body tr').each(function () {
       var $row = $(this);
       jsonData.items.push({
         doc_no: $row.find('[name="doc_no[]"]').val(), vendor_id: $row.find('[name="vendor_id[]"]').val(),
@@ -889,8 +1004,6 @@ if ($last_date_yr < $curr_date_new) {
         market_levy: parseFloat($row.find('[name="market_levy[]"]').val()) || 0,
         round_off: parseFloat($row.find('[name="round_off[]"]').val()) || 0,
         gross: parseFloat($row.find('[name="gross[]"]').val()) || 0,
-        tds_per: parseFloat($row.find('[name="tds_per_input[]"]').val()) || 0,
-        tds_amt: parseFloat($row.find('[name="tds_amt[]"]').val()) || 0,
         net_amt: parseFloat($row.find('[name="net_amt_row[]"]').val()) || 0
       });
     });
@@ -900,15 +1013,15 @@ if ($last_date_yr < $curr_date_new) {
   // =============================================
   // FORM SUBMIT
   // =============================================
-  $('#main_save_form').on('submit', function(e) {
+  $('#main_save_form').on('submit', function (e) {
     e.preventDefault();
-    let form_mode       = $('#form_mode').val();
+    let form_mode = $('#form_mode').val();
     let required_fields = get_required_fields('main_save_form');
-    let validated       = validate_fields(required_fields);
+    let validated = validate_fields(required_fields);
     if (validated === false) return;
 
     let jsonPayload = buildFormJSON();
-    var form_data   = new FormData(this);
+    var form_data = new FormData(this);
     form_data.append('<?= $this->security->get_csrf_token_name(); ?>', $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val());
     form_data.append('form_json', JSON.stringify(jsonPayload));
     if (form_mode == 'edit') { form_data.append('update_id', $('#update_id').val()); }
@@ -918,11 +1031,11 @@ if ($last_date_yr < $curr_date_new) {
       method: "POST", dataType: "JSON", data: form_data,
       contentType: false, cache: false, processData: false,
       beforeSend: function () { $('button[type=submit]').attr('disabled', true); },
-      complete:   function () { $('button[type=submit]').attr('disabled', false); },
-      success: function(response) {
+      complete: function () { $('button[type=submit]').attr('disabled', false); },
+      success: function (response) {
         if (response.success == true) {
           alert_float('success', response.message);
-          setTimeout(function(){ ResetForm(); }, 2000);
+          setTimeout(function () { ResetForm(); }, 2000);
         } else {
           alert_float('warning', response.message);
         }
@@ -933,7 +1046,7 @@ if ($last_date_yr < $curr_date_new) {
   // =============================================
   // MANDI LIST (Modal)
   // =============================================
-  $('#filter_list_form').on('submit', function(e) {
+  $('#filter_list_form').on('submit', function (e) {
     e.preventDefault();
     $('#searchBtn').prop('disabled', true);
     $('#table_ListModal_body').html('<tr><td colspan="9" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
@@ -945,28 +1058,28 @@ if ($last_date_yr < $curr_date_new) {
         from_date: $('#from_date').val(), to_date: $('#to_date').val(),
         '<?= $this->security->get_csrf_token_name(); ?>': $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
       },
-      success: function(response) {
+      success: function (response) {
         $('#searchBtn').prop('disabled', false);
         $('#fetchProgress').css('width', '100%');
-        setTimeout(function(){ $('#fetchProgress').css('width', '0%'); }, 500);
+        setTimeout(function () { $('#fetchProgress').css('width', '0%'); }, 500);
 
         if (!response.success || !response.data || response.data.length === 0) {
           $('#table_ListModal_body').html('<tr><td colspan="9" class="text-center text-muted">No records found.</td></tr>');
           return;
         }
         var html = '';
-        $.each(response.data, function(i, row) {
+        $.each(response.data, function (i, row) {
           var orderDate = row.OrderDate ? moment(row.OrderDate).format('DD/MM/YYYY') : '-';
           var transDate = row.TransDate ? moment(row.TransDate).format('DD/MM/YYYY') : '-';
-          var finalAmt  = row.FinalAmt  ? parseFloat(row.FinalAmt).toFixed(2) : '0.00';
+          var finalAmt = row.FinalAmt ? parseFloat(row.FinalAmt).toFixed(2) : '0.00';
           html += `<tr class="get_Details" style="cursor:pointer;" onclick="getMandiRecord(${row.id}, '${row.OrderID}', this)">
-            <td>${i+1}</td><td>${row.OrderID||'-'}</td><td>${orderDate}</td><td>${transDate}</td>
-            <td>${row.CenterLocation||'-'}</td><td>${row.WarehouseID||'-'}</td><td>${row.ItemID||'-'}</td>
-            <td>${row.VehicleNo||'-'}</td><td class="text-right">${finalAmt}</td></tr>`;
+                  <td>${i + 1}</td><td>${row.OrderID || '-'}</td><td>${orderDate}</td><td>${transDate}</td>
+                  <td>${row.CenterLocation || '-'}</td><td>${row.WarehouseID || '-'}</td><td>${row.ItemID || '-'}</td>
+                  <td>${row.VehicleNo || '-'}</td><td class="text-right">${finalAmt}</td></tr>`;
         });
         $('#table_ListModal_body').html(html);
       },
-      error: function() {
+      error: function () {
         $('#searchBtn').prop('disabled', false);
         $('#table_ListModal_body').html('<tr><td colspan="9" class="text-center text-danger">Error loading data.</td></tr>');
       }
@@ -990,14 +1103,14 @@ if ($last_date_yr < $curr_date_new) {
         id: id, order_id: orderId,
         '<?= $this->security->get_csrf_token_name(); ?>': $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
       },
-      complete: function() {
+      complete: function () {
         if ($row) $row.removeClass('processing');
         // Hide loading overlay after complete
         $('#autoLoadOverlay').hide();
       },
-      success: function(response) {
+      success: function (response) {
         if (response.status && response.data && response.data.length > 0) {
-          var d  = response.data[0];
+          var d = response.data[0];
           var d1 = response.data1 || [];
 
           ResetForm(true);
@@ -1012,12 +1125,6 @@ if ($last_date_yr < $curr_date_new) {
           if (d.TransDate) $('#inwards_date').val(moment(d.TransDate).format('DD/MM/YYYY'));
           if (d.VehicleNo) $('#vehicle_no').val(d.VehicleNo);
 
-          // TDS Code + rate auto-fill
-          if (d.TDSCode) {
-            $('#tds_code').val(d.TDSCode);
-            $('#tds_code').selectpicker('refresh');
-            onTdsCodeChange(d.TDSCode);
-          }
 
           // Item ID
           if (d.ItemID) {
@@ -1036,10 +1143,10 @@ if ($last_date_yr < $curr_date_new) {
                 location_id: d.CenterLocation,
                 '<?= $this->security->get_csrf_token_name(); ?>': $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
               },
-              success: function(gRes) {
+              success: function (gRes) {
                 if (gRes.success && gRes.data.length > 0) {
                   var gHtml = '<option value="">None selected</option>';
-                  $.each(gRes.data, function(i, v) { gHtml += '<option value="' + v.id + '">' + v.GodownName + '</option>'; });
+                  $.each(gRes.data, function (i, v) { gHtml += '<option value="' + v.id + '">' + v.GodownName + '</option>'; });
                   $('#godown_id').selectpicker('destroy');
                   $('#godown_id').html(gHtml);
                   $('#godown_id').selectpicker();
@@ -1052,9 +1159,6 @@ if ($last_date_yr < $curr_date_new) {
           // Items table from data1
           if (d1.length > 0) {
             var first = d1[0];
-            var firstTdsPer = parseFloat(first.Gross || 0) > 0
-              ? ((parseFloat(first.HistoryTDSAmt || 0) / parseFloat(first.Gross)) * 100).toFixed(2)
-              : 0;
 
             $('#vendor_id').val(first.VendorID || '');
             refreshSelectpickers();
@@ -1066,48 +1170,40 @@ if ($last_date_yr < $curr_date_new) {
             $('#rate_quintal').val(first.RatePerQuintal || '');
             $('#brokerage').val(first.Brokerage || '');
             $('#market_levy').val(first.MarketLevy || '');
-            $('#tds_per_input').val(firstTdsPer);
-            $('#tds_per_header').val(firstTdsPer);
             $('#qty_quintal').val(parseFloat(first.QtyQuintal || 0).toFixed(4));
             $('#value').val(parseFloat(first.Value || 0).toFixed(2));
             $('#round_off').val(parseFloat(first.RoundOff || 0).toFixed(2));
             $('#gross').val(parseFloat(first.Gross || 0).toFixed(2));
-            $('#tds_amt').val(parseFloat(first.HistoryTDSAmt || 0).toFixed(2));
             $('#net_amt_row').val(parseFloat(first.NetAmt || 0).toFixed(2));
 
             var vendorOptions = $('#vendor_id').html();
 
             for (var i = 1; i < d1.length; i++) {
-              (function(item) {
+              (function (item) {
                 var row_id = parseInt($('#row_id').val()) + 1;
                 $('#row_id').val(row_id);
-                var tdsPer = parseFloat(item.Gross || 0) > 0
-                  ? ((parseFloat(item.HistoryTDSAmt || 0) / parseFloat(item.Gross)) * 100).toFixed(2)
-                  : 0;
 
                 $('#items_body').append(`
-                  <tr>
-                    <td><input type="text" name="doc_no[]" id="doc_no${row_id}" class="form-control" placeholder="Doc No." value="${item.DocumentNo || ''}"></td>
-                    <td>
-                      <input type="hidden" name="item_uid[]" id="item_uid${row_id}" value="${item.id || 0}">
-                      <select id="vendor_id${row_id}" name="vendor_id[]" class="form-control dynamic_item selectpicker" data-live-search="true" data-container="body" onchange="getItemDetails(this.value, '${row_id}');">${vendorOptions}</select>
-                    </td>
-                    <td><input type="text" name="payment_term[]" id="payment_term${row_id}" class="form-control" placeholder="Payment Term" readonly value="${item.PaymentTerm || ''}"></td>
-                    <td><input type="tel" name="bag[]" id="bag${row_id}" class="form-control bag" min="0" step="1" placeholder="Bag" value="${item.BagQty || ''}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="weight_per_bag[]" id="weight_per_bag${row_id}" class="form-control weight-per-bag" min="0" step="0.01" placeholder="Wt./Bag (kg)" value="${item.WeightPerBag || ''}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="loose_kg[]" id="loose_kg${row_id}" class="form-control loose-kg" min="0" step="0.01" placeholder="Loose (kg)" value="${item.LooseKG || ''}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="qty_quintal[]" id="qty_quintal${row_id}" class="form-control qty-quintal" placeholder="Qty (Qtl)" readonly tabindex="-1" value="${parseFloat(item.QtyQuintal || 0).toFixed(4)}"></td>
-                    <td><input type="tel" name="rate_quintal[]" id="rate_quintal${row_id}" class="form-control rate-quintal" min="0" step="0.01" placeholder="Rate/Qtl" value="${item.RatePerQuintal || ''}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="value[]" id="value${row_id}" class="form-control row-value" placeholder="Value" readonly tabindex="-1" value="${parseFloat(item.Value || 0).toFixed(2)}"></td>
-                    <td><input type="tel" name="brokerage[]" id="brokerage${row_id}" class="form-control row-brokerage" min="0" step="0.01" placeholder="Brokerage" value="${item.Brokerage || ''}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="market_levy[]" id="market_levy${row_id}" class="form-control row-market-levy" min="0" step="0.01" placeholder="Market Levy" value="${item.MarketLevy || ''}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="round_off[]" id="round_off${row_id}" class="form-control row-round-off" placeholder="Round Off" readonly tabindex="-1" value="${parseFloat(item.RoundOff || 0).toFixed(2)}"></td>
-                    <td><input type="tel" name="gross[]" id="gross${row_id}" class="form-control row-gross" placeholder="Gross" readonly tabindex="-1" value="${parseFloat(item.Gross || 0).toFixed(2)}"></td>
-                    <td><input type="tel" name="tds_per_input[]" id="tds_per_input${row_id}" class="form-control row-tds-per" min="0" step="0.01" placeholder="TDS %" value="${tdsPer}" oninput="calculateAmount(${row_id})"></td>
-                    <td><input type="tel" name="tds_amt[]" id="tds_amt${row_id}" class="form-control row-tds" placeholder="TDS Amt" readonly tabindex="-1" value="${parseFloat(item.HistoryTDSAmt || 0).toFixed(2)}"></td>
-                    <td><input type="tel" name="net_amt_row[]" id="net_amt_row${row_id}" class="form-control row-net-amt" placeholder="Net Amt" readonly tabindex="-1" value="${parseFloat(item.NetAmt || 0).toFixed(2)}"></td>
-                    <td><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove(); calculateTotals();" style="padding:2px 6px;"><i class="fa fa-xmark"></i></button></td>
-                  </tr>`);
+                        <tr>
+                          <td><input type="text" name="doc_no[]" id="doc_no${row_id}" class="form-control" placeholder="Doc No." value="${item.DocumentNo || ''}"></td>
+                          <td>
+                            <input type="hidden" name="item_uid[]" id="item_uid${row_id}" value="${item.id || 0}">
+                            <select id="vendor_id${row_id}" name="vendor_id[]" class="dynamic_item selectpicker" data-live-search="true" data-container="body" onchange="getItemDetails(this.value, '${row_id}');">${vendorOptions}</select>
+                          </td>
+                          <td style="display: none;"><input type="text" name="payment_term[]" id="payment_term${row_id}" class="form-control" placeholder="Payment Term" readonly value="${item.PaymentTerm || ''}" style="display: none;"></td>
+                          <td><input type="tel" name="bag[]" id="bag${row_id}" class="form-control bag" min="0" step="1" placeholder="Bag" value="${item.BagQty || ''}" oninput="calculateAmount(${row_id})"></td>
+                          <td><input type="tel" name="weight_per_bag[]" id="weight_per_bag${row_id}" class="form-control weight-per-bag" min="0" step="0.01" placeholder="Wt./Bag (kg)" value="${item.WeightPerBag || ''}" oninput="calculateAmount(${row_id})"></td>
+                          <td><input type="tel" name="loose_kg[]" id="loose_kg${row_id}" class="form-control loose-kg" min="0" step="0.01" placeholder="Loose" value="${item.LooseKG || ''}" oninput="calculateAmount(${row_id})"></td>
+                          <td><input type="tel" name="qty_quintal[]" id="qty_quintal${row_id}" class="form-control qty-quintal" placeholder="Qty"  tabindex="-1" value="${parseFloat(item.QtyQuintal || 0).toFixed(4)}" readonly></td>
+                          <td><input type="tel" name="rate_quintal[]" id="rate_quintal${row_id}" class="form-control rate-quintal" min="0" step="0.01" placeholder="Rate" value="${item.RatePerQuintal || ''}" oninput="calculateAmount(${row_id})"></td>
+                          <td><input type="tel" name="value[]" id="value${row_id}" class="form-control row-value" placeholder="Value" readonly tabindex="-1" value="${parseFloat(item.Value || 0).toFixed(2)}"></td>
+                          <td><input type="tel" name="brokerage[]" id="brokerage${row_id}" class="form-control row-brokerage" min="0" step="0.01" placeholder="Brokerage" value="${item.Brokerage || ''}" oninput="calculateAmount(${row_id})"></td>
+                          <td><input type="tel" name="market_levy[]" id="market_levy${row_id}" class="form-control row-market-levy" min="0" step="0.01" placeholder="Market Levy" value="${item.MarketLevy || ''}" oninput="calculateAmount(${row_id})"></td>
+                          <td><input type="tel" name="round_off[]" id="round_off${row_id}" class="form-control row-round-off" placeholder="Round Off" readonly tabindex="-1" value="${parseFloat(item.RoundOff || 0).toFixed(2)}"></td>
+                          <td style="display: none;"><input type="tel" name="gross[]" id="gross${row_id}" class="form-control row-gross" placeholder="Gross" readonly tabindex="-1" value="${parseFloat(item.Gross || 0).toFixed(2)}"></td>
+                          <td><input type="tel" name="net_amt_row[]" id="net_amt_row${row_id}" class="form-control row-net-amt" placeholder="Net Amt" readonly tabindex="-1" value="${parseFloat(item.NetAmt || 0).toFixed(2)}"></td>
+                          <td><button type="button" class="btn btn-danger btn-sm" onclick="$(this).closest('tr').remove(); calculateTotals();" style="padding:2px 6px;"><i class="fa fa-xmark"></i></button></td>
+                        </tr>`);
 
                 $('#vendor_id' + row_id).selectpicker({ container: 'body', liveSearch: true });
                 $('#vendor_id' + row_id).val(item.VendorID || '');
@@ -1116,7 +1212,7 @@ if ($last_date_yr < $curr_date_new) {
             }
           }
 
-          setTimeout(function(){ calculateTotals(); }, 400);
+          setTimeout(function () { calculateTotals(); }, 400);
           refreshSelectpickers();
           alert_float('success', 'Record loaded: ' + orderId);
 
@@ -1124,7 +1220,7 @@ if ($last_date_yr < $curr_date_new) {
           alert_float('warning', response.message || 'Record not found.');
         }
       },
-      error: function() {
+      error: function () {
         $('#autoLoadOverlay').hide();
         alert_float('warning', 'Error loading record. Please try again.');
       }
@@ -1132,7 +1228,7 @@ if ($last_date_yr < $curr_date_new) {
   }
 
   // AUTO LOAD LIST MODAL
-  $('#ListModal').on('shown.bs.modal', function() { $('#filter_list_form').submit(); });
+  $('#ListModal').on('shown.bs.modal', function () { $('#filter_list_form').submit(); });
 
   // =============================================
   // GODOWN BY LOCATION
@@ -1147,10 +1243,10 @@ if ($last_date_yr < $curr_date_new) {
         location_id: location_id,
         '<?= $this->security->get_csrf_token_name(); ?>': $('input[name="<?= $this->security->get_csrf_token_name(); ?>"]').val()
       },
-      success: function(response) {
+      success: function (response) {
         if (response.success == true && response.data.length > 0) {
           var html = '<option value="">None selected</option>';
-          $.each(response.data, function(index, val) { html += '<option value="' + val.id + '">' + val.GodownName + '</option>'; });
+          $.each(response.data, function (index, val) { html += '<option value="' + val.id + '">' + val.GodownName + '</option>'; });
           $('#godown_id').selectpicker('destroy');
           $('#godown_id').html(html);
           $('#godown_id').selectpicker();
@@ -1161,7 +1257,7 @@ if ($last_date_yr < $curr_date_new) {
           if (response.success == false) { alert_float('warning', response.message); }
         }
       },
-      error: function() { $('#godown_id').html('<option value="">None selected</option>'); refreshSelectpickers(); }
+      error: function () { $('#godown_id').html('<option value="">None selected</option>'); refreshSelectpickers(); }
     });
   }
 
@@ -1198,8 +1294,8 @@ if ($last_date_yr < $curr_date_new) {
   document.getElementById('vehicle_no').addEventListener('input', function () { this.value = this.value.toUpperCase(); });
   document.getElementById('vehicle_no').addEventListener('blur', function () {
     var vehicleNo = this.value.trim();
-    var pattern   = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/;
-    var oldError  = document.getElementById('vehicle_no_error');
+    var pattern = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/;
+    var oldError = document.getElementById('vehicle_no_error');
     if (oldError) oldError.remove();
     if (vehicleNo !== '' && !pattern.test(vehicleNo)) {
       var error = document.createElement('span');
@@ -1207,5 +1303,57 @@ if ($last_date_yr < $curr_date_new) {
       error.innerText = 'Invalid format! Use: MH12DF1234';
       this.parentNode.appendChild(error); this.style.borderColor = 'red';
     } else { this.style.borderColor = ''; }
+  });
+
+
+  // =============================================
+  // CHECK HEADER FIELDS - VENDOR ENABLE/DISABLE
+  // =============================================
+  function checkHeaderFields() {
+    var purchase_order = $('#purchase_order').val();
+    var inwards_date = $('#inwards_date').val();
+    var location_id = $('#location_id').val();
+    var godown_id = $('#godown_id').val();
+    var item_id = $('#item_id_header').val();
+    var vehicle_no = $('#vehicle_no').val();
+
+    var allFilled = !!(
+      purchase_order &&
+      inwards_date &&
+      location_id &&
+      godown_id &&
+      item_id &&
+      vehicle_no
+    );
+
+    // ✅ Header vendor
+    $('#vendor_id').prop('disabled', !allFilled);
+    if (!allFilled) $('#vendor_id').val('');
+    $('#vendor_id').selectpicker('refresh');
+
+    // ✅ Dynamic rows - selectpicker destroy → enable/disable → re-init
+    $('#items_body tr').each(function () {
+      var $sel = $(this).find('select[name="vendor_id[]"]');
+      var selId = $sel.attr('id');
+
+      $sel.selectpicker('destroy');
+      $sel.prop('disabled', !allFilled);
+      if (!allFilled) $sel.val('');
+      $('#' + selId).selectpicker({ container: 'body', liveSearch: true });
+      $('#' + selId).selectpicker('refresh');
+    });
+  }
+
+
+  $(document).ready(function () {
+
+    // On change/input check
+    $('#purchase_order, #inwards_date, #location_id, #godown_id, #item_id_header, #vehicle_no')
+      .on('change input', function () {
+        checkHeaderFields();
+      });
+
+    // Initial call
+    checkHeaderFields();
   });
 </script>

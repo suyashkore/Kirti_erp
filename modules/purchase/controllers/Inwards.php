@@ -285,23 +285,23 @@ class Inwards extends AdminController
 	}
 
 	private function validateStage($GateINID, $currentStage){
-		$gateStatus = $this->Inwards_model->getData('GateMaster','status',['GateINID'=>$GateINID])['status'] ?? 0;
+		// $gateStatus = $this->Inwards_model->getData('GateMaster','status',['GateINID'=>$GateINID])['status'] ?? 0;
 
-		// Cannot skip stage
-		if($currentStage > ($gateStatus + 1)){
-			return [
-				'success'=>false,
-				'message'=>'Previous stage not completed.'
-			];
-		}
+		// // Cannot skip stage
+		// if($currentStage > ($gateStatus + 1)){
+		// 	return [
+		// 		'success'=>false,
+		// 		'message'=>'Previous stage not completed.'
+		// 	];
+		// }
 
-		// Cannot go back
-		if($currentStage < $gateStatus){
-			return [
-				'success'=>false,
-				'message'=>'Cannot modify previous stage.'
-			];
-		}
+		// // Cannot go back
+		// if($currentStage < $gateStatus){
+		// 	return [
+		// 		'success'=>false,
+		// 		'message'=>'Cannot modify previous stage.'
+		// 	];
+		// }
 
 		return ['success'=>true];
 	}

@@ -79,7 +79,7 @@ class Quotation extends AdminController
 		foreach ($field_names as $key => $value) {
 			if(!is_array($data[$value])) $data[$value] = trim($data[$value]);
 		}
-		$required_fields = ['item_type', 'item_category', 'quotation_no', 'quotation_date', 'purchase_location', 'vendor_id', 'vendor_location', 'broker_id', 'payment_terms', 'freight_terms'];
+		$required_fields = ['item_type', 'item_category', 'quotation_no', 'quotation_date', 'purchase_location', 'vendor_id', 'vendor_location', 'payment_terms', 'freight_terms'];
 		
 		foreach ($required_fields as $key => $value) {
 			if (empty($data[$value])) {
@@ -233,8 +233,8 @@ class Quotation extends AdminController
 			$details = $this->Quotation_model->getQuoteDetails($result);
 		} else {
 			if (!has_permission_new('PurchaseQuotation', '', 'edit')) { access_denied('Access Denied'); }
-			$result = $this->Quotation_model->updateData('PurchQuotationMaster', $insertData, ['id' => $update_id]);
-			$details = $this->Quotation_model->getQuoteDetails($update_id);
+			$result = $this->Quotation_model->updateData('PurchQuotationMaster', $insertData, ['QuotatioonID' => $quotation_no]);
+			$details = $this->Quotation_model->getQuoteDetails($quotation_no);
 		}
 		if ($result) {
 			$multi_insert_data = [
@@ -275,8 +275,27 @@ class Quotation extends AdminController
 	}
 
 	public function GetQuotationDetails(){
-		$id = $this->input->post('id');
-		$data = $this->Quotation_model->getQuoteDetails($id);
+		$quotation_no = $this->input->post('quotation_no');
+// 		 echo"";print_r($id);die();
+
+		$data = $this->Quotation_model->getQuoteDetails($quotation_no);
+		if($data){
+			echo json_encode([
+				'success' => true,
+				'data' => $data
+			]);
+		}else{
+			echo json_encode([
+				'success' => false,
+				'message' => 'No data found'
+			]);
+		}
+	}
+		public function GetQuotationDetailsitem(){
+		$quotation_no = $this->input->post('id');
+// 		 echo"";print_r($id);die();
+
+		$data = $this->Quotation_model->GetQuotationDetailsitem($quotation_no);
 		if($data){
 			echo json_encode([
 				'success' => true,
@@ -296,7 +315,9 @@ class Quotation extends AdminController
 	public function List(){
 		if (!has_permission_new('PurchaseQuotationList', '', 'view')) { access_denied('Access Denied'); }
 		$data['title'] = 'Quotation List';
-    $data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
+        $data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
+    	$data['purchaselocation'] = $this->purchase_model->get_purchase_location();
+        // 		echo"";print_r($data['purchaselocation']);die();
 
     $selected_company = $this->session->userdata('root_company');
     $data['company_detail'] = $this->Quotation_model->get_company_detail($selected_company);
@@ -310,6 +331,8 @@ class Quotation extends AdminController
       
       $limit  = $data['limit'] ?? 100;
       $offset = $data['offset'] ?? 0;
+      $data['filter_location_id'] = $data['filter_location_id'] ?? '';
+
       if($data['from_date']){
         $data['from_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['from_date']))).' 00:00:00';
       }else{
@@ -549,5 +572,99 @@ class Quotation extends AdminController
         redirect(admin_url('purchase/Quotation/List'));
     }
 	}
+
+
+public function printquotationPdf($quotation_no)
+	{
+		$id = '';
+		if (!$quotation_no) {
+			redirect(admin_url('admin/Quotation/QuotationAddEdit'));
+		}
+
+		if (!has_permission_new('QuotationAddEdit', '', 'view')) {
+			access_denied('Invoices');
+		}
+		$invoice = [];
+		$data  = $this->Quotation_model->getQuoteDetails($quotation_no);
+		
+		
+		// invoice data + history array madhe ghala
+		$invoice = [
+			'data'  => $data   // was 'invoice'
+		];
+		try {
+			$pdf = Quotation_pdf($invoice);
+		} catch (Exception $e) {
+			$message = $e->getMessage();
+			echo $message;
+			if (strpos($message, 'Unable to get the size of the image') !== false) {
+				show_pdf_unable_to_get_image_size_error();
+			}
+			die;
+		}
+
+		$type = 'I';
+
+		if ($this->input->get('output_type')) {
+			$type = $this->input->get('output_type');
+		}
+
+		if ($this->input->get('print')) {
+			$type = 'I';
+		}
+
+		$pdf->Output(mb_strtoupper(slug_it($quotation_no)) . '-MandiPurchaseOrder.pdf', $type);
+	}
+	
+
+	// ========================================
+// Quotation Controller madhe ha method add kara
+// File: application/controllers/purchase/Quotation.php
+// ========================================
+ 
+public function cancelQuotation()
+{
+    if (!$this->input->is_ajax_request()) {
+        show_404();
+    }
+ 
+    $quotation_id = $this->input->post('quotation_id');
+ 
+    if (empty($quotation_id)) {
+        echo json_encode(['success' => false, 'message' => 'Quotation ID is required.']);
+        return;
+    }
+ 
+    $result = $this->Quotation_model->cancelQuotation($quotation_id);
+ 
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Quotation cancelled successfully.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to cancel quotation. Please try again.']);
+    }
+}
+
+
+public function partiallyCompleteQuotation()
+{
+    if (!$this->input->is_ajax_request()) {
+        show_404();
+    }
+ 
+    $quotation_id = $this->input->post('quotation_id');
+ 
+    if (empty($quotation_id)) {
+        echo json_encode(['success' => false, 'message' => 'Quotation ID is required.']);
+        return;
+    }
+ 
+    $result = $this->Quotation_model->partiallyCompleteQuotation($quotation_id);
+ 
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Quotation cancelled successfully.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to cancel quotation. Please try again.']);
+    }
+}
 
 }

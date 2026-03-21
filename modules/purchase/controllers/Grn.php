@@ -15,7 +15,7 @@ class Grn extends AdminController
     public function index()
     {
         $this->load->model('Quotation_model');
-        $data['vendor_list']      = $this->Quotation_model->getVendorDropdown();
+        // $data['vendor_list']      = $this->Quotation_model->getVendorDropdown();
         $data['purchaselocation'] = $this->purchase_model->get_purchase_location();
         $data['transporters']     = $this->Grn_model->get_transporter_name();
         $data['vehicle_owner']    = $this->Grn_model->get_vehicle_owner();
@@ -496,4 +496,45 @@ class Grn extends AdminController
 
         return '';
     }
+    
+    
+    /**
+ * GET VENDOR LIST BY PURCHASE LOCATION
+ * URL: purchase/Grn/GetVendorByLocation
+ */
+public function GetVendorByLocation()
+{
+    // Only POST allow
+    if ($this->input->server('REQUEST_METHOD') !== 'POST') {
+        show_404();
+        return;
+    }
+
+    $location_id = $this->input->post('location_id', TRUE);
+
+    if (empty($location_id)) {
+        echo json_encode([
+            'status'  => 'error',
+            'message' => 'Location ID is required',
+            'data'    => []
+        ]);
+        return;
+    }
+
+    // Model call
+    $data = $this->Grn_model->getVendorsByLocation($location_id);
+
+    if (!empty($data)) {
+        echo json_encode([
+            'status' => 'success',
+            'data'   => $data
+        ]);
+    } else {
+        echo json_encode([
+            'status'  => 'success',
+            'message' => 'No vendors found for this location',
+            'data'    => []
+        ]);
+    }
+}
 }

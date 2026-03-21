@@ -10,6 +10,55 @@ class SalesQuotation extends AdminController
 	}
 
 	/* =========================
+	* View Sales Quotation Print
+	* ========================= */
+
+	public function SalesQuotationPrint($OrderID)
+	{
+		if (!has_permission_new('salesQuotation', '', 'print')) {
+			access_denied('Access Denied');
+		}
+
+		if (!$OrderID) {
+			redirect($this->load->view('admin/SalesQuotation/SalesQuotationAddEdit'));
+		}
+
+		if (!has_permission_new('CashOrderList', '', 'view')) {
+			access_denied('Invoices');
+		}
+		$invoice = [];
+		$invoice1  = $this->SalesQuotation_model->GetSalesQuotationDetailsForPdf($OrderID);
+		$history  = $this->SalesQuotation_model->get_order_data($OrderID);
+
+		$invoice = [
+			'invoice' => $invoice1,
+			'history' => $history
+		];
+		try {
+			$pdf = SalesQuotation_pdf($invoice);
+		} catch (Exception $e) {
+			$message = $e->getMessage();
+			echo $message;
+			if (strpos($message, 'Unable to get the size of the image') !== false) {
+				show_pdf_unable_to_get_image_size_error();
+			}
+			die;
+		}
+
+		$type = 'I';
+
+		if ($this->input->get('output_type')) {
+			$type = $this->input->get('output_type');
+		}
+
+		if ($this->input->get('print')) {
+			$type = 'I';
+		}
+
+		$pdf->Output(mb_strtoupper(slug_it($OrderID)) . '-InwardSlip.pdf', $type);
+	}
+
+	/* =========================
 		* ADD / EDIT PAGE
 		* ========================= */
 	public function index()
@@ -17,7 +66,7 @@ class SalesQuotation extends AdminController
 		if (!has_permission_new('salesQuotation', '', 'view')) {
 			access_denied('Access Denied');
 		}
-		$data['title'] = 'Quotation Master';
+		$data['title'] = 'Sales Quotation';
 		$data['item_type'] = $this->SalesQuotation_model->getDropdown('ItemTypeMaster', 'id, ItemTypeName', ['isActive' => 'Y'], 'id', 'ASC');
 		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
 		$data['FreightTerms'] = $this->SalesQuotation_model->get_freight_terms();
@@ -26,7 +75,6 @@ class SalesQuotation extends AdminController
 
 		$selected_company = $this->session->userdata('root_company');
 		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
-
 
 		$this->load->view('admin/SalesQuotation/SalesQuotationAddEdit', $data);
 	}
@@ -73,6 +121,37 @@ class SalesQuotation extends AdminController
 			return;
 		}
 
+		// =============================================
+		// LOCK VALIDATION — block update if Status = 5
+		// =============================================
+		$form_mode_raw    = $this->input->post('form_mode') ?? 'add';
+		$quotation_no_raw = trim($this->input->post('quotation_no') ?? '');
+		$update_id_raw    = trim($this->input->post('update_id') ?? '');
+
+		// form_mode may also be empty if somehow disabled — fallback: if update_id is
+		// present it must be an edit regardless of form_mode value
+		$is_edit = ($form_mode_raw === 'edit') || (!empty($update_id_raw));
+
+		if ($is_edit && !empty($quotation_no_raw)) {
+			$locked_status = $this->SalesQuotation_model->isQuotationLocked($quotation_no_raw);
+
+			if ($locked_status !== false) {
+				$status_messages = [
+					2 => 'This Quotation is locked because it has been Cancelled.',
+					5 => 'This Quotation is locked because it is Complete (all quantities are sold out).',
+					7 => 'This Quotation is locked because it has been marked as Partially Complete.',
+				];
+				echo json_encode([
+					'success' => false,
+					'message' => $status_messages[$locked_status] ?? 'This Quotation is locked and cannot be updated.',
+				]);
+				return;
+			}
+		}
+		// =============================================
+		// End Lock Validation
+		// =============================================
+
 		$PlantID = $this->session->userdata('root_company');
 		$UserID = $this->session->userdata('username');
 		$FY = $this->session->userdata('finacial_year');
@@ -97,7 +176,7 @@ class SalesQuotation extends AdminController
 		$item_category = $data['item_category'] ?? '';
 		$quotation_no = $data['quotation_no'] ?? '';
 		if ($data['quotation_date']) {
-			$quotation_date = date('Y-m-d', strtotime(str_replace('/', '-', $data['quotation_date'])));
+			$quotation_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $data['quotation_date'])));
 		} else {
 			$quotation_date = date('Y-m-d');
 		}
@@ -149,15 +228,14 @@ class SalesQuotation extends AdminController
 		// Financial Year Date Validation
 		// =============================================
 		$FY_int      = (int) $FY;
-		$fy_start    = '20' . str_pad($FY_int, 2, '0', STR_PAD_LEFT) . '-04-01';          // e.g. 2024-04-01
-		$fy_end      = '20' . str_pad($FY_int + 1, 2, '0', STR_PAD_LEFT) . '-03-31';      // e.g. 2025-03-31
+		$fy_start    = '20' . str_pad($FY_int, 2, '0', STR_PAD_LEFT) . '-04-01';
+		$fy_end      = '20' . str_pad($FY_int + 1, 2, '0', STR_PAD_LEFT) . '-03-31';
 
-		$today       = date('Y-m-d');
-		// Max allowed for order/delivery_from: lesser of today or FY end
+		$today        = date('Y-m-d');
 		$max_txn_date = ($fy_end < $today) ? $fy_end : $today;
 
-		// --- order_date check ---
-		if ($quotation_date < $fy_start || $quotation_date > $max_txn_date) {
+		$quotation_date_only = date('Y-m-d', strtotime($quotation_date));
+		if ($quotation_date_only < $fy_start || $quotation_date_only > $max_txn_date) {
 			echo json_encode([
 				'success' => false,
 				'message' => 'Quotation Date (' . date('d/m/Y', strtotime($quotation_date)) . ') is outside the allowed financial year range ('
@@ -166,7 +244,6 @@ class SalesQuotation extends AdminController
 			return;
 		}
 
-		// --- delivery_from check ---
 		if ($delivery_from < $fy_start || $delivery_from > $max_txn_date) {
 			echo json_encode([
 				'success' => false,
@@ -176,7 +253,6 @@ class SalesQuotation extends AdminController
 			return;
 		}
 
-		// --- delivery_to check (allows up to FY end for future scheduling) ---
 		if ($delivery_to < $fy_start || $delivery_to > $fy_end) {
 			echo json_encode([
 				'success' => false,
@@ -186,7 +262,6 @@ class SalesQuotation extends AdminController
 			return;
 		}
 
-		// --- delivery_to must not be before delivery_from ---
 		if ($delivery_to < $delivery_from) {
 			echo json_encode([
 				'success' => false,
@@ -197,6 +272,8 @@ class SalesQuotation extends AdminController
 		// =============================================
 		// End of Date Validation
 		// =============================================
+
+		
 
 		$insertData = [
 			'PlantID' => $PlantID,
@@ -231,6 +308,7 @@ class SalesQuotation extends AdminController
 				access_denied('Access Denied');
 			}
 			$insertData['TransDate2'] = date('Y-m-d H:i:s');
+			$insertData['Status'] = 4;
 			$result = $this->SalesQuotation_model->saveData('SalesQuotationMaster', $insertData);
 			$details = $this->SalesQuotation_model->getQuoteDetails($result);
 		} else {
@@ -315,7 +393,7 @@ class SalesQuotation extends AdminController
 	{
 		$data['title'] = 'Sales Quotation List';
 		$data['customer_list'] = $this->SalesQuotation_model->getCustomerDropdown();
-
+		$data['saleslocation'] = $this->SalesQuotation_model->get_sales_location();
 		$selected_company = $this->session->userdata('root_company');
 		$data['company_detail'] = $this->SalesQuotation_model->get_company_detail($selected_company);
 
@@ -323,63 +401,70 @@ class SalesQuotation extends AdminController
 	}
 
 	public function ListFilter()
-{
-    $from_date   = $this->input->post('from_date');
-    $to_date     = $this->input->post('to_date');
-    $customer_id = $this->input->post('customer_id');
-    $broker_id   = $this->input->post('broker_id');
-    $status      = $this->input->post('status');
-    $offset      = (int)$this->input->post('offset');
-    $limit       = (int)$this->input->post('limit') ?: 100;
-	
-    // $this->db->select('q.*,c.billing_state , c.company as customer_name,b.billing_state as broker_state, b.company as broker_name,  IFNULL(som.so_total_weight,0) as so_total_weight');
-    // $this->db->from(db_prefix() . 'SalesQuotationMaster q');
-   $this->db->select('q.*, c.billing_state, c.company as customer_name, 
-    IFNULL(b.billing_state, \'\') as broker_state, 
-    IFNULL(b.company, \'\') as broker_name,  
-    IFNULL(som.so_total_weight, 0) as so_total_weight');
-$this->db->from(db_prefix() . 'SalesQuotationMaster q');
-$this->db->join('tblclients c', 'c.AccountID = q.AccountID', 'left');
-$this->db->join('tblclients b', 
-    'TRIM(b.AccountID) = TRIM(q.BrokerID) AND q.BrokerID IS NOT NULL AND q.BrokerID != \'\'', 
-    'left');
-	$this->db->join(
-    '(SELECT QuotationID, SUM(TotalWeight) as so_total_weight 
-      FROM '.db_prefix().'SalesOrderMaster 
-      GROUP BY QuotationID
-    ) som',
-    'CONVERT(som.QuotationID USING utf8mb4) = CONVERT(q.QuotationID USING utf8mb4)',
-    'left'
-);
+	{
+		$from_date   = $this->input->post('from_date');
+		$to_date     = $this->input->post('to_date');
+		$customer_id = $this->input->post('customer_id');
+		$broker_id   = $this->input->post('broker_id');
+		$sales_location = $this->input->post('SalesLocation');
+		$status      = $this->input->post('status');
+		$offset      = (int)$this->input->post('offset');
+		$limit       = (int)$this->input->post('limit') ?: 100;
 
-    if ($from_date) {
-        $this->db->where('DATE(q.TransDate) >=', date('Y-m-d', strtotime(str_replace('/', '-', $from_date))));
-    }
-    if ($to_date) {
-        $this->db->where('DATE(q.TransDate) <=', date('Y-m-d', strtotime(str_replace('/', '-', $to_date))));
-    }
-    if ($customer_id) {
-        $this->db->where('q.AccountID', $customer_id);
-    }
-    if ($broker_id) {
-        $this->db->where('q.BrokerID', $broker_id);
-    }
+		
 
-    if ($status !== false && $status !== null && strlen($status) > 0) {
-        $this->db->where('q.Status', (int)$status);
-    }
+		$this->db->select('q.*,pld.LocationName as SalesLocationName, c.billing_state, c.company as customer_name, 
+		    IFNULL(b.billing_state, \'\') as broker_state, 
+		    IFNULL(b.company, \'\') as broker_name,  
+		    IFNULL(som.so_total_weight, 0) as so_total_weight,
+			IFNULL(som.so_total_qty, 0) as so_total_qty');
+		$this->db->from(db_prefix() . 'SalesQuotationMaster q');
+		$this->db->join('tblclients c', 'c.AccountID = q.AccountID', 'left');
+		$this->db->join('tblclients b',
+		    'TRIM(b.AccountID) = TRIM(q.BrokerID) AND q.BrokerID IS NOT NULL AND q.BrokerID != \'\'',
+		    'left');
+		$this->db->join(
+		    '(SELECT QuotationID, SUM(TotalWeight) as so_total_weight, SUM(TotalQuantity) as so_total_qty
+		      FROM ' . db_prefix() . 'SalesOrderMaster 
+		      GROUP BY QuotationID
+		    ) som',
+		    'CONVERT(som.QuotationID USING utf8mb4) = CONVERT(q.QuotationID USING utf8mb4)',
+		    'left'
+		);
 
-    $total = $this->db->count_all_results('', false);
+		$this->db->join('tblPlantLocationDetails pld', 'pld.id = q.SalesLocation', 'left');
 
-    $this->db->limit($limit, $offset);
-    $rows = $this->db->get()->result_array();
+		if ($from_date) {
+			$this->db->where('DATE(q.TransDate) >=', date('Y-m-d', strtotime(str_replace('/', '-', $from_date))));
+		}
+		if ($to_date) {
+			$this->db->where('DATE(q.TransDate) <=', date('Y-m-d', strtotime(str_replace('/', '-', $to_date))));
+		}
+		if ($customer_id) {
+			$this->db->where('q.AccountID', $customer_id);
+		}
+		if ($broker_id) {
+			$this->db->where('q.BrokerID', $broker_id);
+		}
+		if ($sales_location) {
+			$this->db->where('q.SalesLocation', $sales_location);
+		}
+		if ($status !== false && $status !== null && strlen($status) > 0) {
+			$this->db->where('q.Status', (int)$status);
+		}
 
-    if (!empty($rows)) {
-        echo json_encode(['success' => true, 'total' => $total, 'rows' => $rows]);
-    } else {
-        echo json_encode(['success' => false, 'total' => 0, 'rows' => []]);
-    }
-}
+		$total = $this->db->count_all_results('', false);
+
+		$this->db->limit($limit, $offset);
+		$this->db->order_by('q.TransDate', 'DESC');
+		$rows = $this->db->get()->result_array();
+
+		if (!empty($rows)) {
+		    echo json_encode(['success' => true, 'total' => $total, 'rows' => $rows]);
+		} else {
+		    echo json_encode(['success' => false, 'total' => 0, 'rows' => []]);
+		}
+	}
 
 	public function ListExportExcel()
 	{
@@ -404,7 +489,7 @@ $this->db->join('tblclients b',
 		$header = [
 			'Quotation Code'  => 'string',
 			'Quotation Date'  => 'string',
-			'Customer Name'     => 'string',
+			'Customer Name'   => 'string',
 			'Broker Name'     => 'string',
 			'Quotation Weight' => 'string',
 			'Quotation Amount' => 'string',
@@ -417,15 +502,12 @@ $this->db->join('tblclients b',
 		$selected_company = $this->session->userdata('root_company');
 		$company_detail   = $this->SalesQuotation_model->get_company_detail($selected_company);
 
-		// ===== COMPANY NAME ROW =====
 		$writer->markMergedCell($sheetName, 0, 0, 0, 12);
 		$writer->writeSheetRow($sheetName, [$company_detail->company_name]);
 
-		// ===== COMPANY ADDRESS ROW =====
 		$writer->markMergedCell($sheetName, 1, 0, 1, 12);
 		$writer->writeSheetRow($sheetName, [$company_detail->address]);
 
-		// ===== FILTER ROW =====
 		$reportedBy = "Filtered By : ";
 		$from_date  = $post['from_date'] ?? date('Y-m-01');
 		$to_date    = $post['to_date'] ?? date('Y-m-d');
@@ -436,21 +518,17 @@ $this->db->join('tblclients b',
 		if ($from_date != '') {
 			$reportedBy .= 'From Date : ' . $from_date . ', ';
 		}
-
 		if ($to_date != '') {
 			$reportedBy .= 'To Date : ' . $to_date . ', ';
 		}
-
 		if ($customer_id != '') {
 			$reportedBy .= 'Customer : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $customer_id])['company'] ?? '') . ', ';
 		}
-
 		if ($broker_id != '') {
 			$reportedBy .= 'Broker : ' . ($this->SalesQuotation_model->getData('clients', 'company', ['AccountID' => $broker_id])['company'] ?? '') . ', ';
 		}
-
 		if ($status != '') {
-			$status_list = [1 => 'Pending', 2 => 'Cancel', 3 => 'Expired', 4 => 'Approved', 5 => 'Inprogress', 6 => 'Complete', 7 => 'Partially Complete'];
+			$status_list = [1 => 'Pending', 2 => 'Cancel', 3 => 'Expired', 4 => 'Approved', 5 => 'Complete', 6 => 'In Progress', 7 => 'Partially Complete'];
 			$reportedBy .= 'Status : ' . ($status_list[$status] ?? '') . ', ';
 		}
 
@@ -458,10 +536,8 @@ $this->db->join('tblclients b',
 		$writer->writeSheetRow($sheetName, [$reportedBy]);
 		$writer->writeSheetRow($sheetName, []);
 
-		// ===== HEADER ROW =====
 		$writer->writeSheetRow($sheetName, array_keys($header));
 
-		// ===== CHUNK FETCH START =====
 		$limit = 100;
 		$offset = 0;
 
@@ -481,7 +557,6 @@ $this->db->join('tblclients b',
 					$row['NetAmt'] ?? '',
 					'',
 					$row['Status'] ?? '',
-
 				]);
 			}
 
@@ -489,7 +564,6 @@ $this->db->join('tblclients b',
 			unset($result);
 		}
 
-		// ===== SAVE FILE =====
 		$filename = 'QuotationList_' . date('YmdHis') . '.xlsx';
 		$filepath = FCPATH . 'uploads/exports/' . $filename;
 
@@ -508,7 +582,7 @@ $this->db->join('tblclients b',
 	function GetCustomDropdownList()
 	{
 		if ($this->input->post()) {
-			$parent_id 		= $this->input->post('parent_id');
+			$parent_id    = $this->input->post('parent_id');
 			$parent_value = $this->input->post('parent_value');
 			$child_id     = $this->input->post('child_id');
 
@@ -556,6 +630,58 @@ $this->db->join('tblclients b',
 				'message' => 'Invalid request'
 			]);
 			die;
+		}
+	}
+
+	/* =========================
+	 * CANCEL QUOTATION
+	 * Status 1 (Pending) or 4 (Approved) → set Status to 2 (Cancel)
+	 * ========================= */
+	public function cancelQuotation()
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+		}
+
+		$quotation_id = $this->input->post('quotation_id');
+
+		if (empty($quotation_id)) {
+			echo json_encode(['success' => false, 'message' => 'Quotation ID is required.']);
+			return;
+		}
+
+		$result = $this->SalesQuotation_model->cancelQuotation($quotation_id);
+
+		if ($result) {
+			echo json_encode(['success' => true, 'message' => 'Quotation cancelled successfully.']);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to cancel quotation. Please try again.']);
+		}
+	}
+
+	/* =========================
+	 * PARTIALLY COMPLETE QUOTATION
+	 * Status 6 (In Progress) → set Status to 7 (Partially Complete)
+	 * ========================= */
+	public function partiallyCompleteQuotation()
+	{
+		if (!$this->input->is_ajax_request()) {
+			show_404();
+		}
+
+		$quotation_id = $this->input->post('quotation_id');
+
+		if (empty($quotation_id)) {
+			echo json_encode(['success' => false, 'message' => 'Quotation ID is required.']);
+			return;
+		}
+
+		$result = $this->SalesQuotation_model->partiallyCompleteQuotation($quotation_id);
+
+		if ($result) {
+			echo json_encode(['success' => true, 'message' => 'Quotation marked as Partially Complete successfully.']);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to update quotation. Please try again.']);
 		}
 	}
 }

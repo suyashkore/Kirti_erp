@@ -8,6 +8,7 @@ class Orders extends AdminController
 		parent::__construct();
 		$this->load->model('Quotation_model');
 		$this->load->model('Orders_model');
+		$this->load->model('purchase_model');
 	}
 
 	/* =========================
@@ -30,6 +31,8 @@ class Orders extends AdminController
     $data['vendor_list'] = $this->Quotation_model->getVendorDropdown();
     $selected_company = $this->session->userdata('root_company');
     $data['company_detail'] = $this->Quotation_model->get_company_detail($selected_company);
+    $data['purchaselocation'] = $this->purchase_model->get_purchase_location();
+
 
 		$this->load->view('admin/Orders/OrdersList', $data);
 	}
@@ -40,6 +43,8 @@ class Orders extends AdminController
       
       $limit  = $data['limit'] ?? 100;
       $offset = $data['offset'] ?? 0;
+      $location  = $data['filter_purchase_location'];
+      
       if($data['from_date']){
         $data['from_date'] = date('Y-m-d', strtotime(str_replace('/', '-', $data['from_date'])));
       }else{

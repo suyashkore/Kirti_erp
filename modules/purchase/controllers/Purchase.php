@@ -530,7 +530,7 @@ class purchase extends AdminController
 
 		$this->load->model('purchase_model');
 
-
+// echo"<pre>";print_r($pur_order_data);die();/
 		$id = $this->purchase_model->add_pur_order_po($pur_order_data);
 
 		if ($id) {
@@ -17144,7 +17144,9 @@ class purchase extends AdminController
 
 		$from_date = $this->input->get_post('from_date');
 		$to_date   = $this->input->get_post('to_date');
-		$category  = $this->input->get_post('category'); // ✅ Category filter
+		$category  = $this->input->get_post('category'); 
+		$location  = $this->input->get_post('location');
+
 
 		$this->db->select(
 			db_prefix() . 'PurchaseOrderMaster.*,' .
@@ -17196,8 +17198,11 @@ class purchase extends AdminController
 		if (!empty($category)) {
 			$this->db->where(db_prefix() . 'PurchaseOrderMaster.ItemCategory', $category);
 		}
+			if (!empty($location)) {
+			$this->db->where(db_prefix() . 'PurchaseOrderMaster.PurchaseLocation', $location);
+		}
 
-		$this->db->order_by(db_prefix() . 'PurchaseOrderMaster.id', 'ASC');
+		$this->db->order_by(db_prefix() . 'PurchaseOrderMaster.id', 'DESC');
 
 		$result = $this->db->get()->result_array();
 

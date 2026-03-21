@@ -12,6 +12,54 @@ class StockTransfer extends AdminController
 	}
 
 	/* =========================
+	* Stock Transfer Print
+	* ========================= */
+	public function StockTransferPrint($TransferID)
+	{
+		if (!has_permission_new('StockTransfer', '', 'print')) {
+			access_denied('Access Denied');
+		}
+		if (!$TransferID) {
+			redirect($this->load->view('admin/StockTransfer/StockTransferAddEdit'));
+		}
+
+		if (!has_permission_new('CashOrderList', '', 'view')) {
+			access_denied('Invoices');
+		}
+		$invoice = [];
+		$invoice1  = $this->StockTransfer_model->GetStockTransferDetailsForPdf($TransferID);
+		$history  = $this->StockTransfer_model->get_order_data($TransferID);
+
+		$invoice = [
+			'invoice' => $invoice1,
+			'history' => $history
+		];
+		try {
+			$pdf = StockTransfer_pdf($invoice);
+		} catch (Exception $e) {
+			$message = $e->getMessage();
+			echo $message;
+			if (strpos($message, 'Unable to get the size of the image') !== false) {
+				show_pdf_unable_to_get_image_size_error();
+			}
+			die;
+		}
+
+		$type = 'I';
+
+		if ($this->input->get('output_type')) {
+			$type = $this->input->get('output_type');
+		}
+
+		if ($this->input->get('print')) {
+			$type = 'I';
+		}
+
+		$pdf->Output(mb_strtoupper(slug_it($TransferID)) . '-Invoice.pdf', $type);
+	}
+
+
+	/* =========================
 	* ADD / EDIT PAGE
 	* ========================= */
 	public function index()
